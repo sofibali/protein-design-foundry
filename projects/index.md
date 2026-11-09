@@ -16,7 +16,7 @@ found a limit has done its job.
   <td><strong><a href="{{ p.url | relative_url }}">{{ p.title }}</a></strong><br>
       <span class="muted">{{ p.summary }}</span></td>
   <td>{{ p.lead }}</td>
-  <td>{{ p.scale }}</td>
+  <td>{{ p.scale | default: "&mdash;" }}</td>
 </tr>
 {%- endfor -%}
 </tbody></table>

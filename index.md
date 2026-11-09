@@ -17,7 +17,7 @@ is useless to someone trying to work out whether their experiment will run here.
   <div class="card"><h3><a href="{{ '/projects/' | relative_url }}">Projects</a></h3>
     <p>Foundational test projects. Each is a claim about a capability.</p></div>
   <div class="card"><h3><a href="{{ '/decisions/' | relative_url }}">Decisions</a></h3>
-    <p>{{ site.data.decisions.decisions | where: "status", "open" | size }} still open, with owners.</p></div>
+    <p>{{ site.data.decisions.decisions | where: "status", "open" | size }} still open, and what each one blocks.</p></div>
   <div class="card"><h3><a href="{{ '/inventory/' | relative_url }}">Inventory</a></h3>
     <p>{{ site.data.instruments.instruments | where: "status", "quoted" | size }} instruments across {{ site.data.instruments.racs | size }} carts.</p></div>
 </div>

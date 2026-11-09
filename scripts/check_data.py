@@ -17,6 +17,7 @@ except ImportError:
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PROBLEMS = []
+NOTES = []
 
 STATUSES = {"open", "pending", "settled", "dropped"}
 PROJECT_STATUSES = {"proposed", "running", "blocked", "complete"}
@@ -25,6 +26,11 @@ INSTRUMENT_STATUSES = {"quoted", "phase2", "gap"}
 
 def fail(where, msg):
     PROBLEMS.append(f"{where}: {msg}")
+
+
+def note(where, msg):
+    """Worth seeing, but not worth failing a build over."""
+    NOTES.append(f"{where}: {msg}")
 
 
 def front_matter(path):
@@ -75,6 +81,8 @@ def main():
             fail(f"decision {d['id']}", f"{d['status']} but no date")
         if not d.get("why") and not d.get("answer"):
             fail(f"decision {d['id']}", "no why and no answer, so the table cell is blank")
+        if d["status"] == "open" and not d.get("owner"):
+            note(f"decision {d['id']}", "open with no owner, so it renders as unassigned")
 
     projects = sorted((ROOT / "_projects").glob("*.md"))
     if not projects:
@@ -96,6 +104,10 @@ def main():
 
     print(f"{len(keys)} instruments on {len(rac_ids)} carts, "
           f"{len(decisions['decisions'])} decisions, {len(projects)} projects")
+    if NOTES:
+        print(f"\n{len(NOTES)} note(s):")
+        for n in NOTES:
+            print("  -", n)
     if PROBLEMS:
         print(f"\n{len(PROBLEMS)} problem(s):")
         for p in PROBLEMS:

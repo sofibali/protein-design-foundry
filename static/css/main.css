@@ -44,7 +44,7 @@ td.num{white-space:nowrap;font-variant-numeric:tabular-nums}
 dl.facts{display:grid;grid-template-columns:auto 1fr;gap:.3rem 1rem;margin:1.2rem 0;font-size:.9rem}
 dl.facts dt{color:var(--ink2)}
 dl.facts dd{margin:0}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:1rem;margin:1.5rem 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:1rem;margin:1.5rem 0}
 .card{border:1px solid var(--line);border-radius:8px;padding:.9rem 1rem;background:var(--sunk)}
 .card h3{margin:0 0 .3rem}
 .card p{margin:0;font-size:.88rem;color:var(--ink2)}
@@ -53,4 +53,9 @@ dl.facts dd{margin:0}
   padding:.7rem .9rem;margin:1.2rem 0;font-size:.9rem;border-radius:0 6px 6px 0}
 .muted{color:var(--ink2);font-size:.85rem}
 ul.open li::marker{color:var(--open)}
-@media(max-width:34rem){table{font-size:.8rem}th,td{padding:.35rem}}
+@media(max-width:34rem){
+  table{font-size:.8rem}
+  th,td{padding:.35rem}
+  /* a five-column table cannot fit a phone; let it scroll rather than push the page wide */
+  table.wide{display:block;overflow-x:auto;min-width:100%}
+}

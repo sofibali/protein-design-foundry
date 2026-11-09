@@ -8,8 +8,8 @@
     <tr>
       <td>{% include status.html s=d.status %}</td>
       <td><strong>{{ d.title }}</strong></td>
-      <td>{{ d.owner }}</td>
-      <td class="num">{{ d.date }}</td>
+      <td>{{ d.owner | default: "<span class='muted'>unassigned</span>" }}</td>
+      <td class="num">{{ d.date | default: "&mdash;" }}</td>
       <td>{{ d.answer | default: d.why }}</td>
     </tr>
     {%- endfor -%}
