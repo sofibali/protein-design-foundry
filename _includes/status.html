@@ -1,0 +1,13 @@
+{%- case include.s -%}
+{%- when 'open' -%}<span class="pill open">open</span>
+{%- when 'pending' -%}<span class="pill pending">pending</span>
+{%- when 'settled' -%}<span class="pill settled">settled</span>
+{%- when 'dropped' -%}<span class="pill dropped">dropped</span>
+{%- when 'running' -%}<span class="pill settled">running</span>
+{%- when 'proposed' -%}<span class="pill pending">proposed</span>
+{%- when 'blocked' -%}<span class="pill open">blocked</span>
+{%- when 'complete' -%}<span class="pill settled">complete</span>
+{%- when 'gap' -%}<span class="pill open">gap</span>
+{%- when 'phase2' -%}<span class="pill pending">phase 2</span>
+{%- else -%}<span class="pill">{{ include.s }}</span>
+{%- endcase -%}

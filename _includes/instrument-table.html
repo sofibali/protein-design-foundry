@@ -1,0 +1,16 @@
+{%- assign live = site.data.instruments.instruments | where: "status", "quoted" | sort: "rac" -%}
+<table class="wide">
+  <thead><tr><th>Cart</th><th>Function</th><th>Instrument</th><th>Vendor</th><th>Role</th></tr></thead>
+  <tbody>
+  {%- for i in live -%}
+    {%- assign r = site.data.instruments.racs | where: "id", i.rac | first -%}
+    <tr id="{{ i.key }}">
+      <td class="num">{{ i.rac }}</td>
+      <td>{{ r.name }}</td>
+      <td><strong>{{ i.name }}</strong></td>
+      <td>{{ i.vendor | default: "TBC" }}</td>
+      <td>{{ i.role }}{% if i.capacity %} <span class="muted">({{ i.capacity }})</span>{% endif %}</td>
+    </tr>
+  {%- endfor -%}
+  </tbody>
+</table>

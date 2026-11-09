@@ -1,0 +1,31 @@
+---
+layout: default
+---
+<h1>{{ page.title }}</h1>
+<p class="standfirst">{{ page.summary }}</p>
+
+<dl class="facts">
+  <dt>Status</dt><dd>{% include status.html s=page.status %}</dd>
+  <dt>Lead</dt><dd>{{ page.lead }}</dd>
+  {% if page.scale %}<dt>Scale</dt><dd>{{ page.scale }}</dd>{% endif %}
+  {% if page.exercises %}
+  <dt>Instruments</dt>
+  <dd>{% for k in page.exercises %}{% assign i = site.data.instruments.instruments | where: "key", k | first %}
+    {% if i %}<a href="{{ '/inventory/' | relative_url }}#{{ i.key }}">{{ i.name }}</a>{% unless forloop.last %}, {% endunless %}{% endif %}
+  {% endfor %}</dd>
+  {% endif %}
+</dl>
+
+{% if page.tests %}
+<h2>What it tests</h2>
+<ul>{% for t in page.tests %}<li>{{ t }}</li>{% endfor %}</ul>
+{% endif %}
+
+{{ content }}
+
+{% if page.open %}
+<h2>Still unsolved</h2>
+<ul class="open">{% for o in page.open %}<li>{{ o }}</li>{% endfor %}</ul>
+{% endif %}
+
+<p class="muted"><a href="{{ '/projects/' | relative_url }}">All projects</a></p>

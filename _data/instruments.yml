@@ -1,0 +1,234 @@
+# Foundry instrument inventory -- single source of truth.
+#
+# NO PRICES IN THIS FILE. This repository is intended to become public, and
+# the vendor proposal it would be drawn from is confidential. Cost data lives
+# in the sibling private repo (apd-foundry-internal/data/budget.yaml).
+#
+# Every page that shows an instrument table is generated from here by
+# scripts/build_tables.py. Change a fact once, rebuild, and every page agrees.
+#
+# status:  quoted      -- on the current proposal
+#          phase2      -- identified for a later expansion
+#          gap         -- a capability we need and have not specified
+# vendor:  TBC means genuinely not yet confirmed, not "look it up later"
+
+racs:
+  - id: 1
+    name: Sealing and de-sealing
+  - id: 2
+    name: Thermal cycling
+  - id: 3
+    name: Liquid handling, 96-channel
+  - id: 4
+    name: Liquid handling, variable span
+  - id: 5
+    name: Ambient store
+  - id: 6
+    name: Cold store
+  - id: 7
+    name: Warm store
+  - id: 8
+    name: Shaking incubator
+  - id: 9
+    name: Acoustic dispense
+  - id: 10
+    name: Bulk dispense
+  - id: 11
+    name: Positive-displacement handling
+  - id: 12
+    name: Centrifugation
+  - id: 13
+    name: Plate reading
+  - id: 14
+    name: Consumable store
+  - id: 15
+    name: Lidding
+
+instruments:
+  - key: plateloc
+    name: PlateLoc Thermal Microplate Sealer
+    vendor: Agilent
+    rac: 1
+    status: quoted
+    role: Heat sealing. Gas-permeable seals for culture, clear peelable for crystallography.
+    note: >-
+      Thermal sealer, 130-180 C for 1-3 s. Whether a crystallisation plate that
+      already holds drops can survive that is an open question.
+
+  - key: xpeel
+    name: XPeel Automated Plate Seal Remover
+    vendor: Azenta
+    rac: 1
+    status: quoted
+    role: De-sealing between steps.
+
+  - key: atc
+    name: Automated thermal cyclers, 4 units
+    vendor: TBC
+    rac: 2
+    status: quoted
+    role: PCR and Golden Gate in 384; heat lysis and melts in 96.
+    note: >-
+      Three 96-block and one 384-block in a single cart. We have asked whether
+      swapping one 96 for a second 384 is price-neutral.
+
+  - key: bravo
+    name: Bravo liquid handler, 96-channel head
+    vendor: Agilent
+    rac: 3
+    status: quoted
+    role: All plate-to-plate transfers. The throughput ceiling for most workflows.
+    note: >-
+      Deck carries a magnet and two temperature-controlled orbital shakers at
+      4 C and 42 C. The 42 C block is what makes heat-shock transformation possible.
+
+  - key: lynx
+    name: Lynx LM900 VVP
+    vendor: Dynamic Devices
+    rac: 4
+    status: quoted
+    role: Variable-span handling and concentration normalisation.
+    note: >-
+      1 uL minimum, 2 uL at 2% CV. VVP 2.0 reaches 1 uL and ships at SLAS in
+      late January at no price difference, so the upgrade path should be in writing.
+
+  - key: ambistore
+    name: AmbiStore D
+    vendor: LiCONiC
+    rac: 5
+    status: quoted
+    role: Controlled ambient store. Crystallography trays, bulk reagents, plates in flight.
+    capacity: 216 standard + 50 deep-well
+    note: Setpoint and stability (+/- C) still unconfirmed.
+
+  - key: steristore_cold
+    name: SteriStore D, 4 C
+    vendor: LiCONiC
+    rac: 6
+    status: quoted
+    role: DNA and detection reagents; grown blocks and transformation outgrowth.
+    capacity: 216 standard + 50 deep-well
+
+  - key: steristore_warm
+    name: SteriStore D, 37 C
+    vendor: LiCONiC
+    rac: 7
+    status: quoted
+    role: Assay-plate incubation, cell-free reactions, static non-shaking culture.
+    capacity: 288 standard + 20 deep-well
+
+  - key: cytomat
+    name: Cytomat 2 C-LiN
+    vendor: Thermo Fisher
+    rac: 8
+    status: quoted
+    role: All shaking E. coli growth. The hard cap on in vivo expression.
+    capacity: 14 deep-well
+    note: >-
+      The quoted 1-2 mm orbit is a mammalian spec. Deep-well E. coli needs
+      25 mm at 100-350 rpm, which means the Selector variant.
+
+  - key: echo
+    name: Echo acoustic liquid handler, 6XX series
+    vendor: Beckman Coulter Labcyte
+    rac: 9
+    status: quoted
+    role: Nanolitre dispensing. Assay setup, crystallography drops, fragment soaking.
+    note: >-
+      The proposal line reads Echo 525, but DMSO handling and 1536 format require
+      a 6XX. Model choice between 650 and 655 is open, on speed grounds.
+
+  - key: multiflo
+    name: MultiFlo bulk dispenser
+    vendor: Agilent
+    rac: 10
+    status: quoted
+    role: Bulk reagent addition.
+    note: Minimum dispense volume into 1536 not yet confirmed.
+
+  - key: magniflex
+    name: Magniflex
+    vendor: Tecan (to confirm)
+    rac: 11
+    status: quoted
+    role: Not yet established.
+    note: >-
+      Probably a Cavro Magni Flex, an OEM framework at 2/4/8 channels, which would
+      overlap the Lynx rather than the Bravo. No protocol we have written uses it.
+      Whether its pump is positive-displacement decides whether RoboColumns are possible.
+
+  - key: hig3
+    name: HiG 3 automated centrifuge
+    vendor: BioNex Solutions
+    rac: 12
+    status: quoted
+    role: Cell harvest, plate clarification, filter-plate spins.
+    note: Reaches 5,000 g. Not refrigerated.
+
+  - key: pherastar
+    name: PHERAstar FSX
+    vendor: BMG Labtech
+    rac: 13
+    status: quoted
+    role: >-
+      Every readout. Fluorescence intensity and polarisation, luminescence, BRET,
+      absorbance 220-1000 nm, HTRF, AlphaScreen.
+    note: >-
+      Measures every detection method from 6- through 3456-well format, so HTRF
+      and AlphaScreen at 1536 are both available.
+
+  - key: microserve
+    name: MicroServe
+    vendor: TBC
+    rac: 14
+    status: quoted
+    role: Tip and consumable store. All tip boxes live here.
+
+  - key: a4s
+    name: a4S automated lidder
+    vendor: Azenta
+    rac: 15
+    status: quoted
+    role: Lidding and de-lidding. Agar plates, and filter plus carrier plate combinations too tall for the sealer.
+
+  # ---- phase 2 and gaps -------------------------------------------------
+
+  - key: imager
+    name: Crystallisation plate imager
+    vendor: TBC
+    rac: null
+    status: phase2
+    role: Scheduled imaging of crystallisation trays.
+    note: >-
+      The largest single automation win available. A campaign of 80 trays at
+      7 timepoints is 560 imaging events, which is roughly 37 h of human time
+      against 9 h of robot time.
+
+  - key: second_ambistore
+    name: Second ambient store
+    vendor: LiCONiC
+    rac: null
+    status: phase2
+    role: Crystallography tray capacity beyond 150 positions.
+
+  - key: prep_purification
+    name: Purification at milligram scale
+    vendor: null
+    rac: null
+    status: gap
+    role: Protein for crystallography.
+    note: >-
+      Magnetic-bead purification gives micrograms. There is no size-exclusion step
+      and no concentrator on the system, so crystallography-grade protein is made
+      off-system for now.
+
+  - key: drop_setter
+    name: Dedicated crystallisation drop setter
+    vendor: null
+    rac: null
+    status: gap
+    role: Sitting-drop setting independent of acoustic fluid classes.
+    note: >-
+      Acoustic drop setting is published but needs a validated fluid class per
+      condition, and viscous precipitants fall outside them. The obvious
+      alternative has no drop-setting API, so it would be a custom integration.

@@ -1,0 +1,137 @@
+# Open and settled decisions for the foundry build.
+#
+# This is the file that makes the site worth visiting. Anyone deciding whether
+# to run work here needs to know what is settled and what is still moving.
+#
+# status:  open      -- no answer yet, and it blocks something
+#          pending   -- answer expected, owner named
+#          settled   -- decided; keep it, with the date and the reason
+#          dropped   -- considered and rejected; keep it so nobody re-opens it
+#
+# Keep `why` short enough to read in one breath. The long version goes in a
+# page under docs/decisions/ and is linked with `detail`.
+
+decisions:
+  - id: 1
+    title: Stacker allocation across the three stores
+    status: settled
+    date: 2026-11-03
+    owner: UCSF
+    answer: 720 standard and 134 deep-well positions.
+    why: >-
+      Ambient 9+5, cold 9+5, warm 12+2, shaking 0+2. Gives 2.0x headroom over a
+      peak demand of 360 standard-equivalent, and 50 deep-well in the ambient
+      store covers crystallography bulk. Two of the three units land close to
+      half and half, which is what the vendor suggested anyway.
+
+  - id: 2
+    title: Echo model, 650 or 655
+    status: pending
+    owner: Vendor
+    why: >-
+      Both meet the 6XX requirement for DMSO and 1536. The difference is
+      dispense speed, and we do not yet have numbers for our plate types.
+
+  - id: 3
+    title: Transformation and plating in scope
+    status: settled
+    date: 2026-11-03
+    answer: In. Colony picking stays out.
+    why: >-
+      Keeps the in vivo expression route open and gives the 42 C deck shaker a
+      purpose. Agar plates follow, which is what the lidder is for.
+
+  - id: 4
+    title: What reads a plate if we plate but do not pick
+    status: open
+    why: >-
+      With no colony picker, nothing returns a clone from agar to liquid. Either
+      plating is for titre and QC only, or identity comes from pooled sequencing.
+
+  - id: 5
+    title: Arraying a designed library to one variant per well
+    status: open
+    why: >-
+      The genuinely unsolved step in the binder pipeline. Without picking, well
+      position does not carry identity, so either we accept pooled libraries with
+      amplicon sequencing to deconvolute, or we add a picker.
+
+  - id: 6
+    title: Has E. coli heat shock ever run on one of these systems
+    status: open
+    owner: Vendor
+    why: >-
+      Yeast is validated, E. coli is not. We need the achieved CV on the 45 s
+      pulse and a transformation efficiency per well against the bench.
+
+  - id: 7
+    title: Shaking orbit for deep-well E. coli growth
+    status: open
+    why: >-
+      The quoted incubator is 1-2 mm, which is a mammalian spec. Deep-well E. coli
+      needs 25 mm at 100-350 rpm or cultures do not aerate.
+
+  - id: 8
+    title: What the Magniflex is and what it is for
+    status: open
+    owner: Vendor
+    why: >-
+      No protocol we have written uses it. If it is positive-displacement it
+      unlocks RoboColumns; if it is air it overlaps the variable-span handler.
+
+  - id: 9
+    title: Milligram-scale purification for crystallography
+    status: open
+    why: >-
+      Bead purification gives micrograms. No size exclusion and no concentrator
+      on the system, so this stays off-system until someone specifies a route.
+
+  - id: 10
+    title: Refrigerated centrifuge
+    status: dropped
+    date: 2026-11-03
+    why: >-
+      Would need its own enclosure, a different vendor and true refrigeration.
+      Not worth it against what it buys.
+
+  - id: 11
+    title: Vacuum filtration on deck
+    status: dropped
+    date: 2026-11-03
+    why: >-
+      More work than it is worth to integrate. Filter tips first, otherwise spin
+      the filter plates in the centrifuge.
+
+  - id: 12
+    title: Syringe-head purification module on the liquid handler
+    status: dropped
+    date: 2026-11-03
+    why: >-
+      Not integratable as a second head, never tested by the vendor, and no
+      nickel cartridge exists for it in any case.
+
+  - id: 13
+    title: Clear seal for crystallography plates
+    status: open
+    owner: UCSF
+    why: >-
+      Crystals need to be visible through the seal. The sealer is thermal, and
+      whether a plate that already holds nanolitre drops survives a heat seal
+      has not been established.
+
+  - id: 14
+    title: Support tier
+    status: open
+    why: >-
+      The lower tier bills protocol work by the hour and the higher one includes
+      it, but the premium buys far more hours than our protocols need. The real
+      difference is that the lower tier carries no third-party instrument
+      support, and nearly every instrument on the system is third-party.
+
+  - id: 15
+    title: Minimum dispense volume into 1536
+    status: open
+    owner: Vendor
+    why: >-
+      Cell-free reactions at 2.5 uL in 1536 are the cheapest way to screen wide.
+      Whether the bulk dispenser can reach that volume decides the route.

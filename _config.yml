@@ -1,0 +1,40 @@
+name: "Automated Protein Design Foundry"
+description: "An automated protein design facility at UCSF Mission Bay."
+short_name: "APD Foundry"
+
+# TODO: set once the GitHub repo exists.
+url: ""
+
+plugins: [jekyll-sitemap]
+
+permalink: pretty
+markdown: kramdown
+kramdown:
+  parse_block_html: true
+
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name/
+
+defaults:
+  - scope: {path: "", type: "projects"}
+    values: {layout: "project"}
+  - scope: {path: ""}
+    values: {layout: "page"}
+
+nav:
+  - {title: "Capabilities", url: "/capabilities/"}
+  - {title: "Projects",     url: "/projects/"}
+  - {title: "Decisions",    url: "/decisions/"}
+  - {title: "Cost model",   url: "/budget/"}
+  - {title: "Inventory",    url: "/inventory/"}
+
+exclude:
+  - README.md
+  - scripts/
+  - .github/
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+  - .jekyll-cache/

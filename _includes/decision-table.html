@@ -1,0 +1,18 @@
+{%- assign order = "open,pending,settled,dropped" | split: "," -%}
+<table class="wide">
+  <thead><tr><th>Status</th><th>Decision</th><th>Owner</th><th>Date</th><th>Where it stands</th></tr></thead>
+  <tbody>
+  {%- for s in order -%}
+    {%- assign group = site.data.decisions.decisions | where: "status", s -%}
+    {%- for d in group -%}
+    <tr>
+      <td>{% include status.html s=d.status %}</td>
+      <td><strong>{{ d.title }}</strong></td>
+      <td>{{ d.owner }}</td>
+      <td class="num">{{ d.date }}</td>
+      <td>{{ d.answer | default: d.why }}</td>
+    </tr>
+    {%- endfor -%}
+  {%- endfor -%}
+  </tbody>
+</table>

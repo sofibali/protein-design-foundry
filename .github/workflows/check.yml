@@ -1,0 +1,18 @@
+name: Check data files
+
+# GitHub Pages builds the site itself, so this only checks what Jekyll cannot:
+# that every key in the data files and project front matter actually resolves.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install pyyaml
+      - run: python3 scripts/check_data.py
