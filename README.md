@@ -1,4 +1,4 @@
-# Automated Protein Design Foundry
+# Protein Design Foundry
 
 Public-facing documentation for an automated protein design facility at UCSF
 Mission Bay. Plain Jekyll on GitHub Pages, matching the stack the lab already
@@ -11,7 +11,7 @@ commercially confidential and must never be committed here, **including in a
 commit that is later reverted**, because git history keeps it.
 
 Priced line items, quotes and vendor correspondence live in the separate private
-repository `apd-foundry-internal`. The cost model page here gives the shape of
+repository `protein-design-foundry-internal`. The cost model page here gives the shape of
 the costs without the figures, which is the part that transfers to another
 institution anyway.
 

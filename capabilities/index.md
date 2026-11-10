@@ -15,7 +15,7 @@ vendor marketing, and the per-stage figures in that model are estimates.
 | In-cell expression | **51.5 h** | 1,344 cultures | 14 shaking deep-well positions |
 | Cell-free, 384-well | **11.7 h** | 57,600 reactions | reagent cost, then reader time |
 | Cell-free, 1536-well | **11.7 h** | 230,400 reactions | reagent cost, then reader time |
-| Crystallography screening | 11.5 h on-system | 216 ambient tray positions | tray positions, then imaging |
+| Crystallography screening | 11.5 h on-system | 150 tray positions | tray positions, then imaging |
 
 Of the 51.5 hours on the in-cell route, 20 are unattended overnight expression
 and **12 are magnetic-bead clean-up**, which is 23% of the run. If an assay

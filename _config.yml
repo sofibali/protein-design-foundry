@@ -1,9 +1,9 @@
-name: "Automated Protein Design Foundry"
+name: "Protein Design Foundry"
 description: "An automated protein design facility at UCSF Mission Bay."
-short_name: "APD Foundry"
+short_name: "Protein Design Foundry"
 
-# TODO: set once the GitHub repo exists.
-url: ""
+url: "https://sofibali.github.io"
+baseurl: "/protein-design-foundry"
 
 plugins: [jekyll-sitemap]
 

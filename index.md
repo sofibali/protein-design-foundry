@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Automated Protein Design Foundry
+title: Protein Design Foundry
 standfirst: An automated protein design facility at UCSF Mission Bay, built on fifteen enclosed robotic carts.
 ---
 

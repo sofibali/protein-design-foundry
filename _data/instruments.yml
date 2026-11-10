@@ -2,7 +2,7 @@
 #
 # NO PRICES IN THIS FILE. This repository is intended to become public, and
 # the vendor proposal it would be drawn from is confidential. Cost data lives
-# in the sibling private repo (apd-foundry-internal/data/budget.yaml).
+# in the sibling private repo (protein-design-foundry-internal/data/budget.yaml).
 #
 # Every page that shows an instrument table is generated from here by
 # scripts/build_tables.py. Change a fact once, rebuild, and every page agrees.
