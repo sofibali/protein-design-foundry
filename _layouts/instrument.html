@@ -1,0 +1,40 @@
+---
+layout: default
+---
+{%- assign i = site.data.instruments.instruments | where: "key", page.key | first -%}
+{%- assign r = site.data.instruments.racs | where: "id", i.rac | first -%}
+
+<h1>{{ i.name }}</h1>
+<p class="standfirst">{{ page.standfirst }}</p>
+
+<dl class="facts">
+  <dt>Vendor</dt><dd>{{ i.vendor | default: "TBC" }}</dd>
+  <dt>Cart</dt><dd>{{ i.rac }} &mdash; {{ r.name }}</dd>
+  <dt>Status</dt><dd>{% include status.html s=i.status %}</dd>
+  {% if i.capacity %}<dt>Capacity</dt><dd>{{ i.capacity }}</dd>{% endif %}
+</dl>
+
+<h2>Specification</h2>
+<table class="wide">
+  <tbody>
+  {%- for s in page.specs -%}
+    <tr><th scope="row">{{ s.label }}</th><td>{{ s.value }}</td></tr>
+  {%- endfor -%}
+  </tbody>
+</table>
+
+{{ content }}
+
+{% if page.unknown %}
+<h2>Not yet confirmed</h2>
+<ul class="open">{% for u in page.unknown %}<li>{{ u }}</li>{% endfor %}</ul>
+{% endif %}
+
+{%- assign k = page.key -%}
+{%- assign uses = site.projects | where_exp: "p", "p.exercises contains k" -%}
+{% if uses.size > 0 %}
+<h2>Used by</h2>
+<ul>{% for p in uses %}<li><a href="{{ p.url | relative_url }}">{{ p.title }}</a></li>{% endfor %}</ul>
+{% endif %}
+
+<p class="muted"><a href="{{ '/inventory/' | relative_url }}">All instruments</a></p>

@@ -102,8 +102,39 @@ def main():
         if len(body.strip()) < 200:
             fail(path.name, "almost no prose; a project page needs to say something")
 
+    sheets = sorted((ROOT / "_instruments").glob("*.md"))
+    documented = set()
+    for path in sheets:
+        fm, body = front_matter(path)
+        if fm is None:
+            continue
+        key = fm.get("key")
+        if key not in keys:
+            fail(path.name, f"key {key!r}, which is not in instruments.yml")
+            continue
+        if key in documented:
+            fail(path.name, f"second spec sheet for {key!r}")
+        documented.add(key)
+        if path.stem != key:
+            fail(path.name, f"filename does not match key {key!r}, so the URL will not")
+        if not fm.get("standfirst"):
+            fail(path.name, "no standfirst, so the page opens on a bare heading")
+        specs = fm.get("specs") or []
+        if len(specs) < 3:
+            fail(path.name, "fewer than three specs; this is a specification page")
+        for s in specs:
+            if not s.get("label") or s.get("value") in (None, ""):
+                fail(path.name, f"spec row with an empty side: {s!r}")
+        if len(body.strip()) < 400:
+            fail(path.name, "almost no prose; the table alone is a datasheet, not a page")
+
+    for i in instruments["instruments"]:
+        if i["status"] == "quoted" and i["key"] not in documented:
+            note(i["key"], "quoted instrument with no spec sheet")
+
     print(f"{len(keys)} instruments on {len(rac_ids)} carts, "
-          f"{len(decisions['decisions'])} decisions, {len(projects)} projects")
+          f"{len(decisions['decisions'])} decisions, {len(projects)} projects, "
+          f"{len(sheets)} spec sheets")
     if NOTES:
         print(f"\n{len(NOTES)} note(s):")
         for n in NOTES:

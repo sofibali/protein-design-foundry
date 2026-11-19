@@ -16,10 +16,15 @@ collections:
   projects:
     output: true
     permalink: /projects/:name/
+  instruments:
+    output: true
+    permalink: /inventory/:name/
 
 defaults:
   - scope: {path: "", type: "projects"}
     values: {layout: "project"}
+  - scope: {path: "", type: "instruments"}
+    values: {layout: "instrument"}
   - scope: {path: ""}
     values: {layout: "page"}
 

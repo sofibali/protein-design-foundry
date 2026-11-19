@@ -7,7 +7,8 @@
     <tr id="{{ i.key }}">
       <td class="num">{{ i.rac }}</td>
       <td>{{ r.name }}</td>
-      <td><strong>{{ i.name }}</strong></td>
+      {%- assign sheet = site.instruments | where: "key", i.key | first -%}
+      <td>{% if sheet %}<strong><a href="{{ sheet.url | relative_url }}">{{ i.name }}</a></strong>{% else %}<strong>{{ i.name }}</strong>{% endif %}</td>
       <td>{{ i.vendor | default: "TBC" }}</td>
       <td>{{ i.role }}{% if i.capacity %} <span class="muted">({{ i.capacity }})</span>{% endif %}</td>
     </tr>

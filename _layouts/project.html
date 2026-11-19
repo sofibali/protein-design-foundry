@@ -11,7 +11,9 @@ layout: default
   {% if page.exercises %}
   <dt>Instruments</dt>
   <dd>{% for k in page.exercises %}{% assign i = site.data.instruments.instruments | where: "key", k | first %}
-    {% if i %}<a href="{{ '/inventory/' | relative_url }}#{{ i.key }}">{{ i.name }}</a>{% unless forloop.last %}, {% endunless %}{% endif %}
+    {% if i %}{% assign sheet = site.instruments | where: "key", k | first %}
+      <a href="{% if sheet %}{{ sheet.url | relative_url }}{% else %}{{ '/inventory/' | relative_url }}#{{ i.key }}{% endif %}">{{ i.name }}</a>{% unless forloop.last %}, {% endunless %}
+    {% endif %}
   {% endfor %}</dd>
   {% endif %}
 </dl>
