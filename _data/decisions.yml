@@ -39,7 +39,7 @@ decisions:
     answer: In. Colony picking stays out.
     why: >-
       Keeps the in vivo expression route open and gives the 42 C deck shaker a
-      purpose. Agar plates follow, which is what the lidder is for.
+      purpose. Agar plates follow, and handling their lids is now decision 16.
 
   - id: 4
     title: What reads a plate if we plate but do not pick
@@ -73,11 +73,13 @@ decisions:
 
   - id: 8
     title: What the Magniflex is and what it is for
-    status: open
-    owner: Vendor
+    status: settled
+    date: 2026-11-17
+    answer: A Tecan Cavro Magni Flex, positive-displacement, 2 to 8 channels at 5-1,000 uL.
     why: >-
-      No protocol we have written uses it. If it is positive-displacement it
-      unlocks RoboColumns; if it is air it overlaps the variable-span handler.
+      Settled from vendor documentation rather than by asking. It moves the
+      glycerol-based enzyme master mixes the acoustic dispenser refuses. The
+      name misleads: it is not a magnet, and bead separation stays on the Bravo.
 
   - id: 9
     title: Milligram-scale purification for crystallography
@@ -130,8 +132,17 @@ decisions:
 
   - id: 15
     title: Minimum dispense volume into 1536
-    status: open
-    owner: Vendor
+    status: settled
+    date: 2026-11-17
+    answer: 1 uL per well, a full plate in 21 s.
     why: >-
-      Cell-free reactions at 2.5 uL in 1536 are the cheapest way to screen wide.
-      Whether the bulk dispenser can reach that volume decides the route.
+      Settled from vendor documentation. A 2.5 uL cell-free reaction sits well
+      inside that, so the 230,400-reaction route is open on the dispenser side.
+
+  - id: 16
+    title: What handles lids now the a4S is a sealer
+    status: open
+    why: >-
+      The a4S is a roll heat sealer, not a lidder, so nothing on the system
+      lifts a lid. Plating is in scope and agar plates carry lids, and filter
+      plus carrier stacks are too tall for either sealer.

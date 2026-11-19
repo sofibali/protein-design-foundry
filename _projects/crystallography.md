@@ -17,7 +17,7 @@ open:
 
 Crystallography drives more hardware decisions here than any other workflow:
 the ambient store's 9-to-5 stacker split, the acoustic dispenser model, the clear
-peelable seal, the lidding cart, the custom arm work for larger-volume dispensing
+peelable seal, the second sealer, the custom arm work for larger-volume dispensing
 and the whole phase-two imaging cart. It is also the least automated of them.
 
 It is where the acoustic dispenser does something no person can match, which is
@@ -62,7 +62,7 @@ integration.
 **Sealing.** The sealer is thermal. Whether a plate already holding 200 nL drops
 survives one to three seconds at 130–180 °C has not been established, and 200 nL
 has no thermal mass to speak of. If it does not, the system needs a cold film
-applicator, and the lidding cart is not one.
+applicator, and both sealers on the system are thermal.
 
 **Imaging.** There is no instrument. Every tray leaves the enclosure on a
 schedule, which is exactly the thing the automation was bought to stop.

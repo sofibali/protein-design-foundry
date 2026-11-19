@@ -4,8 +4,8 @@
 # the vendor proposal it would be drawn from is confidential. Cost data lives
 # in the sibling private repo (protein-design-foundry-internal/data/budget.yaml).
 #
-# Every page that shows an instrument table is generated from here by
-# scripts/build_tables.py. Change a fact once, rebuild, and every page agrees.
+# Every page that shows an instrument table renders from here in Liquid at
+# build time. Change a fact once and every page agrees.
 #
 # status:  quoted      -- on the current proposal
 #          phase2      -- identified for a later expansion
@@ -42,7 +42,7 @@ racs:
   - id: 14
     name: Consumable store
   - id: 15
-    name: Lidding
+    name: Roll sealing
 
 instruments:
   - key: plateloc
@@ -69,7 +69,8 @@ instruments:
     status: quoted
     role: PCR and Golden Gate in 384; heat lysis and melts in 96.
     note: >-
-      Three 96-block and one 384-block in a single cart. We have asked whether
+      Three 96-block and one 384-block in a single cart. The 384 block takes
+      5-20 uL per well and the 96 blocks 10-100 uL. We have asked whether
       swapping one 96 for a second 384 is price-neutral.
 
   - key: bravo
@@ -116,6 +117,9 @@ instruments:
     status: quoted
     role: Assay-plate incubation, cell-free reactions, static non-shaking culture.
     capacity: 288 standard + 20 deep-well
+    note: >-
+      Humidity control runs to 98% RH, which covers the wettest cell-free
+      systems without plates drying over a long incubation.
 
   - key: cytomat
     name: Cytomat 2 C-LiN
@@ -126,7 +130,9 @@ instruments:
     capacity: 14 deep-well
     note: >-
       The quoted 1-2 mm orbit is a mammalian spec. Deep-well E. coli needs
-      25 mm at 100-350 rpm, which means the Selector variant.
+      25 mm at 100-350 rpm, which means the Selector variant. Temperature is
+      not the constraint: the range reaches 50 C, so 30 C growth for yeast
+      needs no extra hardware. The orbit is the only open question.
 
   - key: echo
     name: Echo acoustic liquid handler, 6XX series
@@ -144,18 +150,21 @@ instruments:
     rac: 10
     status: quoted
     role: Bulk reagent addition.
-    note: Minimum dispense volume into 1536 not yet confirmed.
+    note: >-
+      Dispenses a full 1536 plate at 1 uL per well in 21 s, so a 2.5 uL
+      cell-free reaction is comfortably within range.
 
   - key: magniflex
-    name: Magniflex
-    vendor: Tecan (to confirm)
+    name: Cavro Magni Flex
+    vendor: Tecan
     rac: 11
     status: quoted
-    role: Not yet established.
+    role: >-
+      Positive-displacement transfer of viscous reagents, chiefly the
+      glycerol-based enzyme master mixes the acoustic dispenser refuses.
     note: >-
-      Probably a Cavro Magni Flex, an OEM framework at 2/4/8 channels, which would
-      overlap the Lynx rather than the Bravo. No protocol we have written uses it.
-      Whether its pump is positive-displacement decides whether RoboColumns are possible.
+      An OEM pipetting framework, 2 to 8 channels, 5-1,000 uL. It is not a
+      magnet despite the name, and bead separation stays on the Bravo deck.
 
   - key: hig3
     name: HiG 3 automated centrifuge
@@ -185,11 +194,17 @@ instruments:
     role: Tip and consumable store. All tip boxes live here.
 
   - key: a4s
-    name: a4S automated lidder
+    name: a4S automated roll heat sealer
     vendor: Azenta
     rac: 15
     status: quoted
-    role: Lidding and de-lidding. Agar plates, and filter plus carrier plate combinations too tall for the sealer.
+    role: >-
+      Second sealer, 100-195 C. Having two means a gas-permeable culture seal
+      and a foil PCR seal can both stay loaded, with no manual film change.
+    note: >-
+      This is a roll heat sealer, not a lidder. The system therefore has two
+      sealers and nothing that handles lids, which is a capability gap rather
+      than the solution it was first recorded as.
 
   # ---- phase 2 and gaps -------------------------------------------------
 
@@ -232,3 +247,15 @@ instruments:
       Acoustic drop setting is published but needs a validated fluid class per
       condition, and viscous precipitants fall outside them. The obvious
       alternative has no drop-setting API, so it would be a custom integration.
+
+  - key: lidder
+    name: Lidding and de-lidding
+    vendor: null
+    rac: null
+    status: gap
+    role: Handling lids on agar plates and over-tall plate stacks.
+    note: >-
+      Opened 2026-11-17, when the cart we had recorded as a lidder turned out to
+      be a second sealer. Plating is in scope and agar plates carry lids, so
+      something has to lift them. Filter plus carrier combinations are also too
+      tall for either sealer.
