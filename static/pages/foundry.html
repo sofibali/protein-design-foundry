@@ -129,25 +129,40 @@
   .kv .v{color:var(--muted);font-size:13px;line-height:1.45}
 
   /* ---- intake checks ---- */
-  .checks{display:grid;gap:8px;margin-top:4px}
-  .chk{border:1px solid var(--rule);border-radius:10px;padding:0}
-  .chk>summary{list-style:none;cursor:pointer;display:grid;
-       grid-template-columns:22px minmax(0,1fr) auto;gap:4px 11px;padding:11px 14px;align-items:start}
-  .chk>summary::-webkit-details-marker{display:none}
-  .chk .box{width:20px;height:20px;border:2px solid var(--rule);border-radius:5px;margin-top:1px;
-       display:grid;place-items:center;font-size:13px;color:#fff;transition:background .15s,border-color .15s}
-  .chk.on .box{background:#009E73;border-color:#009E73}
-  .chk .ask{font-size:14.5px;font-weight:500}
-  .chk .need{grid-column:2;color:var(--muted);font-size:13px}
-  .chk .more{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;
-       align-self:center;white-space:nowrap}
-  .chk .why{padding:0 14px 13px 47px;font-size:13px;color:var(--muted);max-width:70ch;line-height:1.5}
-  .chk[open] .more{opacity:.4}
-  .score{margin-top:12px;border:1px solid var(--rule);border-radius:10px;padding:13px 15px;
-       display:flex;gap:13px;align-items:baseline;flex-wrap:wrap}
-  .score .n{font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-  .score .lab{font-weight:500}
-  .score .say{color:var(--muted);font-size:13.5px;flex:1 1 320px;min-width:0}
+  /* The five broad questions. Numbered rather than ticked: there is no score
+     here and nothing to pass, which is the whole point of the change. */
+  .asks{display:grid;gap:9px;margin-top:4px}
+  .ask1{border:1px solid var(--rule);border-radius:10px;padding:0}
+  .ask1>summary{list-style:none;cursor:pointer;display:grid;
+       grid-template-columns:30px minmax(0,1fr) auto;gap:3px 13px;
+       align-items:baseline;padding:13px 15px}
+  .ask1>summary::-webkit-details-marker{display:none}
+  .ask1 .num{font-size:15px;color:var(--muted);font-variant-numeric:tabular-nums;
+       font-weight:600;letter-spacing:-.02em}
+  .ask1 .q{font-size:15px;font-weight:500;letter-spacing:-.01em}
+  .ask1 .sub{grid-column:2;color:var(--muted);font-size:13px}
+  .ask1 .more{font-size:11px;color:var(--muted);text-transform:uppercase;
+       letter-spacing:.07em}
+  .ask1[open] .more{opacity:.4}
+  .ask1>summary:hover .q{color:var(--accent,#0072B2)}
+  .ask1 .why{padding:0 15px 14px 58px;font-size:13px;color:var(--muted);
+       max-width:70ch;line-height:1.55}
+
+  /* The risk scale. Three levels, each one a sentence, with the project
+     styles that sit at that level named underneath. */
+  .levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:11px}
+  .lev{border:1px solid var(--rule);border-radius:10px;padding:12px 14px;
+       border-top:3px solid var(--rule)}
+  .lev h4{margin:0;font-size:13.5px;font-weight:600;letter-spacing:-.01em;
+       display:flex;align-items:baseline;gap:8px}
+  .lev h4 .c{margin-left:auto;font-size:11px;color:var(--muted);font-weight:400;
+       font-variant-numeric:tabular-nums}
+  .lev p{margin:7px 0 0;font-size:12.5px;color:var(--muted);line-height:1.5}
+  .lev .eg{margin-top:10px;display:grid;gap:5px}
+  .lev .eg b{font-size:12.5px;font-weight:500;color:var(--ink);display:block}
+  .lev .eg span{font-size:12px;color:var(--muted);line-height:1.45;display:block}
+  .lev .none{font-size:12px;color:var(--muted);font-style:italic;margin-top:10px}
+
   .aside{border-left:3px solid var(--rule);padding:2px 0 2px 14px;margin-top:18px;
          font-size:13px;line-height:1.52;color:var(--muted);max-width:72ch}
   .aside b{color:var(--ink);font-weight:500}
@@ -174,6 +189,7 @@
       <a href="workflows.html">Plan a campaign</a>
       <a href="blueprint.html">System blueprint</a>
       <a href="intake.html">Propose a campaign</a>
+      <a href="https://sofibali.github.io/protein-design-foundry/">Foundry site</a>
     </nav>
   </div>
 
@@ -202,8 +218,8 @@
 
   <section class="band" id="take">
     <div class="bandhead"><h2>Can the foundry take your project?</h2>
-      <span class="lede">What the exchange is, and the four things that have to hold before
-        a target is onboarded.</span></div>
+      <span class="lede">What the exchange is, and the five things we need to know about
+        the work itself.</span></div>
     <div class="twoup">
       <div><div class="kicker" id="pv-t"></div><div class="kv" id="pv"></div></div>
       <div><div class="kicker" id="rt-t"></div><div class="kv" id="rt"></div></div>
@@ -211,8 +227,11 @@
     <div class="kicker" style="margin-top:32px" id="ik-q"></div>
     <p style="color:var(--muted);font-size:13px;line-height:1.5;max-width:72ch;margin:0 0 12px"
        id="ik-note"></p>
-    <div class="checks" id="ik-checks"></div>
-    <div class="score" id="ik-score"></div>
+    <div class="asks" id="ik-asks"></div>
+    <div class="kicker" style="margin-top:30px" id="rs-t"></div>
+    <p style="color:var(--muted);font-size:13px;line-height:1.5;max-width:72ch;margin:0 0 12px"
+       id="rs-note"></p>
+    <div class="levels" id="rs"></div>
   </section>
 
   <div class="foot" id="foot"></div>
@@ -386,52 +405,62 @@ window.FOUNDRY = {
    ]
   }
  ],
- "intake": {
-  "question": "Can the foundry take your target?",
-  "note": "Four things have to hold. Each is the precondition of a decision the machine makes later, so a target missing one does not fail at intake for bureaucratic reasons - it fails months in, after the protein has been made. This is gate D0.",
-  "checks": [
+ "fit": {
+  "question": "What the foundry needs to know about your project",
+  "note": "None of this is a test and nothing here is scored. It is the one page the 19 November session set out to produce, asked as questions. The five project styles above are this same page already filled in, so if one of them is close to your project you can answer by pointing at it.",
+  "asks": [
    {
-    "id": "structure",
-    "ask": "Is there a structure of the domain you want targeted?",
-    "need": "An experimental structure, or a prediction at pLDDT 85 or better across the intended epitope.",
-    "why": "Design works from it, and so does the gate that checks where a binder actually landed."
+    "id": "problem",
+    "q": "What is the problem?",
+    "sub": "Not the protein - the problem.",
+    "why": "It is what decides whether a binder, a designed enzyme, a family screen or a structure is the answer. A project that starts from the reagent has usually picked the loop before asking which one fits, and the loop is the expensive part to get wrong."
    },
    {
-    "id": "hotspot",
-    "ask": "Can you name a hotspot residue that tolerates an alanine substitution?",
-    "need": "At least one, and the domain still has to fold without it.",
-    "why": "D6 asks whether a binder engages the face it was designed for, by mutating that residue and watching the signal drop. With no mutable hotspot that gate cannot run, and a binder that found a different face reaches the structure queue undetected."
+    "id": "areas",
+    "q": "Which proteins does it come down to?",
+    "sub": "A family, a set of paralogs, one domain.",
+    "why": "The one page calls these the protein areas to target. It is the step between a problem worth solving and something that fits in a plate, and it is usually where a broad problem becomes a campaign of a knowable size."
    },
    {
-    "id": "homolog",
-    "ask": "Is there a close homolog that can be expressed?",
-    "need": "One is enough. It goes on the plate beside the target.",
-    "why": "Selectivity is measured against it, on the same plate, at no extra cost."
+    "id": "strategy",
+    "q": "What is the strategy for targeting them?",
+    "sub": "Which of the loops this becomes, or a new one.",
+    "why": "Four loops run here. A strategy that is none of them is not a refusal, but it is a protocol-writing project before it is a campaign, and that is worth knowing at the start rather than in month three."
    },
    {
-    "id": "expression",
-    "ask": "Has this protein, or a close homolog, been expressed before?",
-    "need": "Any system, any scale. A reference will do; a working protocol is better.",
-    "why": "It stands in for the expression model, which is an output of year one rather than an input to it."
+    "id": "risk",
+    "q": "What risk level would we agree on?",
+    "sub": "Low to high, agreed with you rather than assigned to you.",
+    "why": "The session was explicit that the rating is not set centrally. You know what a failed round costs your project and we know what it costs the deck. The level is those two together, and it sets how much gets committed before the first result comes back."
+   },
+   {
+    "id": "rounds",
+    "q": "Will a failed round inform the next one?",
+    "sub": "Where the pipeline fails, and at which step.",
+    "why": "This is the one the foundry needs most. Iterative round design is the point of the machine: the model that picks round two is trained on round one, failures included. A round that reports only its hits leaves the next round no better than the last."
    }
   ],
-  "verdicts": [
-   {
-    "n": 4,
-    "label": "All four",
-    "say": "Ranked against the other targets in the queue and assigned an expression route."
-   },
-   {
-    "n": 3,
-    "label": "Three, or one met weakly",
-    "say": "A feasibility run rather than a decline - usually the expression arm first."
-   },
-   {
-    "n": 0,
-    "label": "Any missing outright",
-    "say": "Declined, with the reason named. Bring it back when that one is answered."
-   }
-  ]
+  "scale": {
+   "title": "The risk levels",
+   "note": "Indicative, and the one thing on this page that is not settled. Each level is agreed with the group that owns the work and none has been agreed yet, so read these as what the scale means rather than as a rating anyone has signed off.",
+   "levels": [
+    {
+     "id": "low",
+     "name": "Low",
+     "say": "The loop is known to work and the unknowns are in the biology, not the method."
+    },
+    {
+     "id": "medium",
+     "name": "Medium",
+     "say": "The loop works but the hit rate is the question. Expect more than one round."
+    },
+    {
+     "id": "high",
+     "name": "High",
+     "say": "The method itself is the experiment. Worth doing, and worth saying so at the start so a null result reads as information."
+    }
+   ]
+  }
  },
  "provide": {
   "title": "What you hand over",
@@ -627,6 +656,10 @@ window.FOUNDRY = {
     "name": "Binder campaigns",
     "sub": "the spine of the machine",
     "status": "running",
+    "risk": {
+     "level": "medium",
+     "why": "The loop that works best here, and still the hit rate is the question - published success runs 10 to 100 percent per target, and this project has its own round where the two best designs bound the wrong face. Expect more than one round and plan the counter-screen from the start."
+    },
     "problem": "A protein with a face worth blocking and no reagent that binds it. The design models will propose thousands of candidates against that face; the question is which of them actually bind it, and whether the ones that bind landed where they were designed to land.",
     "areas": [
      "Parkinson's",
@@ -656,6 +689,10 @@ window.FOUNDRY = {
     "name": "Structural biology and construct workflow",
     "sub": "which construct crystallises",
     "status": "phase 2",
+    "risk": {
+     "level": "low",
+     "why": "Crystallography of a designed complex is the most routine thing on this list and it is the house speciality. The risk is queue and hardware - the imaging carts are phase 2 - rather than whether the method works."
+    },
     "problem": "A construct that expresses is not a construct that diffracts, and the distance between the two is usually paid for in months of hand work. The screen is cheap per drop and expensive per hour, which is exactly the shape of problem automation is for.",
     "areas": [
      "crystallisation screening",
@@ -676,6 +713,10 @@ window.FOUNDRY = {
     "name": "Enzyme design",
     "sub": "active or inactive, at plate scale",
     "status": "taking proposals",
+    "risk": {
+     "level": "high",
+     "why": "De novo catalytic activity is still the hardest ask in design. Worth doing precisely because a null result is informative, but it should be entered as a method experiment rather than as a reagent order."
+    },
     "problem": "A designed or redesigned enzyme is a binding problem with a turnover readout bolted on. The deck's limit is not the chemistry, it is whether the assay fits in a well and reads on the PHERAstar.",
     "areas": [
      "designed actives",
@@ -699,6 +740,10 @@ window.FOUNDRY = {
     "name": "Cell-free family screening",
     "sub": "a UniProt family, expressed and sorted",
     "status": "taking proposals",
+    "risk": {
+     "level": "low",
+     "why": "Expression and an activity readout across family members, with no design step to fail. The scale is the work, and the scale is what the deck is for."
+    },
     "problem": "For most protein families, which members are active is unknown because nobody has expressed them all. Cell-free makes the whole family a pipetting problem rather than a cloning programme.",
     "areas": [
      "UniProt family members",
@@ -721,6 +766,10 @@ window.FOUNDRY = {
     "name": "Linkage-specific PTM reagents",
     "sub": "starting with ADP-ribosylation",
     "status": "taking proposals",
+    "risk": {
+     "level": "high",
+     "why": "Discriminating a linkage by its geometry, in sequence context, is a harder discrimination than anything else on this page asks for. The design problem and the assay problem are both open at once."
+    },
     "problem": "Reagents against modified proteins mostly read the modification or the sequence, not both, and almost none read the linkage. A reagent that distinguishes linkage by geometry is a binder design problem with an unusually well-defined face.",
     "areas": [
      "ADP-ribosylation first",
@@ -1091,6 +1140,7 @@ window.FOUNDRY = {
   };
   const esc = t => String(t).replace(/[&<>"]/g, m =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+  const LEVC = {low: '#009E73', medium: '#E69F00', high: '#D55E00'};
   const PH = {}; (F.phases || []).forEach(p => { PH[p.id] = p; });
   const LOOPS = {}; (F.loops || []).forEach(l => { LOOPS[l.id] = l; });
   const ROUTES = {}; (F.routes || []).forEach(r => { ROUTES[r.id] = r; });
@@ -1288,52 +1338,54 @@ window.FOUNDRY = {
   document.getElementById('rt-t').textContent = F.returns.title;
   document.getElementById('rt').innerHTML = rows(F.returns.items);
 
-  const IK = F.intake;
-  document.getElementById('ik-q').textContent = IK.question;
-  document.getElementById('ik-note').textContent = IK.note;
-  let ticked = new Set();
-  try { ticked = new Set(JSON.parse(localStorage.getItem('foundry-intake') || '[]')); } catch (e) {}
+  // The five broad questions, from the 19 November session's "what we want to
+  // produce". Nothing is ticked and nothing is scored: the four things that
+  // used to sit here were preconditions of gate D0, and a reader arriving at
+  // "can the foundry take your project" read them as entry requirements. They
+  // are now guidance on the proposal page, where they are advice about shaping
+  // a binder question rather than a bar to clear.
+  const FIT = F.fit;
+  document.getElementById('ik-q').textContent = FIT.question;
+  document.getElementById('ik-note').textContent = FIT.note;
 
-  document.getElementById('ik-checks').innerHTML = IK.checks.map(c =>
-    `<details class="chk${ticked.has(c.id) ? ' on' : ''}" data-id="${esc(c.id)}">
+  document.getElementById('ik-asks').innerHTML = FIT.asks.map((a, i) =>
+    `<details class="ask1">
        <summary>
-         <span class="box" role="checkbox" tabindex="0"
-               aria-checked="${ticked.has(c.id)}" aria-label="${esc(c.ask)}">&#10003;</span>
-         <span class="ask">${esc(c.ask)}</span>
+         <span class="num">${i + 1}</span>
+         <span class="q">${esc(a.q)}</span>
          <span class="more">why</span>
-         <span class="need">${esc(c.need)}</span>
+         <span class="sub">${esc(a.sub)}</span>
        </summary>
-       <div class="why">${esc(c.why)}</div>
+       <div class="why">${esc(a.why)}</div>
      </details>`).join('');
 
-  function score() {
-    const n = ticked.size, v = IK.verdicts;
-    const pick = n === IK.checks.length ? v[0] : n === IK.checks.length - 1 ? v[1] : v[2];
-    document.getElementById('ik-score').innerHTML =
-      `<span class="n">${n}/${IK.checks.length}</span>
-       <span class="lab">${esc(pick.label)}</span>
-       <span class="say">${esc(pick.say)}</span>`;
-    try { localStorage.setItem('foundry-intake', JSON.stringify([...ticked])); } catch (e) {}
-  }
-  document.querySelectorAll('.chk .box').forEach(box => {
-    const d = box.closest('.chk'), id = d.dataset.id;
-    const flip = ev => {
-      ev.preventDefault(); ev.stopPropagation();
-      ticked.has(id) ? ticked.delete(id) : ticked.add(id);
-      d.classList.toggle('on', ticked.has(id));
-      box.setAttribute('aria-checked', String(ticked.has(id)));
-      score();
-    };
-    box.addEventListener('click', flip);
-    box.addEventListener('keydown', ev => { if (ev.key === ' ' || ev.key === 'Enter') flip(ev); });
-  });
-  score();
+  // The risk scale, with the project styles sitting at each level. The rating
+  // is agreed with the group that owns the work rather than set centrally, so
+  // these are shown as what the scale means and the note says plainly that
+  // none has been signed off.
+  const SC = FIT.scale;
+  document.getElementById('rs-t').textContent = SC.title;
+  document.getElementById('rs-note').textContent = SC.note;
+  document.getElementById('rs').innerHTML = SC.levels.map(l => {
+    const mine = (F.programmes.programmes || [])
+      .filter(p => p.risk && p.risk.level === l.id);
+    const eg = mine.map(p =>
+      `<div><b>${esc(p.name)}</b><span>${esc(p.risk.why)}</span></div>`).join('');
+    return `<div class="lev" style="border-top-color:${LEVC[l.id] || 'var(--rule)'}">
+      <h4>${esc(l.name)}<span class="c">${mine.length || 'none'}</span></h4>
+      <p>${esc(l.say)}</p>
+      ${eg ? `<div class="eg">${eg}</div>`
+           : '<div class="none">Nothing sits here yet.</div>'}
+    </div>`;
+  }).join('');
 
   document.getElementById('foot').innerHTML =
     `Generated from <code>_data/programmes.yml</code>, <code>_data/stages.yml</code> and
      <code>_data/gates.yml</code>; the build fails if a programme claims a loop, a route or a
-     gate that does not exist. Risk is rated per target with the group that owns it, so no
-     rating appears here until that conversation has happened.
+     gate that does not exist. The risk levels are indicative. Each is meant to be agreed
+     with the group that owns the work rather than set centrally, and none has been agreed
+     yet, so they say where a kind of work sits on the scale and not what anyone has
+     signed off.
      <a href="workflows.html" style="color:var(--ink)">Plan a campaign &rarr;</a>`;
 })();
 </script>

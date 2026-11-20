@@ -28,7 +28,16 @@ defaults:
   - scope: {path: ""}
     values: {layout: "page"}
 
+# The four built pages come first: they are the interactive ones, and they are
+# what someone is sent a link to. They sit under /static/pages/ rather than at
+# a pretty URL because they cross-link to each other by bare filename, and
+# because they are built to be self-contained - the same file opens from a
+# mail attachment as from the site.
 nav:
+  - {title: "Project styles",  url: "/static/pages/foundry.html"}
+  - {title: "Plan a campaign", url: "/static/pages/workflows.html"}
+  - {title: "Blueprint",       url: "/static/pages/blueprint.html"}
+  - {title: "Propose",         url: "/static/pages/intake.html"}
   - {title: "Capabilities", url: "/capabilities/"}
   - {title: "Projects",     url: "/projects/"}
   - {title: "Decisions",    url: "/decisions/"}

@@ -121,46 +121,134 @@ stages:
 # labs bringing a target; they need to know whether it can be taken, what
 # they hand over, and what comes back. Everything below answers one of those.
 
-intake:
-  question: Can the foundry take your target?
+# The broad questions, from the 19 November session with Jamie. That meeting
+# set out to produce one page covering every problem area the foundry could
+# take on, and named the fields it needs: the problem statement, the protein
+# areas to target, the strategy for targeting them, and a risk level agreed
+# with the group that owns the work rather than set centrally. These are those
+# fields asked as questions. The fifth is from the same tab's computational
+# pipeline thread - where the pipeline fails and at which step - because
+# iterative round design is what the machine is for.
+fit:
+  question: What the foundry needs to know about your project
   note: >-
-    Four things have to hold. Each is the precondition of a decision the
-    machine makes later, so a target missing one does not fail at intake for
-    bureaucratic reasons - it fails months in, after the protein has been
-    made. This is gate D0.
-  checks:
+    None of this is a test and nothing here is scored. It is the one page the
+    19 November session set out to produce, asked as questions. The five
+    project styles above are this same page already filled in, so if one of
+    them is close to your project you can answer by pointing at it.
+  asks:
+    - id: problem
+      q: What is the problem?
+      sub: Not the protein - the problem.
+      why: >-
+        It is what decides whether a binder, a designed enzyme, a family
+        screen or a structure is the answer. A project that starts from the
+        reagent has usually picked the loop before asking which one fits, and
+        the loop is the expensive part to get wrong.
+    - id: areas
+      q: Which proteins does it come down to?
+      sub: A family, a set of paralogs, one domain.
+      why: >-
+        The one page calls these the protein areas to target. It is the step
+        between a problem worth solving and something that fits in a plate,
+        and it is usually where a broad problem becomes a campaign of a
+        knowable size.
+    - id: strategy
+      q: What is the strategy for targeting them?
+      sub: Which of the loops this becomes, or a new one.
+      why: >-
+        Four loops run here. A strategy that is none of them is not a refusal,
+        but it is a protocol-writing project before it is a campaign, and that
+        is worth knowing at the start rather than in month three.
+    - id: risk
+      q: What risk level would we agree on?
+      sub: Low to high, agreed with you rather than assigned to you.
+      why: >-
+        The session was explicit that the rating is not set centrally. You
+        know what a failed round costs your project and we know what it costs
+        the deck. The level is those two together, and it sets how much gets
+        committed before the first result comes back.
+    - id: rounds
+      q: Will a failed round inform the next one?
+      sub: Where the pipeline fails, and at which step.
+      why: >-
+        This is the one the foundry needs most. Iterative round design is the
+        point of the machine: the model that picks round two is trained on
+        round one, failures included. A round that reports only its hits
+        leaves the next round no better than the last.
+  scale:
+    title: The risk levels
+    note: >-
+      Indicative, and the one thing on this page that is not settled. Each
+      level is agreed with the group that owns the work and none has been
+      agreed yet, so read these as what the scale means rather than as a
+      rating anyone has signed off.
+    levels:
+      - id: low
+        name: Low
+        say: The loop is known to work and the unknowns are in the biology, not the method.
+      - id: medium
+        name: Medium
+        say: The loop works but the hit rate is the question. Expect more than one round.
+      - id: high
+        name: High
+        say: >-
+          The method itself is the experiment. Worth doing, and worth saying
+          so at the start so a null result reads as information.
+
+# How to shape a binder question so it can be screened here. NOT a gate and
+# NOT scored - these moved off the landing page on 2026-11-20 because they
+# were being read as entry requirements when what they actually are is the
+# four things that decide whether a binder campaign returns an interpretable
+# answer. Each one says what to do when it is missing. The formal version of
+# the same four is gate D0 in gates.yml, which is a decision the foundry makes
+# and not a bar the proposer has to clear.
+guidance:
+  title: Shaping a binder question so it can be screened here
+  scope: >-
+    Binder design campaigns. The other loops ask different things, and a
+    structure or family-screening project should ignore this.
+  note: >-
+    Nothing here is scored and nothing is a requirement. These are the four
+    things that decide whether a campaign comes back with an interpretable
+    answer or just a number, and each one has something to do about it if you
+    do not have it yet.
+  items:
     - id: structure
-      ask: Is there a structure of the domain you want targeted?
-      need: An experimental structure, or a prediction at pLDDT 85 or better across the intended epitope.
-      why: Design works from it, and so does the gate that checks where a binder actually landed.
+      t: A structure of the domain you want targeted
+      v: Experimental, or predicted at pLDDT 85 or better across the intended face.
+      do: >-
+        Design works from it, and so does the later check on where a binder
+        actually landed. With no experimental structure, predict it and read
+        the confidence across the face you mean to target rather than across
+        the whole domain - a good average hides exactly the loop that matters.
     - id: hotspot
-      ask: Can you name a hotspot residue that tolerates an alanine substitution?
-      need: At least one, and the domain still has to fold without it.
-      why: >-
-        D6 asks whether a binder engages the face it was designed for, by
-        mutating that residue and watching the signal drop. With no mutable
-        hotspot that gate cannot run, and a binder that found a different
-        face reaches the structure queue undetected.
+      t: A hotspot residue that tolerates an alanine substitution
+      v: One is enough, and the domain still has to fold without it.
+      do: >-
+        This is what turns a positive into an interpretable positive. The
+        screen mutates that residue and watches the signal drop, which is how
+        a binder is shown to engage the face it was designed for rather than
+        some other one - without it, a binder that found a different face
+        looks identical to one that worked. If no residue is obviously
+        mutable, a short stability check on two or three candidates is the
+        cheapest thing to run first.
     - id: homolog
-      ask: Is there a close homolog that can be expressed?
-      need: One is enough. It goes on the plate beside the target.
-      why: Selectivity is measured against it, on the same plate, at no extra cost.
+      t: A close homolog to put on the plate beside it
+      v: It becomes the counter-target, read on the same plate at no extra cost.
+      do: >-
+        Selectivity is measured against it. With no close homolog, selectivity
+        has to come from somewhere else - a more distant family member, a
+        point mutant, or an explicit decision that selectivity is not part of
+        the question this round. Any of those is fine; leaving it unsaid is
+        what causes trouble.
     - id: expression
-      ask: Has this protein, or a close homolog, been expressed before?
-      need: Any system, any scale. A reference will do; a working protocol is better.
-      why: >-
-        It stands in for the expression model, which is an output of year one
-        rather than an input to it.
-  verdicts:
-    - n: 4
-      label: "All four"
-      say: "Ranked against the other targets in the queue and assigned an expression route."
-    - n: 3
-      label: "Three, or one met weakly"
-      say: "A feasibility run rather than a decline - usually the expression arm first."
-    - n: 0
-      label: "Any missing outright"
-      say: "Declined, with the reason named. Bring it back when that one is answered."
+      t: Evidence the protein, or a near relative, has been expressed
+      v: Any system, any scale. A reference will do; a working protocol is better.
+      do: >-
+        It picks the expression route. With nothing, the first thing that runs
+        is an expression arm rather than a binder screen - a real result and a
+        cheap one, but it is a round, so it is better to know that going in.
 
 provide:
   title: What you hand over

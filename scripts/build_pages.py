@@ -285,18 +285,38 @@ def check(gates, stages, protos, progs):
                 errs.append(f"route {r['id']!r}: step {sid!r} is not a workflow")
 
     # --- the user-facing blocks ---
-    ik = stages.get("intake")
-    if not ik:
-        errs.append("stages.yml has no intake block - the page cannot ask the first question")
+    fit = stages.get("fit")
+    if not fit:
+        errs.append("stages.yml has no fit block - the landing page cannot ask "
+                    "what the project is")
     else:
-        if len(ik.get("checks", [])) < 2:
-            errs.append("intake needs at least two checks")
-        for c in ik.get("checks", []):
-            for k in ("id", "ask", "need", "why"):
+        if len(fit.get("asks", [])) < 2:
+            errs.append("fit needs at least two questions")
+        for c in fit.get("asks", []):
+            for k in ("id", "q", "sub", "why"):
                 if not c.get(k):
-                    errs.append(f"intake check {c.get('id', '?')!r} is missing {k!r}")
-        if not ik.get("verdicts"):
-            errs.append("intake states no verdicts, so a reader cannot score themselves")
+                    errs.append(f"fit question {c.get('id', '?')!r} is missing {k!r}")
+        lv = (fit.get("scale") or {}).get("levels") or []
+        if not lv:
+            errs.append("fit states no risk levels, so the ratings on the "
+                        "programmes mean nothing to a reader")
+        for l in lv:
+            for k in ("id", "name", "say"):
+                if not l.get(k):
+                    errs.append(f"risk level {l.get('id', '?')!r} is missing {k!r}")
+
+    gd = stages.get("guidance")
+    if not gd:
+        errs.append("stages.yml has no guidance block - the proposal page has "
+                    "nothing to say about shaping a binder question")
+    else:
+        for c in gd.get("items", []):
+            for k in ("id", "t", "v", "do"):
+                if not c.get(k):
+                    errs.append(f"guidance item {c.get('id', '?')!r} is missing {k!r}")
+        if not gd.get("scope"):
+            errs.append("guidance has no scope - it reads as applying to every "
+                        "loop when it is about binder campaigns")
     for key in ("provide", "returns", "limits"):
         blk = stages.get(key)
         if not blk or not blk.get("items"):
@@ -342,6 +362,21 @@ def check(gates, stages, protos, progs):
         for gid in p.get("gates", []):
             if gid not in gates:
                 errs.append(f"programme {pid!r}: unknown gate {gid!r}")
+        # A rating is only meaningful against a published scale, and the scale
+        # is in stages.yml. A programme rated at a level the page never
+        # explains is a label with nothing behind it.
+        rk = p.get("risk") or {}
+        levels = {l["id"] for l in
+                  ((stages.get("fit") or {}).get("scale") or {}).get("levels", [])}
+        if not rk.get("level"):
+            errs.append(f"programme {pid!r} has no risk level")
+        elif levels and rk["level"] not in levels:
+            errs.append(f"programme {pid!r}: risk level {rk['level']!r} is not "
+                        f"one of the published levels {sorted(levels)}")
+        if not rk.get("why"):
+            errs.append(f"programme {pid!r} gives no reason for its risk level - "
+                        f"an unexplained rating is the thing the 19 Nov session "
+                        f"said not to hand a group")
     if len(seen_pr) < 2:
         errs.append("programmes.yml lists fewer than two programmes")
 
@@ -408,6 +443,19 @@ def embed_images(text):
     return re.sub(r"(images/[\w.\-]+\.(?:png|jpe?g|svg))", repl, text), used
 
 
+def site_url():
+    """The site's own address, from _config.yml.
+
+    These pages are built to be self-contained - opened from the file system,
+    mailed, dropped in Slack - so a root-relative "/inventory/echo/" would
+    resolve against whatever host the file is sitting on, and on the site
+    itself would miss the project baseurl entirely. Anything pointing back at
+    the site has to be absolute, and this is where that address comes from.
+    """
+    cfg = yaml.safe_load((ROOT / "_config.yml").read_text(encoding="utf-8"))
+    return (cfg.get("url", "") + cfg.get("baseurl", "")).rstrip("/")
+
+
 def sheet_specs():
     """The structured spec rows from _instruments/*.md, keyed by instrument id.
 
@@ -420,14 +468,7 @@ def sheet_specs():
     A sheet is optional. An instrument with none keeps its paragraph and shows
     no table, which is what `offline` does.
     """
-    # An absolute URL, not a root-relative one. These pages are built to be
-    # self-contained - opened from the file system, mailed, dropped in Slack -
-    # so "/inventory/echo/" would resolve against whatever host the file
-    # happens to be sitting on, and on the site itself it would miss the
-    # project baseurl entirely. The one from _config.yml is the real address.
-    cfg = yaml.safe_load((ROOT / "_config.yml").read_text(encoding="utf-8"))
-    site = (cfg.get("url", "") + cfg.get("baseurl", "")).rstrip("/")
-
+    site = site_url()
     out = {}
     for path in sorted((ROOT / "_instruments").glob("*.md")):
         text = path.read_text(encoding="utf-8")
@@ -459,6 +500,11 @@ def bundle(page, src_tag, var, payload):
     (PAGES / src_tag).write_text(f"window.{var} = {blob};\n", encoding="utf-8")
 
     html = (PAGES / page).read_text(encoding="utf-8")
+
+    # {{SITE}} is how a built page points back at the Jekyll site it belongs
+    # to. The address lives in _config.yml and nowhere else.
+    html = html.replace("{{SITE}}", site_url())
+
     tag = f'<script src="{src_tag}"></script>'
     if tag not in html:
         sys.exit(f"Expected {tag} in {page}")
@@ -528,6 +574,11 @@ def main():
     # reader is already looking at what the deck does.
     loop = dict(stages)
     loop.pop("limits", None)
+    # The binder guidance belongs on the proposal page, next to the form it is
+    # advice for. It left the landing page on 2026-11-20 because four
+    # preconditions under "can the foundry take your project" read as entry
+    # requirements, which is the opposite of what they are.
+    loop.pop("guidance", None)
     loop["gates"] = gates
     loop["programmes"] = progs
     loop["loops"] = protos["loops"]
@@ -556,7 +607,9 @@ def main():
         "phases": protos["phases"],
     })
 
-    imgs += bundle("intake.html", "pipeline.js", "PIPE", pipeline(protos))
+    pipe = pipeline(protos)
+    pipe["guidance"] = stages["guidance"]
+    imgs += bundle("intake.html", "pipeline.js", "PIPE", pipe)
 
     nr, ni = write_inventory(protos)
     print(f"Wrote _data/instruments.yml ({nr} carts, {ni} instruments)")

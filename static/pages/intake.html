@@ -73,6 +73,28 @@ button.send{width:100%;margin-top:4px;border:0;border-radius:10px;background:var
   color:var(--bg);font:inherit;font-weight:500;font-size:15px;padding:11px;cursor:pointer}
 button.send:disabled{opacity:.3;cursor:not-allowed}
 .note{font-size:12px;color:var(--muted);margin-top:8px}
+
+.nav{font-size:12.5px;color:var(--muted);margin:-12px 0 22px}
+.nav a{color:var(--muted);text-decoration:none;border-bottom:1px solid transparent}
+.nav a:hover{color:var(--ink);border-bottom-color:var(--rule)}
+
+/* Guidance, not a gate. These four used to sit on the landing page under
+   "can the foundry take your project", where four preconditions read as four
+   entry requirements. Here they are advice next to the form they are advice
+   about, and each one says what to do when the answer is no. */
+.guide{margin-top:44px;border-top:1px solid var(--rule);padding-top:26px}
+.guide h2{font-weight:400;font-size:19px;margin:0;letter-spacing:-.01em}
+.guide .scope{font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--muted);margin-top:9px;line-height:1.5;max-width:70ch}
+.guide .g-note{font-size:13px;color:var(--muted);line-height:1.55;
+  max-width:72ch;margin:12px 0 18px}
+.gitems{display:grid;gap:10px}
+.gi{border:1px solid var(--rule);border-radius:10px;padding:13px 15px}
+.gi h3{margin:0;font-size:14.5px;font-weight:500;letter-spacing:-.01em}
+.gi .v{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.45}
+.gi .do{font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:9px;
+  padding-top:9px;border-top:1px solid var(--rule);max-width:72ch}
+.gi .do b{color:var(--ink);font-weight:500}
 .sent{border:1px solid var(--ok);border-radius:11px;padding:13px 15px;margin-bottom:18px;font-size:14px}
 .sent b{font-family:ui-monospace,Menlo,monospace}
 .err{color:var(--stop);font-size:12.5px;margin-top:8px}
@@ -89,6 +111,10 @@ td.s2{font-variant-numeric:tabular-nums;white-space:nowrap}
 
 <div class="wrap">
 <h1>Propose a campaign</h1>
+<div class="nav"><a href="foundry.html">&larr; what happens here</a>
+  &nbsp;&middot;&nbsp; <a href="workflows.html">plan a campaign</a>
+  &nbsp;&middot;&nbsp; <a href="blueprint.html">system blueprint</a>
+  &nbsp;&middot;&nbsp; <a href="https://sofibali.github.io/protein-design-foundry/">foundry site</a></div>
 <div id="sent-box"></div>
 
 <div class="cols">
@@ -200,6 +226,13 @@ td.s2{font-variant-numeric:tabular-nums;white-space:nowrap}
     <div class="err" id="err"></div>
   </aside>
 </div>
+
+<section class="guide" id="guide" hidden>
+  <h2 id="g-t"></h2>
+  <div class="scope" id="g-scope"></div>
+  <p class="g-note" id="g-note"></p>
+  <div class="gitems" id="g-items"></div>
+</section>
 
 <section class="inbox" id="inbox" hidden>
   <h2 id="inbox-h">Proposals</h2>
@@ -343,6 +376,37 @@ window.PIPE = {
    "4.8",
    "4.9"
   ]
+ },
+ "guidance": {
+  "title": "Shaping a binder question so it can be screened here",
+  "scope": "Binder design campaigns. The other loops ask different things, and a structure or family-screening project should ignore this.",
+  "note": "Nothing here is scored and nothing is a requirement. These are the four things that decide whether a campaign comes back with an interpretable answer or just a number, and each one has something to do about it if you do not have it yet.",
+  "items": [
+   {
+    "id": "structure",
+    "t": "A structure of the domain you want targeted",
+    "v": "Experimental, or predicted at pLDDT 85 or better across the intended face.",
+    "do": "Design works from it, and so does the later check on where a binder actually landed. With no experimental structure, predict it and read the confidence across the face you mean to target rather than across the whole domain - a good average hides exactly the loop that matters."
+   },
+   {
+    "id": "hotspot",
+    "t": "A hotspot residue that tolerates an alanine substitution",
+    "v": "One is enough, and the domain still has to fold without it.",
+    "do": "This is what turns a positive into an interpretable positive. The screen mutates that residue and watches the signal drop, which is how a binder is shown to engage the face it was designed for rather than some other one - without it, a binder that found a different face looks identical to one that worked. If no residue is obviously mutable, a short stability check on two or three candidates is the cheapest thing to run first."
+   },
+   {
+    "id": "homolog",
+    "t": "A close homolog to put on the plate beside it",
+    "v": "It becomes the counter-target, read on the same plate at no extra cost.",
+    "do": "Selectivity is measured against it. With no close homolog, selectivity has to come from somewhere else - a more distant family member, a point mutant, or an explicit decision that selectivity is not part of the question this round. Any of those is fine; leaving it unsaid is what causes trouble."
+   },
+   {
+    "id": "expression",
+    "t": "Evidence the protein, or a near relative, has been expressed",
+    "v": "Any system, any scale. A reference will do; a working protocol is better.",
+    "do": "It picks the expression route. With nothing, the first thing that runs is an expression arm rather than a binder screen - a real result and a cheap one, but it is a round, so it is better to know that going in."
+   }
+  ]
  }
 };
 </script>
@@ -355,6 +419,23 @@ const NEED = [['who','pi','email'],['goal'],['shape'],['supply'],['expression'],
               ['structure'],['hotspot'],['homolog'],['assay'],['limits'],[]];
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// Guidance on shaping a binder question. Rendered only if the data is there,
+// so the page still works if the block is ever dropped.
+(function () {
+  const G = P.guidance;
+  if (!G || !(G.items || []).length) return;
+  document.getElementById('g-t').textContent = G.title;
+  document.getElementById('g-scope').textContent = G.scope;
+  document.getElementById('g-note').textContent = G.note;
+  document.getElementById('g-items').innerHTML = G.items.map(i =>
+    `<div class="gi">
+       <h3>${esc(i.t)}</h3>
+       <div class="v">${esc(i.v)}</div>
+       <div class="do">${esc(i.do)}</div>
+     </div>`).join('');
+  document.getElementById('guide').hidden = false;
+})();
 const val = id => ($(id)?.value || '').trim();
 const A = {limits:[]};
 let db=null, user=null, canWrite=false;
