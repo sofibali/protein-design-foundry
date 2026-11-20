@@ -10,7 +10,7 @@
 
 title: Foundry protocols
 subtitle: Every workflow as a deck sequence
-note: Click an instrument to see everything that needs it. Each workflow also carries what it costs the day.
+note: Click an instrument to see everything that needs it.
 
 # ---------------------------------------------------------------------------
 # Machine time. Added 2026-11-17 to close audit finding 3.
@@ -555,6 +555,8 @@ workflows:
     gives: a template plate ready for any expression route
     scale: 384 per plate
     time: one hour
+    input: "One ordered gene fragment per design, delivered plated"
+    output: "A 384-well template plate, every well at the same concentration"
     cost: {bravo: 0, echo: 3, reader: 0, binds: Echo — and it is the cheapest workflow on the deck}
     gates: []
     inputs:
@@ -579,6 +581,8 @@ workflows:
     gives: a library in liquid culture, never plated for colonies
     scale: one pool per run
     time: overnight
+    input: "One oligo pool, a linearised backbone and electrocompetent cells"
+    output: "The library in liquid culture, plus the sequencing read that says what is in it"
     cost: {bravo: 24, echo: 6, reader: 0, binds: Cytomat — the outgrowth occupies a shaking position for the night}
     gates: []
     inputs:
@@ -615,6 +619,8 @@ workflows:
     gives: a circular, expression-ready construct per design, no colonies
     scale: 96-384 per run
     time: one day
+    input: "Linear gene fragments with Golden Gate handles, and a circularising vector"
+    output: "One circular, expression-ready construct per design, no colonies"
     cost: {bravo: 16, echo: 6, reader: 0, binds: Bravo — two SPRI cleanups at 96. Run the assembly at 384 and they cost 64 min instead of 16}
     gates: []
     inputs:
@@ -654,6 +660,8 @@ workflows:
     gives: ug/mL per well against a standard curve
     scale: 384 per plate, four plates in parallel
     time: 4-6 h
+    input: "Template DNA, lysate or PURE kit, and the salt stocks the DOE varies"
+    output: "Protein in ug/mL per well, read against the GFP11 standard curve"
     cost: {bravo: 0, echo: 12, reader: 32, binds: PHERAstar — four reads at 8 min; the Bravo is never in the chain}
     gates: [D1, D2]
     inputs:
@@ -687,6 +695,8 @@ workflows:
     gives: lysate ready for purification
     scale: 96 per plate
     time: overnight
+    input: "Plasmid or fragment, BL21(DE3) and autoinduction medium"
+    output: "A deep-well block of lysate, one culture per well"
     cost: {bravo: 0, echo: 0, reader: 0, binds: Cytomat — 14 deep-well positions and 7 concurrent culture protocols. Nothing else on the deck binds this}
     gates: [D1]
     inputs:
@@ -722,6 +732,8 @@ workflows:
     gives: micrograms, which is plenty for plate assays
     scale: 96 per plate
     time: one hour
+    input: "Cleared lysate or a finished cell-free reaction, and tagged beads"
+    output: "Micrograms of eluted protein per well, in elution buffer"
     cost: {bravo: 60, echo: 0, reader: 0, binds: Bravo — 96 lysates per hour. A full 14-plate E. coli round is a 14 h serial step}
     gates: [D2]
     inputs:
@@ -753,6 +765,8 @@ workflows:
     gives: concentration, nucleic-acid carryover, aggregation — and a normalised plate
     scale: 384 per plate
     time: 30 min
+    input: "The eluted plate, plus one detection reagent per question"
+    output: "Concentration, A260/A280 and an aggregation flag per well, and a plate normalised to one concentration"
     cost: {bravo: 0, echo: 0, reader: 24, binds: PHERAstar — three reads of the same plate at 8 min each}
     gates: [D2]
     inputs:
@@ -785,6 +799,8 @@ workflows:
     gives: a binding signal per well
     scale: 384 routine, 1536 reachable
     time: 1-2 h
+    input: "Protein and a tagged target, with one format's detection reagents"
+    output: "A binding signal per well: a TR-FRET ratio, a luminescence count or a polarisation"
     cost: {bravo: 0, echo: 3, reader: 8, binds: "PHERAstar — 150 plates per 20 h day, and 3 min rather than 8 if the format is luminescent"}
     gates: [D3, D4]
     inputs:
@@ -822,6 +838,8 @@ workflows:
     gives: selectivity margin and IC50
     scale: same plate as 4.7
     time: 1-2 h
+    input: "The binding plate, plus a homolog, a hotspot point-mutant and a non-binder control"
+    output: "A selectivity margin per design: on-target signal against each control"
     cost: {bravo: 0, echo: 3, reader: 8, binds: "PHERAstar — but it is three extra columns on 4.7's plate, so in practice it costs nothing new"}
     gates: [D6]
     inputs:
@@ -847,6 +865,8 @@ workflows:
     gives: KD or IC50 per hit
     scale: 384 per plate
     time: 1-2 h
+    input: "Hits from 4.7, and one Echo source plate of titrant"
+    output: "A KD or IC50 per hit, with the fitted curve behind it"
     cost: {bravo: 0, echo: 3, reader: 8, binds: PHERAstar — a serial dilution on the Bravo would cost 32 min of the bottleneck instead of 3 on the Echo}
     gates: [D5]
     inputs:
@@ -867,6 +887,8 @@ workflows:
     gives: residual binding after a temperature ladder
     scale: 384 per plate
     time: 3 h
+    input: "A sealed assay plate, and the binding reagents it is read with"
+    output: "Residual binding after each step of the temperature ladder, four points, not a Tm"
     cost: {bravo: 0, echo: 0, reader: 32, binds: "PHERAstar — four reads. The four ATC blocks run independent programs, so the ladder costs one pass, not four"}
     gates: []
     inputs:
@@ -889,6 +911,8 @@ workflows:
     gives: transformants in liquid — a pool, or one well per design
     scale: 96 per plate
     time: ~2 h, plus an hour of recovery
+    input: "Assembled DNA and chemically competent cells, both held cold"
+    output: "Transformants in liquid, and a titre from the plated dilution series"
     cost: {bravo: 24, echo: 3, reader: 0, binds: "Bravo — the pulse is a plate move between two deck nests, so the whole transformation is Bravo time"}
     gates: []
     inputs:
@@ -922,6 +946,8 @@ workflows:
     gives: nL drops in condition matrices
     scale: 1536
     time: hours to set, weeks to grow
+    input: "Purified protein at >=10 mg/mL from offline expression, and commercial screens"
+    output: "1,536 sitting drops, scored clear, precipitate or crystal"
     cost: {bravo: 0, echo: 9, reader: 0, binds: Echo — 80 trays is 11.5 h on-system against 48.9 h once imaging is done by hand}
     gates: [D7]
     inputs:
@@ -959,6 +985,8 @@ workflows:
     gives: hit list from a compound library
     scale: 1536
     time: 1-2 h
+    input: "A compound library in DMSO, and the 4.7 assay spine"
+    output: "A hit list: percent effect per compound, against the plate's own controls"
     cost: {bravo: 0, echo: 3, reader: 8, binds: PHERAstar — the same plate cost as 4.7 for four times the wells}
     gates: []
     inputs:
@@ -983,6 +1011,8 @@ workflows:
     gives: a rank, not a number — fold-activation per design
     scale: 36 designs per 384 plate, in triplicate
     time: 4-8 h
+    input: "CI-fusion fragments, the reporter plasmid and a dRecBCD extract"
+    output: "Fold activation per design, a rank rather than an affinity"
     cost: {bravo: 32, echo: 3, reader: 8, binds: "Bravo — the cold master mix goes into a 384 plate, which is four offset quadrant transfers"}
     gates: [D1, D4, D6]
     inputs:

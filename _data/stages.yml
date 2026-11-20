@@ -301,7 +301,7 @@ returns:
       v: "Yield, aggregation state, and a specificity index that means the same thing in every campaign."
 
 limits:
-  title: What it cannot do
+  title: Limits
   note: Worth knowing before you plan around it.
   items:
     - "No FACS, so no yeast-display selection and no libraries at 10^6 and above."

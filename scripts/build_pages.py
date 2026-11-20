@@ -78,6 +78,24 @@ def nulls(obj, path=""):
             yield from nulls(v, f"{path}[{i}]")
 
 
+def figures():
+    """What the planner page can draw, read back out of the page itself.
+
+    The figures are drawing code, so they live in pages/workflows.html rather
+    than in the YAML. This reads the registry between the FIGURES markers so
+    the build can still check that every protocol has one.
+    """
+    src = (PAGES / "workflows.html").read_text(encoding="utf-8")
+    m = re.search(r"// FIGURES START(.*?)// FIGURES END", src, re.S)
+    if not m:
+        sys.exit("pages/workflows.html has no FIGURES block - the protocol "
+                 "library has nothing to draw with")
+    block = m.group(1)
+    ids = set(re.findall(r"^  '([^']+)': \{", block, re.M))
+    shapes = {k: len(re.findall(r"^    %s:" % k, block, re.M)) for k in ("s", "o", "oc")}
+    return ids, shapes
+
+
 def check(gates, stages, protos, progs):
     """Fail the build rather than ship pages that disagree with each other."""
     errs = []
@@ -190,6 +208,14 @@ def check(gates, stages, protos, progs):
         for k in ("name", "sub", "gives", "scale", "time"):
             if not w.get(k):
                 errs.append(f"workflow {wid!r} is missing {k!r}")
+        # every workflow states, in one plain line each, what it takes and
+        # what it hands back. These are the headers on the card: Input and
+        # Output, not "what goes in" and "what comes back".
+        for k in ("input", "output"):
+            v = w.get(k)
+            if not v or not isinstance(v, str) or len(v.split()) < 4:
+                errs.append(f"workflow {wid!r}: {k}: must name in plain words what the "
+                            f"protocol takes or hands back")
         # every workflow states what goes into it
         if not w.get("inputs"):
             errs.append(f"workflow {wid!r} lists no inputs")
@@ -206,6 +232,24 @@ def check(gates, stages, protos, progs):
     for i in sorted(insts - touched - held):
         where = "deck chain" if KINDS.get(kind.get(i)) == "deck" else "workflow's holds: list"
         errs.append(f"instrument {i!r} appears in no {where} — it would render as a dead chip")
+
+    # --- every protocol is drawn ---
+    # The planner page carries two panels per protocol: a schematic of what
+    # physically happens, and a sketch of the readout. They live in the page
+    # because they are drawing code, but a protocol added to the YAML with no
+    # figure would render as a card with a hole in it, so the build checks the
+    # registry here rather than letting the page fall back silently.
+    drawn, shapes = figures()
+    for wid in sorted({w["id"] for w in protos["workflows"]} - drawn):
+        errs.append(f"workflow {wid!r} has no figure - add a '{wid}' entry to the FIGURES "
+                    f"block in pages/workflows.html, with s:, o: and oc:")
+    for wid in sorted(drawn - {w["id"] for w in protos["workflows"]}):
+        errs.append(f"pages/workflows.html draws a figure for {wid!r}, which is not a workflow")
+    for key, n in sorted(shapes.items()):
+        if n != len(drawn):
+            errs.append(f"the FIGURES block has {len(drawn)} protocols but {n} {key!r} keys - "
+                        f"every protocol needs a schematic (s:), a sample output (o:) and "
+                        f"its caption (oc:)")
 
     # --- the carts, against the instruments ---
     # The capability map and the floor plan have to describe the same machine.
