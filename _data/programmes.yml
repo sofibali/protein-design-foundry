@@ -34,14 +34,6 @@ programmes:
     name: Binder campaigns
     sub: the spine of the machine
     status: running
-    risk:
-      level: medium
-      why: >-
-        The loop that works best here, and still the hit rate is the
-        question - published success runs 10 to 100 percent per target, and
-        this project has its own round where the two best designs bound the
-        wrong face. Expect more than one round and plan the counter-screen
-        from the start.
     problem: >-
       A protein with a face worth blocking and no reagent that binds it. The
       design models will propose thousands of candidates against that face;
@@ -65,13 +57,6 @@ programmes:
     name: Structural biology and construct workflow
     sub: which construct crystallises
     status: phase 2
-    risk:
-      level: low
-      why: >-
-        Crystallography of a designed complex is the most routine thing on
-        this list and it is the house speciality. The risk is queue and
-        hardware - the imaging carts are phase 2 - rather than whether the
-        method works.
     problem: >-
       A construct that expresses is not a construct that diffracts, and the
       distance between the two is usually paid for in months of hand work. The
@@ -97,12 +82,6 @@ programmes:
     name: Enzyme design
     sub: active or inactive, at plate scale
     status: taking proposals
-    risk:
-      level: high
-      why: >-
-        De novo catalytic activity is still the hardest ask in design. Worth
-        doing precisely because a null result is informative, but it should
-        be entered as a method experiment rather than as a reagent order.
     problem: >-
       A designed or redesigned enzyme is a binding problem with a turnover
       readout bolted on. The deck's limit is not the chemistry, it is whether
@@ -122,12 +101,6 @@ programmes:
     name: Cell-free family screening
     sub: a UniProt family, expressed and sorted
     status: taking proposals
-    risk:
-      level: low
-      why: >-
-        Expression and an activity readout across family members, with no
-        design step to fail. The scale is the work, and the scale is what
-        the deck is for.
     problem: >-
       For most protein families, which members are active is unknown because
       nobody has expressed them all. Cell-free makes the whole family a
@@ -149,12 +122,6 @@ programmes:
     name: Linkage-specific PTM reagents
     sub: starting with ADP-ribosylation
     status: taking proposals
-    risk:
-      level: high
-      why: >-
-        Discriminating a linkage by its geometry, in sequence context, is a
-        harder discrimination than anything else on this page asks for. The
-        design problem and the assay problem are both open at once.
     problem: >-
       Reagents against modified proteins mostly read the modification or the
       sequence, not both, and almost none read the linkage. A reagent that

@@ -155,13 +155,13 @@
        border-top:3px solid var(--rule)}
   .lev h4{margin:0;font-size:13.5px;font-weight:600;letter-spacing:-.01em;
        display:flex;align-items:baseline;gap:8px}
-  .lev h4 .c{margin-left:auto;font-size:11px;color:var(--muted);font-weight:400;
-       font-variant-numeric:tabular-nums}
   .lev p{margin:7px 0 0;font-size:12.5px;color:var(--muted);line-height:1.5}
-  .lev .eg{margin-top:10px;display:grid;gap:5px}
-  .lev .eg b{font-size:12.5px;font-weight:500;color:var(--ink);display:block}
-  .lev .eg span{font-size:12px;color:var(--muted);line-height:1.45;display:block}
-  .lev .none{font-size:12px;color:var(--muted);font-style:italic;margin-top:10px}
+  .lev .eg{margin-top:11px;padding-top:10px;border-top:1px solid var(--rule);
+       display:grid;gap:6px}
+  .lev .eg span{font-size:12px;color:var(--muted);line-height:1.45;display:block;
+       padding-left:13px;position:relative}
+  .lev .eg span::before{content:"";position:absolute;left:1px;top:7px;
+       width:4px;height:4px;border-radius:50%;background:var(--rule)}
 
   .aside{border-left:3px solid var(--rule);padding:2px 0 2px 14px;margin-top:18px;
          font-size:13px;line-height:1.52;color:var(--muted);max-width:72ch}
@@ -467,33 +467,30 @@
        <div class="why">${esc(a.why)}</div>
      </details>`).join('');
 
-  // The risk scale, with the project styles sitting at each level. The rating
-  // is agreed with the group that owns the work rather than set centrally, so
-  // these are shown as what the scale means and the note says plainly that
-  // none has been signed off.
+  // The risk scale. These rate the TARGET, not the campaign: the same binder
+  // chain is low risk against a well-characterised single domain and high
+  // against a disordered assembly, so the examples under each level are kinds
+  // of target rather than kinds of work. No project style carries a level,
+  // and no group is named against one - the 19 November session was explicit
+  // that a tier is agreed with the group that owns the target.
   const SC = FIT.scale;
   document.getElementById('rs-t').textContent = SC.title;
   document.getElementById('rs-note').textContent = SC.note;
-  document.getElementById('rs').innerHTML = SC.levels.map(l => {
-    const mine = (F.programmes.programmes || [])
-      .filter(p => p.risk && p.risk.level === l.id);
-    const eg = mine.map(p =>
-      `<div><b>${esc(p.name)}</b><span>${esc(p.risk.why)}</span></div>`).join('');
-    return `<div class="lev" style="border-top-color:${LEVC[l.id] || 'var(--rule)'}">
-      <h4>${esc(l.name)}<span class="c">${mine.length || 'none'}</span></h4>
+  document.getElementById('rs').innerHTML = SC.levels.map(l =>
+    `<div class="lev" style="border-top-color:${LEVC[l.id] || 'var(--rule)'}">
+      <h4>${esc(l.name)}</h4>
       <p>${esc(l.say)}</p>
-      ${eg ? `<div class="eg">${eg}</div>`
-           : '<div class="none">Nothing sits here yet.</div>'}
-    </div>`;
-  }).join('');
+      <div class="eg">${(l.eg || []).map(e => `<span>${esc(e)}</span>`).join('')}</div>
+    </div>`).join('');
 
   document.getElementById('foot').innerHTML =
     `Generated from <code>_data/programmes.yml</code>, <code>_data/stages.yml</code> and
      <code>_data/gates.yml</code>; the build fails if a programme claims a loop, a route or a
-     gate that does not exist. The risk levels are indicative. Each is meant to be agreed
-     with the group that owns the work rather than set centrally, and none has been agreed
-     yet, so they say where a kind of work sits on the scale and not what anyone has
-     signed off.
+     gate that does not exist. The risk levels rate a target rather than a style of work,
+     so no programme above carries one: the same campaign is low risk against a
+     well-characterised domain and high against a disordered assembly. They are indicative,
+     agreed with the group that owns the target rather than set centrally, and none has
+     been agreed yet.
      <a href="workflows.html" style="color:var(--ink)">Plan a campaign &rarr;</a>`;
 })();
 </script>

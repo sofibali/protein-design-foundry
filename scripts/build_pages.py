@@ -304,6 +304,11 @@ def check(gates, stages, protos, progs):
             for k in ("id", "name", "say"):
                 if not l.get(k):
                     errs.append(f"risk level {l.get('id', '?')!r} is missing {k!r}")
+            # A level with no worked example is an adjective. The examples are
+            # what let a reader place their own target on the scale.
+            if len(l.get("eg", [])) < 2:
+                errs.append(f"risk level {l.get('id', '?')!r} gives fewer than "
+                            f"two example targets, so a reader cannot place theirs")
 
     gd = stages.get("guidance")
     if not gd:
@@ -362,21 +367,17 @@ def check(gates, stages, protos, progs):
         for gid in p.get("gates", []):
             if gid not in gates:
                 errs.append(f"programme {pid!r}: unknown gate {gid!r}")
-        # A rating is only meaningful against a published scale, and the scale
-        # is in stages.yml. A programme rated at a level the page never
-        # explains is a label with nothing behind it.
-        rk = p.get("risk") or {}
-        levels = {l["id"] for l in
-                  ((stages.get("fit") or {}).get("scale") or {}).get("levels", [])}
-        if not rk.get("level"):
-            errs.append(f"programme {pid!r} has no risk level")
-        elif levels and rk["level"] not in levels:
-            errs.append(f"programme {pid!r}: risk level {rk['level']!r} is not "
-                        f"one of the published levels {sorted(levels)}")
-        if not rk.get("why"):
-            errs.append(f"programme {pid!r} gives no reason for its risk level - "
-                        f"an unexplained rating is the thing the 19 Nov session "
-                        f"said not to hand a group")
+        # Deliberately no risk level here. A tier rates a TARGET - how well
+        # characterised it is, how large, how ordered - and a project style
+        # holds targets of every difficulty, so a single level against a
+        # whole style would be rating the method instead, which is a
+        # different thing and not what the 19 November session asked for.
+        if p.get("risk"):
+            errs.append(f"programme {pid!r} carries a risk level. Risk is a "
+                        f"property of a target, not of a style of work: the "
+                        f"same binder campaign is low risk against a "
+                        f"well-characterised domain and high against a "
+                        f"disordered assembly. The scale is in stages.yml.")
     if len(seen_pr) < 2:
         errs.append("programmes.yml lists fewer than two programmes")
 

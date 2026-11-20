@@ -162,12 +162,15 @@ fit:
         is worth knowing at the start rather than in month three.
     - id: risk
       q: What risk level would we agree on?
-      sub: Low to high, agreed with you rather than assigned to you.
+      sub: How hard the target is, agreed with you rather than assigned to you.
       why: >-
-        The session was explicit that the rating is not set centrally. You
-        know what a failed round costs your project and we know what it costs
-        the deck. The level is those two together, and it sets how much gets
-        committed before the first result comes back.
+        This rates the target, not the experiment. The same binder campaign
+        against a well-characterised single domain and against a disordered
+        multi-domain system is the same chain of protocols with very
+        different odds, and it is the target that moves the odds. You know
+        yours better than we do, which is why the session was explicit that
+        the level is agreed with the owning group rather than set centrally.
+        It sets how much gets committed before the first result comes back.
     - id: rounds
       q: Will a failed round inform the next one?
       sub: Where the pipeline fails, and at which step.
@@ -179,22 +182,43 @@ fit:
   scale:
     title: The risk levels
     note: >-
-      Indicative, and the one thing on this page that is not settled. Each
-      level is agreed with the group that owns the work and none has been
-      agreed yet, so read these as what the scale means rather than as a
-      rating anyone has signed off.
+      These rate the target, not the campaign. A method that is hard for
+      everyone is not a risk tier - it is just the state of the field. What
+      moves a target up this scale is how much is unknown about the thing you
+      want bound: how well characterised it is, how large, how ordered, and
+      whether the site of interest exists on its own or only in context. The
+      levels are indicative. Each is meant to be agreed with the group that
+      owns the target rather than set centrally, and none has been agreed yet.
     levels:
       - id: low
         name: Low
-        say: The loop is known to work and the unknowns are in the biology, not the method.
+        say: >-
+          A single, well-characterised domain. Several experimental
+          structures, a folded surface, and a hotspot you can point at. The
+          open question is whether a binder works, not what it is binding to.
+        eg:
+          - A catalytic or binding domain with several deposited structures
+          - A well-studied family member that has been expressed before
+          - A domain that folds and behaves on its own, away from its partners
       - id: medium
         name: Medium
-        say: The loop works but the hit rate is the question. Expect more than one round.
+        say: >-
+          Most of that holds and one piece does not. Enough is known to design
+          against, and the gap is nameable rather than open-ended.
+        eg:
+          - A domain with a confident prediction but no experimental structure
+          - A target whose relevant conformation is one of several
+          - A shallow or highly charged surface with no obvious pocket
       - id: high
         name: High
         say: >-
-          The method itself is the experiment. Worth doing, and worth saying
-          so at the start so a null result reads as information.
+          A larger system, a disordered one, or one with little structural
+          precedent. What to bind is still a question alongside whether a
+          binder will.
+        eg:
+          - A multi-domain assembly whose interface only forms in context
+          - A disordered region at the site of interest
+          - A target with no close structural precedent to design from
 
 # How to shape a binder question so it can be screened here. NOT a gate and
 # NOT scored - these moved off the landing page on 2026-11-20 because they

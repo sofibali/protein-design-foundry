@@ -155,13 +155,13 @@
        border-top:3px solid var(--rule)}
   .lev h4{margin:0;font-size:13.5px;font-weight:600;letter-spacing:-.01em;
        display:flex;align-items:baseline;gap:8px}
-  .lev h4 .c{margin-left:auto;font-size:11px;color:var(--muted);font-weight:400;
-       font-variant-numeric:tabular-nums}
   .lev p{margin:7px 0 0;font-size:12.5px;color:var(--muted);line-height:1.5}
-  .lev .eg{margin-top:10px;display:grid;gap:5px}
-  .lev .eg b{font-size:12.5px;font-weight:500;color:var(--ink);display:block}
-  .lev .eg span{font-size:12px;color:var(--muted);line-height:1.45;display:block}
-  .lev .none{font-size:12px;color:var(--muted);font-style:italic;margin-top:10px}
+  .lev .eg{margin-top:11px;padding-top:10px;border-top:1px solid var(--rule);
+       display:grid;gap:6px}
+  .lev .eg span{font-size:12px;color:var(--muted);line-height:1.45;display:block;
+       padding-left:13px;position:relative}
+  .lev .eg span::before{content:"";position:absolute;left:1px;top:7px;
+       width:4px;height:4px;border-radius:50%;background:var(--rule)}
 
   .aside{border-left:3px solid var(--rule);padding:2px 0 2px 14px;margin-top:18px;
          font-size:13px;line-height:1.52;color:var(--muted);max-width:72ch}
@@ -430,8 +430,8 @@ window.FOUNDRY = {
    {
     "id": "risk",
     "q": "What risk level would we agree on?",
-    "sub": "Low to high, agreed with you rather than assigned to you.",
-    "why": "The session was explicit that the rating is not set centrally. You know what a failed round costs your project and we know what it costs the deck. The level is those two together, and it sets how much gets committed before the first result comes back."
+    "sub": "How hard the target is, agreed with you rather than assigned to you.",
+    "why": "This rates the target, not the experiment. The same binder campaign against a well-characterised single domain and against a disordered multi-domain system is the same chain of protocols with very different odds, and it is the target that moves the odds. You know yours better than we do, which is why the session was explicit that the level is agreed with the owning group rather than set centrally. It sets how much gets committed before the first result comes back."
    },
    {
     "id": "rounds",
@@ -442,22 +442,37 @@ window.FOUNDRY = {
   ],
   "scale": {
    "title": "The risk levels",
-   "note": "Indicative, and the one thing on this page that is not settled. Each level is agreed with the group that owns the work and none has been agreed yet, so read these as what the scale means rather than as a rating anyone has signed off.",
+   "note": "These rate the target, not the campaign. A method that is hard for everyone is not a risk tier - it is just the state of the field. What moves a target up this scale is how much is unknown about the thing you want bound: how well characterised it is, how large, how ordered, and whether the site of interest exists on its own or only in context. The levels are indicative. Each is meant to be agreed with the group that owns the target rather than set centrally, and none has been agreed yet.",
    "levels": [
     {
      "id": "low",
      "name": "Low",
-     "say": "The loop is known to work and the unknowns are in the biology, not the method."
+     "say": "A single, well-characterised domain. Several experimental structures, a folded surface, and a hotspot you can point at. The open question is whether a binder works, not what it is binding to.",
+     "eg": [
+      "A catalytic or binding domain with several deposited structures",
+      "A well-studied family member that has been expressed before",
+      "A domain that folds and behaves on its own, away from its partners"
+     ]
     },
     {
      "id": "medium",
      "name": "Medium",
-     "say": "The loop works but the hit rate is the question. Expect more than one round."
+     "say": "Most of that holds and one piece does not. Enough is known to design against, and the gap is nameable rather than open-ended.",
+     "eg": [
+      "A domain with a confident prediction but no experimental structure",
+      "A target whose relevant conformation is one of several",
+      "A shallow or highly charged surface with no obvious pocket"
+     ]
     },
     {
      "id": "high",
      "name": "High",
-     "say": "The method itself is the experiment. Worth doing, and worth saying so at the start so a null result reads as information."
+     "say": "A larger system, a disordered one, or one with little structural precedent. What to bind is still a question alongside whether a binder will.",
+     "eg": [
+      "A multi-domain assembly whose interface only forms in context",
+      "A disordered region at the site of interest",
+      "A target with no close structural precedent to design from"
+     ]
     }
    ]
   }
@@ -656,10 +671,6 @@ window.FOUNDRY = {
     "name": "Binder campaigns",
     "sub": "the spine of the machine",
     "status": "running",
-    "risk": {
-     "level": "medium",
-     "why": "The loop that works best here, and still the hit rate is the question - published success runs 10 to 100 percent per target, and this project has its own round where the two best designs bound the wrong face. Expect more than one round and plan the counter-screen from the start."
-    },
     "problem": "A protein with a face worth blocking and no reagent that binds it. The design models will propose thousands of candidates against that face; the question is which of them actually bind it, and whether the ones that bind landed where they were designed to land.",
     "areas": [
      "Parkinson's",
@@ -689,10 +700,6 @@ window.FOUNDRY = {
     "name": "Structural biology and construct workflow",
     "sub": "which construct crystallises",
     "status": "phase 2",
-    "risk": {
-     "level": "low",
-     "why": "Crystallography of a designed complex is the most routine thing on this list and it is the house speciality. The risk is queue and hardware - the imaging carts are phase 2 - rather than whether the method works."
-    },
     "problem": "A construct that expresses is not a construct that diffracts, and the distance between the two is usually paid for in months of hand work. The screen is cheap per drop and expensive per hour, which is exactly the shape of problem automation is for.",
     "areas": [
      "crystallisation screening",
@@ -713,10 +720,6 @@ window.FOUNDRY = {
     "name": "Enzyme design",
     "sub": "active or inactive, at plate scale",
     "status": "taking proposals",
-    "risk": {
-     "level": "high",
-     "why": "De novo catalytic activity is still the hardest ask in design. Worth doing precisely because a null result is informative, but it should be entered as a method experiment rather than as a reagent order."
-    },
     "problem": "A designed or redesigned enzyme is a binding problem with a turnover readout bolted on. The deck's limit is not the chemistry, it is whether the assay fits in a well and reads on the PHERAstar.",
     "areas": [
      "designed actives",
@@ -740,10 +743,6 @@ window.FOUNDRY = {
     "name": "Cell-free family screening",
     "sub": "a UniProt family, expressed and sorted",
     "status": "taking proposals",
-    "risk": {
-     "level": "low",
-     "why": "Expression and an activity readout across family members, with no design step to fail. The scale is the work, and the scale is what the deck is for."
-    },
     "problem": "For most protein families, which members are active is unknown because nobody has expressed them all. Cell-free makes the whole family a pipetting problem rather than a cloning programme.",
     "areas": [
      "UniProt family members",
@@ -766,10 +765,6 @@ window.FOUNDRY = {
     "name": "Linkage-specific PTM reagents",
     "sub": "starting with ADP-ribosylation",
     "status": "taking proposals",
-    "risk": {
-     "level": "high",
-     "why": "Discriminating a linkage by its geometry, in sequence context, is a harder discrimination than anything else on this page asks for. The design problem and the assay problem are both open at once."
-    },
     "problem": "Reagents against modified proteins mostly read the modification or the sequence, not both, and almost none read the linkage. A reagent that distinguishes linkage by geometry is a binder design problem with an unusually well-defined face.",
     "areas": [
      "ADP-ribosylation first",
@@ -1359,33 +1354,30 @@ window.FOUNDRY = {
        <div class="why">${esc(a.why)}</div>
      </details>`).join('');
 
-  // The risk scale, with the project styles sitting at each level. The rating
-  // is agreed with the group that owns the work rather than set centrally, so
-  // these are shown as what the scale means and the note says plainly that
-  // none has been signed off.
+  // The risk scale. These rate the TARGET, not the campaign: the same binder
+  // chain is low risk against a well-characterised single domain and high
+  // against a disordered assembly, so the examples under each level are kinds
+  // of target rather than kinds of work. No project style carries a level,
+  // and no group is named against one - the 19 November session was explicit
+  // that a tier is agreed with the group that owns the target.
   const SC = FIT.scale;
   document.getElementById('rs-t').textContent = SC.title;
   document.getElementById('rs-note').textContent = SC.note;
-  document.getElementById('rs').innerHTML = SC.levels.map(l => {
-    const mine = (F.programmes.programmes || [])
-      .filter(p => p.risk && p.risk.level === l.id);
-    const eg = mine.map(p =>
-      `<div><b>${esc(p.name)}</b><span>${esc(p.risk.why)}</span></div>`).join('');
-    return `<div class="lev" style="border-top-color:${LEVC[l.id] || 'var(--rule)'}">
-      <h4>${esc(l.name)}<span class="c">${mine.length || 'none'}</span></h4>
+  document.getElementById('rs').innerHTML = SC.levels.map(l =>
+    `<div class="lev" style="border-top-color:${LEVC[l.id] || 'var(--rule)'}">
+      <h4>${esc(l.name)}</h4>
       <p>${esc(l.say)}</p>
-      ${eg ? `<div class="eg">${eg}</div>`
-           : '<div class="none">Nothing sits here yet.</div>'}
-    </div>`;
-  }).join('');
+      <div class="eg">${(l.eg || []).map(e => `<span>${esc(e)}</span>`).join('')}</div>
+    </div>`).join('');
 
   document.getElementById('foot').innerHTML =
     `Generated from <code>_data/programmes.yml</code>, <code>_data/stages.yml</code> and
      <code>_data/gates.yml</code>; the build fails if a programme claims a loop, a route or a
-     gate that does not exist. The risk levels are indicative. Each is meant to be agreed
-     with the group that owns the work rather than set centrally, and none has been agreed
-     yet, so they say where a kind of work sits on the scale and not what anyone has
-     signed off.
+     gate that does not exist. The risk levels rate a target rather than a style of work,
+     so no programme above carries one: the same campaign is low risk against a
+     well-characterised domain and high against a disordered assembly. They are indicative,
+     agreed with the group that owns the target rather than set centrally, and none has
+     been agreed yet.
      <a href="workflows.html" style="color:var(--ink)">Plan a campaign &rarr;</a>`;
 })();
 </script>
