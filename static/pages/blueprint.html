@@ -27,6 +27,18 @@
   .nav a{color:var(--muted)}
   .nav a:hover{color:var(--ink)}
 
+  /* a drawn panel: what the cart does, in page colours rather than on paper */
+  .cfig{margin:13px 0 0;border:1px solid var(--rule);border-radius:9px;padding:8px 10px}
+  .cfig figcaption{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;
+                   color:var(--muted);margin-bottom:4px}
+  .cfig svg{display:block;width:100%;height:auto;font-family:var(--font)}
+  svg .ln{fill:none;stroke:var(--ink);stroke-width:1.1;stroke-linejoin:round;stroke-linecap:round}
+  svg .mu{fill:none;stroke:var(--muted);stroke-width:1}
+  svg .dash{stroke-dasharray:3 2.5}
+  svg .fl,svg .none{stroke:none}
+  svg text.lb{font-size:8.5px;fill:var(--ink)}
+  svg text.sm{font-size:7.5px;fill:var(--muted)}
+
   /* the sheet */
   .sheet{background:var(--paper);border-radius:14px;padding:6px;overflow:hidden;
          box-shadow:0 1px 3px rgba(0,0,0,.18)}
@@ -151,7 +163,7 @@
     <div class="sub" id="s"></div>
     <div class="note" id="n"></div>
     <div class="nav"><a href="foundry.html">what happens here</a>
-      &nbsp;&middot;&nbsp; <a href="workflows.html">plan a campaign</a>
+      &nbsp;&middot;&nbsp; <a href="workflows.html">sample protocols</a>
       &nbsp;&middot;&nbsp; <a href="intake.html">propose a campaign</a>
       &nbsp;&middot;&nbsp; <a href="https://sofibali.github.io/protein-design-foundry/">foundry site</a></div>
   </header>
@@ -169,6 +181,92 @@
   <div class="foot" id="foot"></div>
 </div>
 
+<script>
+// The drawing kit the figures on these pages are made of.
+//
+// Shared by the protocol library (workflows.html) and the cart details
+// (blueprint.html), inlined into both by scripts/build_pages.py so each page
+// stays a single file you can mail. Every panel is built from these few
+// primitives, which is what keeps fifteen protocols and nineteen carts
+// looking like they came out of the same pen.
+(function () {
+const esc = t => String(t).replace(/[&<>]/g, m => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[m]));
+// Two panels per protocol, drawn the way panel A of a paper is drawn: what
+// physically happens on the deck, and what the readout looks like when it
+// comes back. The sample panels are sketches of the shape of the answer,
+// not measurements - every one of them carries a tag saying so.
+const gv = (o, k, d) => (o && o[k] !== undefined) ? o[k] : d;
+const n1 = v => Math.round(v * 10) / 10;
+const G = {
+  // primitives
+  r: (x, y, w, h, o) => `<rect x="${n1(x)}" y="${n1(y)}" width="${n1(w)}" height="${n1(h)}"`
+    + ` rx="${gv(o, 'r', 2.5)}" class="${gv(o, 'c', 'ln')}"`
+    + ((o && o.f) ? ` fill="${o.f}" fill-opacity="${gv(o, 'o', .16)}"` : '') + `/>`,
+  c: (x, y, rr, o) => `<circle cx="${n1(x)}" cy="${n1(y)}" r="${n1(rr)}" class="${gv(o, 'c', 'ln')}"`
+    + ((o && o.f) ? ` fill="${o.f}" fill-opacity="${gv(o, 'o', .16)}"` : '') + `/>`,
+  dot: (x, y, rr, col) => `<circle cx="${n1(x)}" cy="${n1(y)}" r="${n1(rr)}" class="fl"`
+    + ` fill="${col || 'var(--ink)'}"/>`,
+  l: (x1, y1, x2, y2, o) => `<line x1="${n1(x1)}" y1="${n1(y1)}" x2="${n1(x2)}" y2="${n1(y2)}"`
+    + ` class="${gv(o, 'c', 'ln')}"/>`,
+  p: (d, o) => `<path d="${d}" class="${gv(o, 'c', 'ln')}"`
+    + ((o && o.f) ? ` fill="${o.f}" fill-opacity="${gv(o, 'o', .16)}"` : '') + `/>`,
+  t: (x, y, s, o) => `<text x="${n1(x)}" y="${n1(y)}" class="${gv(o, 'c', 'lb')}"`
+    + ` text-anchor="${gv(o, 'a', 'middle')}"`
+    + ((o && o.rot) ? ` transform="rotate(${o.rot} ${n1(x)} ${n1(y)})"` : '') + `>${esc(s)}</text>`,
+
+  // an arrow with its head drawn as a path, so no page-wide marker ids
+  a: (x1, y1, x2, y2, o) => {
+    const an = Math.atan2(y2 - y1, x2 - x1), hh = gv(o, 'h', 4.2);
+    const bx = x2 - Math.cos(an) * hh, by = y2 - Math.sin(an) * hh;
+    const px = Math.sin(an) * hh * .52, py = -Math.cos(an) * hh * .52;
+    const col = gv(o, 'fill', 'var(--muted)');
+    return G.l(x1, y1, bx, by, {c: gv(o, 'c', 'mu')})
+      + `<path class="fl" fill="${col}" d="M${n1(x2)} ${n1(y2)}L${n1(bx + px)} ${n1(by + py)}`
+      + `L${n1(bx - px)} ${n1(by - py)}Z"/>`;
+  },
+
+  // a plate seen from above, optionally with wells filled by a function
+  plate: (x, y, w, h, cols, rows, o) => {
+    o = o || {};
+    let s = G.r(x, y, w, h, {r: 2, f: o.f, o: o.o, c: gv(o, 'c', 'ln')});
+    const pd = gv(o, 'pad', 3), dx = (w - 2 * pd) / cols, dy = (h - 2 * pd) / rows;
+    const rr = Math.min(dx, dy) * gv(o, 'wr', .32);
+    for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
+      const cx = x + pd + dx * (i + .5), cy = y + pd + dy * (j + .5);
+      const fill = o.well ? o.well(i, j) : null;
+      s += fill ? G.dot(cx, cy, rr, fill) : G.c(cx, cy, rr, {c: 'mu'});
+    }
+    return s;
+  },
+
+  // a single well seen in section, and the liquid standing in it
+  well: (x, y, w, h, o) => G.p(`M${n1(x)} ${n1(y)}V${n1(y + h - 5)}Q${n1(x)} ${n1(y + h)}`
+    + ` ${n1(x + 5)} ${n1(y + h)}H${n1(x + w - 5)}Q${n1(x + w)} ${n1(y + h)} ${n1(x + w)}`
+    + ` ${n1(y + h - 5)}V${n1(y)}`, o),
+  liq: (x, y, w, h, top, col) => G.p(`M${n1(x)} ${n1(top)}V${n1(y + h - 5)}Q${n1(x)} ${n1(y + h)}`
+    + ` ${n1(x + 5)} ${n1(y + h)}H${n1(x + w - 5)}Q${n1(x + w)} ${n1(y + h)} ${n1(x + w)}`
+    + ` ${n1(y + h - 5)}V${n1(top)}Z`, {c: 'none', f: col, o: .22}),
+
+  // axes, drawn as an L
+  ax: (x, y, w, h) => G.p(`M${n1(x)} ${n1(y)}V${n1(y + h)}H${n1(x + w)}`, {c: 'mu'}),
+  poly: (pts, o) => `<polyline points="${pts.map(p => n1(p[0]) + ',' + n1(p[1])).join(' ')}"`
+    + ` class="${gv(o, 'c', 'ln')}"/>`,
+  arc: (cx, cy, rr, a0, a1, col, wd) => {
+    const pt = a => [cx + rr * Math.cos(a * Math.PI / 180), cy + rr * Math.sin(a * Math.PI / 180)];
+    const s = pt(a0), e = pt(a1);
+    return `<path d="M${n1(s[0])} ${n1(s[1])}A${rr} ${rr} 0 ${(a1 - a0) > 180 ? 1 : 0} 1`
+      + ` ${n1(e[0])} ${n1(e[1])}" fill="none" stroke="${col}" stroke-width="${wd || 4}"/>`;
+  }
+};
+// deterministic pseudo-random, so a figure draws the same way every time
+const rnd = seed => { let s = seed; return () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648; };
+const svg = (body, label, h) => `<svg viewBox="0 0 320 ${h || 136}" role="img"`
+  + ` aria-label="${esc(label)}">` + body + `</svg>`;
+
+
+window.FIGKIT = {G: G, svg: svg, rnd: rnd, gv: gv};
+})();
+</script>
 <script>
 window.BLUEPRINT = {
  "title": "UCSF Protein Design Foundry",
@@ -1264,6 +1362,367 @@ window.BLUEPRINT = {
   const esc = t => String(t).replace(/[&<>"]/g, m =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 
+  // the drawing kit (pages/figkit.js, inlined by the build)
+  const G = window.FIGKIT.G, svg = window.FIGKIT.svg, rnd = window.FIGKIT.rnd;
+
+  // CART FIGURES START
+  const CART = {
+
+  'echo': {
+    s: c => {
+      let b = G.t(160, 12, 'destination plate, inverted', {c: 'sm'})
+        + G.plate(70, 16, 180, 18, 12, 1, {f: c});
+      [2, 6, 10].map(i => 73 + (174 / 12) * (i + .5)).forEach(x => {
+        b += G.dot(x, 44, 1.5) + G.dot(x, 54, 1.8) + G.dot(x, 64, 2.1);
+      });
+      b += G.plate(70, 74, 180, 18, 12, 1, {well: (i) => ([2, 6, 10].indexOf(i) >= 0 ? c : null)});
+      return b + G.p('M146 98H174L169 110H151Z', {f: c, o: .3})
+        + G.p('M148 96Q160 89 172 96', {c: 'mu'})
+        + G.t(258, 58, 'picked wells', {c: 'sm', a: 'start'})
+        + G.t(258, 68, 'only', {c: 'sm', a: 'start'})
+        + G.t(160, 126, 'the transducer fires 2.5 nL at a time - no tip, no contact', {c: 'sm'});
+    }
+  },
+
+  'multiflo': {
+    s: c => {
+      let b = G.c(34, 44, 16, {c: 'mu'}) + G.c(34, 44, 8, {c: 'mu'})
+        + G.t(34, 22, 'cassette', {c: 'sm'})
+        + G.p('M50 44H64Q72 44 72 36V32', {c: 'mu'})
+        + G.r(72, 26, 216, 11, {r: 2, f: c});
+      for (let i = 0; i < 12; i++) {
+        const x = 82 + i * 18.6;
+        b += G.l(x, 37, x, 44) + G.l(x, 48, x, 62, {c: 'mu dash'});
+      }
+      return b + G.plate(72, 64, 216, 28, 12, 2, {f: c, well: () => c})
+        + G.t(180, 108, 'every well, same volume', {c: 'lb'})
+        + G.t(180, 124, 'three cassettes cover 1 uL to 3 mL; a 1536 plate at 1 uL a well takes 21 s', {c: 'sm'});
+    }
+  },
+
+  'bravo': {
+    s: c => {
+      let b = G.r(16, 18, 116, 14, {r: 2, f: c});
+      for (let i = 0; i < 12; i++) b += G.l(24 + i * 9.5, 32, 24 + i * 9.5, 48);
+      b += G.plate(16, 52, 116, 26, 12, 2, {f: c})
+        + G.t(74, 94, '96 channels, one stamp', {c: 'lb'})
+        + G.t(74, 106, 'the system throughput ceiling', {c: 'sm'});
+      const nest = (x, lbl, fill) => G.r(x, 40, 54, 26, {r: 3, f: fill, o: .22})
+        + G.t(x + 27, 56, lbl, {c: 'lb'});
+      b += nest(154, '4 C', '#0072B2') + nest(214, '42 C', '#D55E00')
+        + G.r(274, 40, 34, 26, {r: 3, f: c})
+        + G.p('M280 52Q286 46 292 52T304 52', {c: 'mu'})
+        + G.r(276, 58, 30, 4, {r: 1, f: 'var(--ink)', o: 1, c: 'fl'})
+        + G.t(291, 76, 'shake', {c: 'sm'}) + G.t(291, 86, '+ magnet', {c: 'sm'})
+        + G.a(208, 32, 214, 32, {h: 3.5}) + G.t(184, 30, '45 s', {c: 'sm'})
+        + G.t(231, 94, 'two fixed nests', {c: 'lb'})
+        + G.t(231, 106, 'make heat shock a plate move', {c: 'sm'});
+      return b + G.t(160, 126, 'on-deck: the plate never leaves the head to be heated, shaken or held', {c: 'sm'});
+    }
+  },
+
+  'magniflex': {
+    s: c => {
+      let b = G.r(40, 20, 250, 10, {r: 2, f: c});
+      // two channels close together over a tube, two spread over a plate
+      [60, 74].forEach(x => { b += G.l(x, 30, x, 46) + G.p(`M${x - 3} 46H${x + 3}L${x} 56Z`, {c: 'ln'}); });
+      [196, 266].forEach(x => { b += G.l(x, 30, x, 54) + G.p(`M${x - 3} 54H${x + 3}L${x} 64Z`, {c: 'ln'}); });
+      b += G.p('M50 58H84V86Q67 98 50 86Z', {f: c, o: .22}) + G.t(67, 110, 'from a tube', {c: 'sm'})
+        + G.plate(160, 66, 142, 22, 8, 1, {f: c}) + G.t(231, 110, 'into a plate', {c: 'sm'});
+      return b + G.a(96, 40, 186, 40, {h: 3.5}) + G.a(186, 40, 96, 40, {h: 3.5})
+        + G.t(141, 36, 'spacing 9-445 mm', {c: 'sm'})
+        + G.t(160, 128, '2, 4 or 8 independent channels, piston pumps over 5-1000 uL', {c: 'sm'});
+    }
+  },
+
+  'lynx': {
+    s: c => {
+      let b = G.r(30, 18, 180, 11, {r: 2, f: c});
+      for (let i = 0; i < 8; i++) {
+        const x = 42 + i * 22;
+        b += G.l(x, 29, x, 40) + G.r(x - 4.5, 40, 9, 9, {r: 1.5, f: c, o: .5})
+          + G.l(x, 49, x, 60) + G.dot(x, 64, 1.6);
+      }
+      b += G.t(120, 104, 'a flow sensor in every channel', {c: 'lb'})
+        + G.plate(30, 68, 180, 24, 8, 2, {f: c})
+        + G.r(226, 36, 84, 44, {r: 4, c: 'mu'})
+        + G.t(268, 52, 'channel 3', {c: 'sm'}) + G.t(268, 66, '1.02 uL', {c: 'lb'})
+        + G.p('M292 60L296 64L304 54', {c: 'ln'})
+        + G.t(268, 92, 'measured, per channel', {c: 'sm'});
+      return b + G.t(160, 126, 'so a normalised plate is measured rather than nominal', {c: 'sm'});
+    }
+  },
+
+  'thermal': {
+    s: c => {
+      let b = '';
+      [['96', '10-100 uL'], ['96', '10-100 uL'], ['96', '10-100 uL'], ['384', '5-20 uL']].forEach((blk, i) => {
+        const x = 14 + i * 77;
+        // each block runs its own program
+        const pts = [], base = 46;
+        for (let k = 0; k <= 12; k++) {
+          const u = k / 12;
+          const hi = i === 0 ? (k % 2 ? 16 : 0)                       // fast cycling
+            : i === 1 ? (k % 4 < 2 ? 15 : 2)                          // long holds
+            : i === 2 ? 16 * u                                        // a ramp
+            : (k < 2 ? 2 : 14);                                       // hold at one temperature
+          pts.push([x + 4 + k * 5, base - hi]);
+        }
+        b += G.poly(pts, {c: 'mu'})
+          + G.r(x, 54, 68, 30, {r: 3, f: c}) + G.l(x, 62, x + 68, 62, {c: 'mu'});
+        for (let k = 0; k < 4; k++) b += G.c(x + 12 + k * 15, 73, 4, {c: 'mu'});
+        b += G.t(x + 34, 98, blk[0] + '-well', {c: 'lb'}) + G.t(x + 34, 109, blk[1], {c: 'sm'});
+      });
+      return b + G.t(160, 128, 'four blocks, four independent programs at once', {c: 'sm'});
+    }
+  },
+
+  'sealpeel': {
+    s: c => {
+      // apply: foil off a roll, pressed on by a heated head
+      let b = G.c(34, 32, 15, {c: 'mu'}) + G.c(34, 32, 5, {c: 'mu'})
+        + G.l(49, 32, 92, 32, {c: 'mu'})
+        + G.r(58, 36, 70, 12, {r: 2, f: '#D55E00', o: .25}) + G.t(93, 45, 'heat', {c: 'sm'})
+        + G.a(93, 52, 93, 60, {h: 3.5})
+        + G.plate(58, 62, 70, 22, 6, 2, {f: c})
+        + G.t(93, 100, 'PlateLoc', {c: 'lb'}) + G.t(93, 111, 'foil, 30-200 C', {c: 'sm'});
+      b += G.a(140, 62, 166, 62);
+      // peel: the seal lifted off at an angle
+      b += G.plate(192, 62, 70, 22, 6, 2, {f: c})
+        + G.p('M192 60H250L286 34', {c: 'ln'})
+        + G.p('M286 34Q298 30 300 22', {c: 'mu'})
+        + G.t(276, 48, 'seal off', {c: 'sm', a: 'start'})
+        + G.t(227, 100, 'XPeel', {c: 'lb'}) + G.t(227, 111, 'up to 200 seals an hour', {c: 'sm'});
+      return b + G.t(160, 128, 'Ginkgo gives sealing and peeling a cart each; ours shares one', {c: 'sm'});
+    }
+  },
+
+  'breathable': {
+    s: c => {
+      let b = G.r(24, 44, 110, 40, {r: 2, f: c})
+        + [0, 1, 2, 3].map(i => G.well(32 + i * 26, 48, 20, 32)
+            + G.liq(32 + i * 26, 48, 20, 32, 58, c)).join('')
+        + G.l(22, 44, 136, 44, {c: 'ln dash'})
+        + G.t(79, 34, 'gas-permeable', {c: 'sm'})
+        + G.a(50, 40, 50, 22, {h: 3.5}) + G.a(108, 22, 108, 40, {h: 3.5})
+        + G.t(79, 100, 'air moves, 20 h unattended', {c: 'lb'});
+      b += G.r(186, 44, 110, 40, {r: 2, f: c})
+        + [0, 1, 2, 3].map(i => G.well(194 + i * 26, 48, 20, 32)
+            + G.liq(194 + i * 26, 48, 20, 32, 58, c)).join('')
+        + G.l(184, 44, 298, 44, {c: 'ln'})
+        + G.t(241, 34, 'foil', {c: 'sm'})
+        + G.l(234, 12, 248, 26, {c: 'mu'}) + G.l(248, 12, 234, 26, {c: 'mu'})
+        + G.t(241, 100, 'anaerobic by morning', {c: 'lb'});
+      return b + G.t(160, 124, 'the second sealer is what keeps both rolls resident, with no changeover', {c: 'sm'});
+    }
+  },
+
+  'spin': {
+    s: c => {
+      const cx = 96, cy = 62;
+      let b = G.c(cx, cy, 46, {c: 'mu'}) + G.c(cx, cy, 7, {f: c, o: .6})
+        + G.p(`M${cx - 44} ${cy}L${cx + 44} ${cy}`, {c: 'mu dash'});
+      [[-1, -14], [1, 14]].forEach(s => {
+        b += G.r(cx + s[0] * 44 - 13, cy - 11, 26, 22, {r: 2, f: c, o: .4});
+      });
+      b += G.arc(cx, cy, 56, 200, 330, 'var(--muted)', 1.4)
+        + G.a(cx + 50, cy - 26, cx + 56, cy - 14, {h: 4})
+        + G.t(cx, 124, '2 plates a run, 5000 g, about 20 s to speed', {c: 'sm'});
+      // what it leaves behind
+      b += G.well(212, 34, 44, 46) + G.liq(212, 34, 44, 46, 46, c)
+        + G.p('M218 74Q234 66 250 74Q250 80 244 80H224Q218 80 218 74Z', {f: 'var(--ink)', o: .55, c: 'ln'})
+        + G.t(234, 24, 'cell harvest', {c: 'lb'}) + G.t(234, 96, 'pellet, then lysis', {c: 'sm'});
+      return b;
+    }
+  },
+
+  'shaking': {
+    s: c => {
+      let b = G.r(14, 16, 170, 96, {r: 5, f: c, o: .08});
+      for (let i = 0; i < 2; i++) {
+        b += G.l(20, 44 + i * 26, 178, 44 + i * 26, {c: 'mu'});
+        for (let k = 0; k < 2; k++) b += G.r(28 + k * 76, 28 + i * 26, 68, 12, {r: 1, f: c, o: .3});
+      }
+      // the one shelf that shakes, with a deep-well block on it
+      b += G.r(34, 74, 130, 18, {r: 2, f: c})
+        + [0,1,2,3,4,5,6].map(k => G.l(44 + k * 17, 78, 44 + k * 17, 88, {c: 'mu'})).join('')
+        + G.r(24, 94, 150, 8, {r: 2, c: 'mu'})
+        + G.p('M18 92Q8 84 18 76', {c: 'mu'}) + G.p('M180 92Q190 84 180 76', {c: 'mu'})
+        + G.t(99, 124, '14 deep-well slots, 7 concurrent culture protocols', {c: 'sm'})
+        + G.t(214, 40, 'the only shaking', {c: 'lb', a: 'start'})
+        + G.t(214, 54, 'position on the system', {c: 'sm', a: 'start'})
+        + G.t(214, 76, 'so this is the cap on', {c: 'sm', a: 'start'})
+        + G.t(214, 88, 'everything that grows', {c: 'sm', a: 'start'});
+      return b;
+    }
+  },
+
+  'static37': {
+    s: c => {
+      let b = G.r(20, 14, 150, 100, {r: 4, f: c, o: .08});
+      for (let i = 0; i < 6; i++) {
+        b += G.l(24, 28 + i * 15, 166, 28 + i * 15, {c: 'mu'});
+        for (let k = 0; k < 3; k++) b += G.r(30 + k * 46, 18 + i * 15, 42, 9, {r: 1, f: c, o: .35});
+      }
+      return b + G.t(95, 128, '288 standard positions, static, up to 98% RH', {c: 'sm'})
+        + G.l(196, 30, 196, 86) + G.c(196, 92, 7, {f: '#D55E00', o: .55})
+        + G.r(193, 40, 6, 50, {r: 3, f: '#D55E00', o: .55, c: 'none'})
+        + G.t(210, 44, '37 C', {c: 'lb', a: 'start'})
+        + G.t(210, 68, 'this, not the four', {c: 'sm', a: 'start'})
+        + G.t(210, 80, 'cycler blocks, is where', {c: 'sm', a: 'start'})
+        + G.t(210, 92, 'cell-free scales', {c: 'sm', a: 'start'});
+    }
+  },
+
+  'cold': {
+    s: c => {
+      const cx = 84, cy = 62;
+      let b = G.c(cx, cy, 46, {f: c, o: .1}) + G.c(cx, cy, 8, {c: 'mu'});
+      for (let a = 0; a < 12; a++) {
+        const r0 = 12, r1 = 45, th = a * 30 * Math.PI / 180;
+        b += G.l(cx + r0 * Math.cos(th), cy + r0 * Math.sin(th),
+                 cx + r1 * Math.cos(th), cy + r1 * Math.sin(th), {c: 'mu'});
+      }
+      b += G.r(126, 54, 36, 16, {r: 1, f: c, o: .5}) + G.a(136, 62, 172, 62)
+        + G.t(196, 50, 'to the track', {c: 'sm', a: 'start'})
+        + G.t(196, 66, '216 standard', {c: 'lb', a: 'start'})
+        + G.t(196, 78, '+ 50 deep-well', {c: 'sm', a: 'start'});
+      // the coldest position on the system
+      b += G.l(276, 16, 276, 36, {c: 'mu'}) + G.l(268, 21, 284, 31, {c: 'mu'})
+        + G.l(284, 21, 268, 31, {c: 'mu'}) + G.t(276, 48, '4 C', {c: 'lb'});
+      return b + G.t(160, 126, 'DNA, detection reagents, grown blocks, and competent cells on the day', {c: 'sm'});
+    }
+  },
+
+  'ambient': {
+    s: c => {
+      const cx = 84, cy = 60;
+      let b = G.c(cx, cy, 46, {f: c, o: .1}) + G.c(cx, cy, 8, {c: 'mu'});
+      for (let a = 0; a < 12; a++) {
+        const r0 = 12, r1 = 45, th = a * 30 * Math.PI / 180;
+        b += G.l(cx + r0 * Math.cos(th), cy + r0 * Math.sin(th),
+                 cx + r1 * Math.cos(th), cy + r1 * Math.sin(th), {c: 'mu'});
+      }
+      b += G.r(126, 52, 36, 16, {r: 1, f: c, o: .5}) + G.a(136, 60, 172, 60)
+        + G.c(206, 60, 15, {c: 'ln'}) + G.l(206, 60, 206, 51) + G.l(206, 60, 212, 64)
+        + G.l(206, 45, 206, 41) + G.t(206, 88, '12 s', {c: 'lb'})
+        + G.t(238, 52, 'a tray back out in as', {c: 'sm', a: 'start'})
+        + G.t(238, 64, 'little as twelve seconds', {c: 'sm', a: 'start'});
+      return b + G.t(160, 126, 'crystallography trays, Echo source plates, assay plates in flight', {c: 'sm'});
+    }
+  },
+
+  'consumable': {
+    s: c => {
+      let b = '';
+      [[30, 7, 'tip boxes'], [118, 9, 'plates'], [206, 6, 'reservoirs']].forEach(st => {
+        for (let k = 0; k < st[1]; k++)
+          b += G.r(st[0], 86 - k * 9, 66, 8, {r: 1, f: c, o: .25 + k * .05});
+        b += G.t(st[0] + 33, 108, st[2], {c: 'sm'});
+      });
+      // the gripper taking the top box
+      b += G.l(63, 18, 63, 28) + G.l(50, 28, 76, 28) + G.l(50, 28, 50, 38) + G.l(76, 28, 76, 38)
+        + G.a(63, 42, 63, 52, {h: 3.5});
+      return b + G.t(160, 126, 'about 770 plates or 154 tip boxes - every tip box on the system lives here', {c: 'sm'});
+    }
+  },
+
+  'reader': {
+    s: c => {
+      let b = G.r(96, 14, 128, 30, {r: 3, f: c})
+        + G.c(130, 29, 10, {c: 'mu'}) + G.c(130, 29, 4, {c: 'mu'})
+        + G.l(130, 19, 130, 39, {c: 'mu'}) + G.l(120, 29, 140, 29, {c: 'mu'})
+        + G.t(188, 32, 'optic module', {c: 'sm'})
+        + G.a(126, 46, 140, 66, {h: 3.6}) + G.t(104, 58, 'ex', {c: 'sm'})
+        + G.a(170, 66, 184, 46, {h: 3.6}) + G.t(200, 58, 'em', {c: 'sm'})
+        + G.plate(60, 70, 200, 30, 24, 3, {f: c, wr: .3,
+            well: (i, j) => ((i * 3 + j) % 7 === 0 ? c : null)});
+      return b + G.t(160, 114, 'every readout in the spec, 6 to 3,456 wells', {c: 'lb'})
+        + G.t(160, 128, 'tied with the Bravo as the system bottleneck: 150 384-well plates a day', {c: 'sm'});
+    }
+  },
+
+  'imaging': {
+    s: c =>
+      G.r(116, 12, 88, 30, {r: 3, c: 'ln dash'}) + G.c(160, 27, 9, {c: 'mu'})
+      + G.t(160, 56, 'camera', {c: 'sm'})
+      + G.l(142, 42, 128, 66, {c: 'mu dash'}) + G.l(178, 42, 192, 66, {c: 'mu dash'})
+      + G.well(104, 66, 112, 30) + G.liq(104, 66, 112, 30, 76, c)
+      + G.p('M150 76A12 7 0 0 1 174 76Z', {f: c, o: .6, c: 'ln'})
+      + G.p('M158 70L164 73L160 78L154 75Z', {f: 'var(--ink)', o: .7, c: 'ln'})
+      + G.t(160, 110, 'one subwell of a tray', {c: 'sm'})
+      + G.r(240, 54, 62, 44, {r: 2, c: 'mu'})
+      + G.p('M264 70L272 74L267 81L259 77Z', {f: c, o: .8, c: 'ln'})
+      + G.t(271, 48, 'scored image', {c: 'sm'})
+      + G.a(222, 76, 236, 76, {h: 3.5})
+      + G.t(160, 128, '560 imaging events a campaign: 9 h on a cart against 37 h at a microscope', {c: 'sm'})
+  },
+
+  'ambient2': {
+    s: c => {
+      const wheel = (cx, cy, dashed) => {
+        let s = G.c(cx, cy, 36, {f: dashed ? null : c, o: .1, c: dashed ? 'ln dash' : 'ln'})
+          + G.c(cx, cy, 7, {c: 'mu'});
+        for (let a = 0; a < 10; a++) {
+          const th = a * 36 * Math.PI / 180;
+          s += G.l(cx + 10 * Math.cos(th), cy + 10 * Math.sin(th),
+                   cx + 35 * Math.cos(th), cy + 35 * Math.sin(th), {c: 'mu'});
+        }
+        return s;
+      };
+      return wheel(76, 58, false) + wheel(190, 58, true)
+        + G.t(76, 108, 'installed', {c: 'sm'}) + G.t(190, 108, 'phase 2', {c: 'sm'})
+        + G.a(120, 58, 148, 58)
+        + G.t(262, 50, '216', {c: 'lb'}) + G.t(262, 64, 'to 432', {c: 'lb'})
+        + G.t(262, 78, 'positions', {c: 'sm'})
+        + G.t(160, 128, 'so trays can rotate without displacing assay plates in flight', {c: 'sm'});
+    }
+  },
+
+  'sealer2': {
+    s: c => {
+      let b = '';
+      [[52, 'foil', false], [152, 'breathable', false], [252, 'third type', true]].forEach(r => {
+        b += G.c(r[0], 40, 17, {c: r[2] ? 'ln dash' : 'ln'}) + G.c(r[0], 40, 6, {c: 'mu'})
+          + G.t(r[0], 20, r[1], {c: 'sm'})
+          + G.l(r[0] - 17, 57, r[0] + 17, 57, {c: r[2] ? 'mu dash' : 'mu'});
+      });
+      return b + G.plate(52, 70, 200, 26, 12, 2, {f: c})
+        + G.t(152, 112, 'three rolls resident, no changeover mid-run', {c: 'lb'})
+        + G.t(152, 128, 'a crystallography seal alongside the foil and breathable rolls', {c: 'sm'});
+    }
+  },
+
+  'handler2': {
+    s: c => {
+      const head = (x, dashed) => {
+        let s = G.r(x, 18, 104, 13, {r: 2, f: dashed ? null : c, c: dashed ? 'ln dash' : 'ln'});
+        for (let i = 0; i < 10; i++) s += G.l(x + 8 + i * 10, 31, x + 8 + i * 10, 44,
+                                              {c: dashed ? 'mu dash' : 'ln'});
+        return s + G.plate(x, 48, 104, 24, 12, 2, {f: c, c: dashed ? 'ln dash' : 'ln'});
+      };
+      return head(14, false) + head(160, true)
+        + G.t(66, 88, 'the Bravo', {c: 'lb'}) + G.t(212, 88, 'a second head', {c: 'sm'})
+        + G.t(160, 112, 'about 75 two-plate protocols a day, doubled', {c: 'lb'})
+        + G.t(160, 128, 'the ceiling moves without changing the Bravo', {c: 'sm'});
+    }
+  }
+
+  };
+  // CART FIGURES END
+
+  // what the cart does to a plate, drawn. The elevation under "How it is
+  // built" is the cart as hardware; this is the cart as a unit operation, in
+  // the same hand as the protocol panels on the sample protocols page.
+  const cartFig = r => {
+    const f = CART[r.id];
+    if (!f) return '';
+    const cl = CLASS[(r.class || [])[0]];
+    return `<figure class="cfig"><figcaption>Schematic</figcaption>
+      ${svg(f.s(cl ? cl.c : 'var(--muted)'), r.unitop + ': what the cart does')}</figure>`;
+  };
+
+
   document.getElementById('t').textContent = B.title;
   document.getElementById('s').textContent = B.subtitle;
   document.getElementById('n').textContent =
@@ -1272,7 +1731,7 @@ window.BLUEPRINT = {
     `through it, and how it is built.`;
 
   // one line glyph per kind of unit operation
-  const G = {
+  const GPATH = {
     acoustic: 'M4 16h16M6 16V9M10 16V9M14 16V9M18 16V9M5 7h14',
     bulk:     'M4 17h16M7 17V9a3 3 0 0 1 6 0v8M16 9c0-2 2-2 2-4M13 12h5',
     stamp:    'M5 6h14M7 6v5M10 6v5M14 6v5M17 6v5M5 15h14v3H5z',
@@ -1309,7 +1768,7 @@ window.BLUEPRINT = {
     'Plate reading': 'reader',
     'Crystal imaging': 'imaging',
   };
-  const gpath = u => G[GLYPH[u]] || G.ambient;
+  const gpath = u => GPATH[GLYPH[u]] || GPATH.ambient;
 
   // what each cart class is, in a word. These are the labels Sofia asked for:
   // a cart is one or more of these, and the chips say which.
@@ -1540,6 +1999,7 @@ window.BLUEPRINT = {
           ? '<span class="cls" style="color:var(--muted);border-color:var(--rule)">hand I/O</span>'
           : ''}</div>
         <p class="lead">${esc(r.note)}</p>
+        ${cartFig(r)}
         <table class="kv" style="margin-top:13px">
           <tr><td class="k">Unit operation</td><td class="v">${esc(r.unitop)}</td></tr>
           <tr><td class="k">Cart class</td><td class="v">${esc((r.class || []).join(', ') || '—')}</td></tr>
@@ -1595,6 +2055,7 @@ window.BLUEPRINT = {
         <span><h3>${esc(r.unitop)}</h3><div class="n2">cart ${r.n} &middot; phase 2</div></span>
       </div>
       <p>${esc(r.note)}</p>
+      ${cartFig(r)}
       <div class="classes">${classChips(r)}</div>
     </article>`).join('');
 

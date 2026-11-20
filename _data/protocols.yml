@@ -8,8 +8,8 @@
 #         offline  runs, but its endpoint is a sample prepared for something
 #                  off the rack - the chain ends in an Offline chip
 
-title: Foundry protocols
-subtitle: Every workflow as a deck sequence
+title: Sample protocols
+subtitle: What each one does on the deck, and what it hands back
 note: Click an instrument to see everything that needs it.
 
 # ---------------------------------------------------------------------------

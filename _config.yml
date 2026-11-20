@@ -35,7 +35,7 @@ defaults:
 # mail attachment as from the site.
 nav:
   - {title: "Project styles",  url: "/static/pages/foundry.html"}
-  - {title: "Plan a campaign", url: "/static/pages/workflows.html"}
+  - {title: "Sample protocols", url: "/static/pages/workflows.html"}
   - {title: "Blueprint",       url: "/static/pages/blueprint.html"}
   - {title: "Propose",         url: "/static/pages/intake.html"}
   - {title: "Capabilities", url: "/capabilities/"}

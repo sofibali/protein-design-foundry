@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Plan a Campaign</title>
+<title>Sample Protocols</title>
 <style>
   :root {
     --bg:#fff; --ink:#1d1d1f; --muted:#8e8e93; --rule:#d2d2d7; --tab-bg:#f2f2f4;
@@ -46,7 +46,7 @@
   .role b{color:var(--ink);font-weight:500}
   .role .sp{display:block;margin-top:4px;line-height:1.5}
   /* --- plan a day --- */
-  .plan{border:1px solid var(--rule);border-radius:12px;padding:14px 16px 16px;margin:18px 0 4px}
+  .plan{border:1px solid var(--rule);border-radius:12px;padding:14px 16px 16px;margin:34px 0 4px}
   .plan h2{font-size:16px;font-weight:500;margin:0 0 3px}
   .plan .lede{color:var(--muted);font-size:12.5px;margin-bottom:11px;max-width:74ch}
   .routes{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
@@ -281,6 +281,12 @@
   </div>
   <div class="legend" id="legend"></div>
 
+  <h2 class="libhead">Protocols</h2>
+  <p class="libnote">Fifteen of them, each with a schematic of what happens on the deck and a
+    sample output drawn in the shape the readout comes back in, not from real results. Add any
+    protocol to the campaign at the foot of the page; its gates come with it.</p>
+  <div id="phases"></div>
+
   <section class="plan">
     <h2>Plan a campaign</h2>
     <div class="lede" id="plan-lede"></div>
@@ -292,13 +298,6 @@
       <div class="verdict" id="verdict"></div>
     </details>
   </section>
-
-  <h2 class="libhead">Protocols</h2>
-  <p class="libnote">Fifteen of them, each with a schematic of what happens on the deck and a
-    sketch of what comes back. <b>The sample panels are drawn, not measured</b> &mdash; they show
-    the shape of the readout, never real results. Add any protocol to the campaign above; its
-    gates come with it.</p>
-  <div id="phases"></div>
 
   <section class="loops">
     <h2>Loops</h2>
@@ -315,9 +314,95 @@
 </div>
 
 <script>
+// The drawing kit the figures on these pages are made of.
+//
+// Shared by the protocol library (workflows.html) and the cart details
+// (blueprint.html), inlined into both by scripts/build_pages.py so each page
+// stays a single file you can mail. Every panel is built from these few
+// primitives, which is what keeps fifteen protocols and nineteen carts
+// looking like they came out of the same pen.
+(function () {
+const esc = t => String(t).replace(/[&<>]/g, m => ({'&': '&amp;', '<': '&lt;', '>': '&gt;'}[m]));
+// Two panels per protocol, drawn the way panel A of a paper is drawn: what
+// physically happens on the deck, and what the readout looks like when it
+// comes back. The sample panels are sketches of the shape of the answer,
+// not measurements - every one of them carries a tag saying so.
+const gv = (o, k, d) => (o && o[k] !== undefined) ? o[k] : d;
+const n1 = v => Math.round(v * 10) / 10;
+const G = {
+  // primitives
+  r: (x, y, w, h, o) => `<rect x="${n1(x)}" y="${n1(y)}" width="${n1(w)}" height="${n1(h)}"`
+    + ` rx="${gv(o, 'r', 2.5)}" class="${gv(o, 'c', 'ln')}"`
+    + ((o && o.f) ? ` fill="${o.f}" fill-opacity="${gv(o, 'o', .16)}"` : '') + `/>`,
+  c: (x, y, rr, o) => `<circle cx="${n1(x)}" cy="${n1(y)}" r="${n1(rr)}" class="${gv(o, 'c', 'ln')}"`
+    + ((o && o.f) ? ` fill="${o.f}" fill-opacity="${gv(o, 'o', .16)}"` : '') + `/>`,
+  dot: (x, y, rr, col) => `<circle cx="${n1(x)}" cy="${n1(y)}" r="${n1(rr)}" class="fl"`
+    + ` fill="${col || 'var(--ink)'}"/>`,
+  l: (x1, y1, x2, y2, o) => `<line x1="${n1(x1)}" y1="${n1(y1)}" x2="${n1(x2)}" y2="${n1(y2)}"`
+    + ` class="${gv(o, 'c', 'ln')}"/>`,
+  p: (d, o) => `<path d="${d}" class="${gv(o, 'c', 'ln')}"`
+    + ((o && o.f) ? ` fill="${o.f}" fill-opacity="${gv(o, 'o', .16)}"` : '') + `/>`,
+  t: (x, y, s, o) => `<text x="${n1(x)}" y="${n1(y)}" class="${gv(o, 'c', 'lb')}"`
+    + ` text-anchor="${gv(o, 'a', 'middle')}"`
+    + ((o && o.rot) ? ` transform="rotate(${o.rot} ${n1(x)} ${n1(y)})"` : '') + `>${esc(s)}</text>`,
+
+  // an arrow with its head drawn as a path, so no page-wide marker ids
+  a: (x1, y1, x2, y2, o) => {
+    const an = Math.atan2(y2 - y1, x2 - x1), hh = gv(o, 'h', 4.2);
+    const bx = x2 - Math.cos(an) * hh, by = y2 - Math.sin(an) * hh;
+    const px = Math.sin(an) * hh * .52, py = -Math.cos(an) * hh * .52;
+    const col = gv(o, 'fill', 'var(--muted)');
+    return G.l(x1, y1, bx, by, {c: gv(o, 'c', 'mu')})
+      + `<path class="fl" fill="${col}" d="M${n1(x2)} ${n1(y2)}L${n1(bx + px)} ${n1(by + py)}`
+      + `L${n1(bx - px)} ${n1(by - py)}Z"/>`;
+  },
+
+  // a plate seen from above, optionally with wells filled by a function
+  plate: (x, y, w, h, cols, rows, o) => {
+    o = o || {};
+    let s = G.r(x, y, w, h, {r: 2, f: o.f, o: o.o, c: gv(o, 'c', 'ln')});
+    const pd = gv(o, 'pad', 3), dx = (w - 2 * pd) / cols, dy = (h - 2 * pd) / rows;
+    const rr = Math.min(dx, dy) * gv(o, 'wr', .32);
+    for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
+      const cx = x + pd + dx * (i + .5), cy = y + pd + dy * (j + .5);
+      const fill = o.well ? o.well(i, j) : null;
+      s += fill ? G.dot(cx, cy, rr, fill) : G.c(cx, cy, rr, {c: 'mu'});
+    }
+    return s;
+  },
+
+  // a single well seen in section, and the liquid standing in it
+  well: (x, y, w, h, o) => G.p(`M${n1(x)} ${n1(y)}V${n1(y + h - 5)}Q${n1(x)} ${n1(y + h)}`
+    + ` ${n1(x + 5)} ${n1(y + h)}H${n1(x + w - 5)}Q${n1(x + w)} ${n1(y + h)} ${n1(x + w)}`
+    + ` ${n1(y + h - 5)}V${n1(y)}`, o),
+  liq: (x, y, w, h, top, col) => G.p(`M${n1(x)} ${n1(top)}V${n1(y + h - 5)}Q${n1(x)} ${n1(y + h)}`
+    + ` ${n1(x + 5)} ${n1(y + h)}H${n1(x + w - 5)}Q${n1(x + w)} ${n1(y + h)} ${n1(x + w)}`
+    + ` ${n1(y + h - 5)}V${n1(top)}Z`, {c: 'none', f: col, o: .22}),
+
+  // axes, drawn as an L
+  ax: (x, y, w, h) => G.p(`M${n1(x)} ${n1(y)}V${n1(y + h)}H${n1(x + w)}`, {c: 'mu'}),
+  poly: (pts, o) => `<polyline points="${pts.map(p => n1(p[0]) + ',' + n1(p[1])).join(' ')}"`
+    + ` class="${gv(o, 'c', 'ln')}"/>`,
+  arc: (cx, cy, rr, a0, a1, col, wd) => {
+    const pt = a => [cx + rr * Math.cos(a * Math.PI / 180), cy + rr * Math.sin(a * Math.PI / 180)];
+    const s = pt(a0), e = pt(a1);
+    return `<path d="M${n1(s[0])} ${n1(s[1])}A${rr} ${rr} 0 ${(a1 - a0) > 180 ? 1 : 0} 1`
+      + ` ${n1(e[0])} ${n1(e[1])}" fill="none" stroke="${col}" stroke-width="${wd || 4}"/>`;
+  }
+};
+// deterministic pseudo-random, so a figure draws the same way every time
+const rnd = seed => { let s = seed; return () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648; };
+const svg = (body, label, h) => `<svg viewBox="0 0 320 ${h || 136}" role="img"`
+  + ` aria-label="${esc(label)}">` + body + `</svg>`;
+
+
+window.FIGKIT = {G: G, svg: svg, rnd: rnd, gv: gv};
+})();
+</script>
+<script>
 window.PROTOCOLS = {
- "title": "Foundry protocols",
- "subtitle": "Every workflow as a deck sequence",
+ "title": "Sample protocols",
+ "subtitle": "What each one does on the deck, and what it hands back",
  "note": "Click an instrument to see everything that needs it.",
  "rates": {
   "day_min": 1200,
@@ -2077,82 +2162,8 @@ window.PROTOCOLS = {
   };
   const esc = t => String(t).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
 
-  // ---- the protocol figures --------------------------------------------
-  // Two panels per protocol, drawn the way panel A of a paper is drawn: what
-  // physically happens on the deck, and what the readout looks like when it
-  // comes back. The sample panels are sketches of the shape of the answer,
-  // not measurements - every one of them carries a tag saying so.
-  const gv = (o, k, d) => (o && o[k] !== undefined) ? o[k] : d;
-  const n1 = v => Math.round(v * 10) / 10;
-  const G = {
-    // primitives
-    r: (x, y, w, h, o) => `<rect x="${n1(x)}" y="${n1(y)}" width="${n1(w)}" height="${n1(h)}"`
-      + ` rx="${gv(o, 'r', 2.5)}" class="${gv(o, 'c', 'ln')}"`
-      + ((o && o.f) ? ` fill="${o.f}" fill-opacity="${gv(o, 'o', .16)}"` : '') + `/>`,
-    c: (x, y, rr, o) => `<circle cx="${n1(x)}" cy="${n1(y)}" r="${n1(rr)}" class="${gv(o, 'c', 'ln')}"`
-      + ((o && o.f) ? ` fill="${o.f}" fill-opacity="${gv(o, 'o', .16)}"` : '') + `/>`,
-    dot: (x, y, rr, col) => `<circle cx="${n1(x)}" cy="${n1(y)}" r="${n1(rr)}" class="fl"`
-      + ` fill="${col || 'var(--ink)'}"/>`,
-    l: (x1, y1, x2, y2, o) => `<line x1="${n1(x1)}" y1="${n1(y1)}" x2="${n1(x2)}" y2="${n1(y2)}"`
-      + ` class="${gv(o, 'c', 'ln')}"/>`,
-    p: (d, o) => `<path d="${d}" class="${gv(o, 'c', 'ln')}"`
-      + ((o && o.f) ? ` fill="${o.f}" fill-opacity="${gv(o, 'o', .16)}"` : '') + `/>`,
-    t: (x, y, s, o) => `<text x="${n1(x)}" y="${n1(y)}" class="${gv(o, 'c', 'lb')}"`
-      + ` text-anchor="${gv(o, 'a', 'middle')}"`
-      + ((o && o.rot) ? ` transform="rotate(${o.rot} ${n1(x)} ${n1(y)})"` : '') + `>${esc(s)}</text>`,
-
-    // an arrow with its head drawn as a path, so no page-wide marker ids
-    a: (x1, y1, x2, y2, o) => {
-      const an = Math.atan2(y2 - y1, x2 - x1), hh = gv(o, 'h', 4.2);
-      const bx = x2 - Math.cos(an) * hh, by = y2 - Math.sin(an) * hh;
-      const px = Math.sin(an) * hh * .52, py = -Math.cos(an) * hh * .52;
-      const col = gv(o, 'fill', 'var(--muted)');
-      return G.l(x1, y1, bx, by, {c: gv(o, 'c', 'mu')})
-        + `<path class="fl" fill="${col}" d="M${n1(x2)} ${n1(y2)}L${n1(bx + px)} ${n1(by + py)}`
-        + `L${n1(bx - px)} ${n1(by - py)}Z"/>`;
-    },
-
-    // a plate seen from above, optionally with wells filled by a function
-    plate: (x, y, w, h, cols, rows, o) => {
-      o = o || {};
-      let s = G.r(x, y, w, h, {r: 2, f: o.f, o: o.o, c: gv(o, 'c', 'ln')});
-      const pd = gv(o, 'pad', 3), dx = (w - 2 * pd) / cols, dy = (h - 2 * pd) / rows;
-      const rr = Math.min(dx, dy) * gv(o, 'wr', .32);
-      for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) {
-        const cx = x + pd + dx * (i + .5), cy = y + pd + dy * (j + .5);
-        const fill = o.well ? o.well(i, j) : null;
-        s += fill ? G.dot(cx, cy, rr, fill) : G.c(cx, cy, rr, {c: 'mu'});
-      }
-      return s;
-    },
-
-    // a single well seen in section, and the liquid standing in it
-    well: (x, y, w, h, o) => G.p(`M${n1(x)} ${n1(y)}V${n1(y + h - 5)}Q${n1(x)} ${n1(y + h)}`
-      + ` ${n1(x + 5)} ${n1(y + h)}H${n1(x + w - 5)}Q${n1(x + w)} ${n1(y + h)} ${n1(x + w)}`
-      + ` ${n1(y + h - 5)}V${n1(y)}`, o),
-    liq: (x, y, w, h, top, col) => G.p(`M${n1(x)} ${n1(top)}V${n1(y + h - 5)}Q${n1(x)} ${n1(y + h)}`
-      + ` ${n1(x + 5)} ${n1(y + h)}H${n1(x + w - 5)}Q${n1(x + w)} ${n1(y + h)} ${n1(x + w)}`
-      + ` ${n1(y + h - 5)}V${n1(top)}Z`, {c: 'none', f: col, o: .22}),
-
-    // axes, drawn as an L
-    ax: (x, y, w, h) => G.p(`M${n1(x)} ${n1(y)}V${n1(y + h)}H${n1(x + w)}`, {c: 'mu'}),
-    poly: (pts, o) => `<polyline points="${pts.map(p => n1(p[0]) + ',' + n1(p[1])).join(' ')}"`
-      + ` class="${gv(o, 'c', 'ln')}"/>`,
-    arc: (cx, cy, rr, a0, a1, col, wd) => {
-      const pt = a => [cx + rr * Math.cos(a * Math.PI / 180), cy + rr * Math.sin(a * Math.PI / 180)];
-      const s = pt(a0), e = pt(a1);
-      return `<path d="M${n1(s[0])} ${n1(s[1])}A${rr} ${rr} 0 ${(a1 - a0) > 180 ? 1 : 0} 1`
-        + ` ${n1(e[0])} ${n1(e[1])}" fill="none" stroke="${col}" stroke-width="${wd || 4}"/>`;
-    },
-
-    // the tag every sample panel carries, so no one mistakes a sketch for data
-    tag: (x, y) => G.r(x, y, 78, 11, {r: 5.5, c: 'mu'})
-      + G.t(x + 39, y + 7.8, 'sketch, not data', {c: 'tg'})
-  };
-  // deterministic pseudo-random, so a figure draws the same way every time
-  const rnd = seed => { let s = seed; return () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648; };
-  const svg = (body, label) => `<svg viewBox="0 0 320 136" role="img" aria-label="${esc(label)}">`
-    + body + `</svg>`;
+  // the drawing kit (pages/figkit.js, inlined by the build)
+  const G = window.FIGKIT.G, svg = window.FIGKIT.svg, rnd = window.FIGKIT.rnd;
 
   // FIGURES START
   const FIG = {
@@ -2171,7 +2182,7 @@ window.PROTOCOLS = {
       + G.t(160, 126, 'fired from below: no tip ever touches the DNA', {c: 'sm'}),
     o: c => {
       const seg = [[14, ''], [30, 'T7'], [16, 'RBS'], [112, 'design CDS'], [46, 'Twin-Strep'], [28, 'term'], [14, '']];
-      let x = 18, b = G.t(16, 13, 'what lands in every well', {c: 'sm', a: 'start'}) + G.tag(230, 4);
+      let x = 18, b = G.t(16, 13, 'what lands in every well', {c: 'sm', a: 'start'});
       seg.forEach(sg => {
         const w = sg[0], wide = w >= 40;
         b += (sg[1] === 'design CDS')
@@ -2210,7 +2221,7 @@ window.PROTOCOLS = {
         + G.t(160, 124, 'never plated for colonies - the pool is grown as a pool', {c: 'sm'});
     },
     o: c => {
-      let b = G.ax(32, 22, 268, 78) + G.tag(230, 4);
+      let b = G.ax(32, 22, 268, 78);
       for (let i = 0; i < 26; i++) {
         const h = Math.max(4, 72 * Math.exp(-i / 8.5)), x = 34 + i * 10.2;
         b += G.r(x, 100 - h, 7.6, h, {r: 1, f: c, o: .45, c: 'mu'});
@@ -2248,7 +2259,7 @@ window.PROTOCOLS = {
       const feat = [[-95, -25, 'T7 promoter', 1], [-20, 70, 'design CDS', 1],
                     [78, 104, 'TEV site', 0], [112, 180, 'FP fusion + tag', 0],
                     [190, 255, 'ori', 0]];
-      let b = G.c(cx, cy, r, {c: 'mu'}) + G.tag(230, 4)
+      let b = G.c(cx, cy, r, {c: 'mu'})
         + G.t(cx, cy - 3, '4.1 kb', {c: 'lb'}) + G.t(cx, cy + 8, 'assembled', {c: 'sm'});
       feat.forEach((f, i) => {
         b += G.arc(cx, cy, r, f[0], f[1], c, 5);
@@ -2279,7 +2290,7 @@ window.PROTOCOLS = {
     o: c => {
       const X = v => 40 + v * 24, Y = v => 100 - v * 0.021;
       const pts = [0, 1, 2, 4, 6, 8, 10].map(v => [X(v), Y(3400 * (1 - Math.exp(-v / 4.4)))]);
-      let b = G.ax(36, 20, 268, 80) + G.tag(230, 4) + G.poly(pts, {c: 'ln'});
+      let b = G.ax(36, 20, 268, 80) + G.poly(pts, {c: 'ln'});
       pts.forEach(p => { b += G.dot(p[0], p[1], 2.1); });
       [[3, 'A7'], [5.6, 'B4'], [8.4, 'C11']].forEach(w => {
         const y = Y(3400 * (1 - Math.exp(-w[0] / 4.4)));
@@ -2309,7 +2320,7 @@ window.PROTOCOLS = {
       + G.t(160, 122, 'autoinduction, 20 h unattended - no IPTG, no colony picking', {c: 'sm'}),
     o: c => {
       const X = h => 38 + h * 12.6, Y = od => 102 - od * 18;
-      let b = G.ax(36, 18, 268, 84) + G.tag(230, 4);
+      let b = G.ax(36, 18, 268, 84);
       [[3.1, 'a'], [2.4, 'b'], [1.5, 'c']].forEach((s, i) => {
         const pts = [];
         for (let h = 0; h <= 20; h += 1) pts.push([X(h), Y(s[0] / (1 + Math.exp(-(h - 7) / 2.1)))]);
@@ -2350,7 +2361,7 @@ window.PROTOCOLS = {
       const A = nm => 0.42 * Math.exp(-Math.pow(nm - 280, 2) / 200)
                     + 0.55 * Math.exp(-Math.pow(nm - 232, 2) / 512);
       const pts = []; for (let nm = 240; nm <= 340; nm += 2) pts.push([X(nm), Y(A(nm))]);
-      let b = G.ax(40, 20, 262, 80) + G.tag(230, 4) + G.poly(pts, {c: 'ln'});
+      let b = G.ax(40, 20, 262, 80) + G.poly(pts, {c: 'ln'});
       [260, 280, 300, 320, 340].forEach(nm => {
         b += G.l(X(nm), 100, X(nm), 103, {c: 'mu'}) + G.t(X(nm), 112, String(nm), {c: 'sm'});
       });
@@ -2382,7 +2393,7 @@ window.PROTOCOLS = {
       + G.t(160, 128, 'a flow sensor on every channel: the plate is measured, not nominal', {c: 'sm'}),
     o: c => {
       const R = rnd(31), Y = v => 100 - v * 54;
-      let b = G.ax(44, 18, 258, 82) + G.tag(230, 4)
+      let b = G.ax(44, 18, 258, 82)
         + G.l(44, Y(0.5), 302, Y(0.5), {c: 'mu dash'})
         + G.t(302, Y(0.5) - 4, 'target 0.5 mg/mL', {c: 'sm', a: 'end'});
       for (let i = 0; i < 16; i++) {
@@ -2417,7 +2428,7 @@ window.PROTOCOLS = {
       + G.t(160, 126, 'one read, no wash, no separation step', {c: 'sm'}),
     o: c => {
       const R = rnd(11);
-      let b = G.ax(40, 18, 264, 82) + G.tag(230, 4), hit = 0;
+      let b = G.ax(40, 18, 264, 82), hit = 0;
       for (let i = 0; i < 26; i++) {
         const v = R() < .12 ? 0.55 + R() * 0.4 : 0.06 + R() * 0.22;
         const x = 46 + i * 9.8, y = 100 - v * 76, on = v > 0.5;
@@ -2454,7 +2465,7 @@ window.PROTOCOLS = {
     },
     o: c => {
       const set = [[.92, .18, .14, .05], [.74, .61, .66, .06], [.81, .22, .78, .04]];
-      let b = G.ax(40, 18, 264, 82) + G.tag(230, 4);
+      let b = G.ax(40, 18, 264, 82);
       set.forEach((d, g) => {
         d.forEach((v, i) => {
           const x = 52 + g * 84 + i * 15, h = v * 74;
@@ -2490,7 +2501,7 @@ window.PROTOCOLS = {
       const X = nM => 44 + (Math.log(nM) / Math.LN10 + 1) * 64, Y = p => 100 - p * 0.76;
       const KD = 34, f = x => 100 * x / (x + KD);
       const pts = []; for (let e = -1; e <= 3; e += 0.08) pts.push([X(Math.pow(10, e)), Y(f(Math.pow(10, e)))]);
-      let b = G.ax(44, 18, 262, 82) + G.tag(230, 4) + G.poly(pts, {c: 'ln'});
+      let b = G.ax(44, 18, 262, 82) + G.poly(pts, {c: 'ln'});
       [0.3, 1, 3, 10, 30, 100, 300, 1000].forEach(v => {
         const x = X(v), y = Y(f(v));
         b += G.l(x, y - 4, x, y + 4, {c: 'mu'}) + G.dot(x, y, 2.3, c);
@@ -2524,7 +2535,7 @@ window.PROTOCOLS = {
     o: c => {
       const X = i => 64 + i * 72, Y = v => 100 - v * 0.76;
       const A = [100, 96, 87, 61], B = [100, 71, 27, 9];
-      let b = G.ax(44, 18, 266, 82) + G.tag(230, 4);
+      let b = G.ax(44, 18, 266, 82);
       [[A, 'ln', 'holds'], [B, 'mu', 'gone by 60 C']].forEach(s => {
         b += G.poly(s[0].map((v, i) => [X(i), Y(v)]), {c: s[1]});
         s[0].forEach((v, i) => { b += G.dot(X(i), Y(v), 2.4, s[1] === 'ln' ? c : 'var(--muted)'); });
@@ -2549,7 +2560,7 @@ window.PROTOCOLS = {
       + G.t(160, 132, 'two fixed nests, one move - a single block would ramp for about three minutes', {c: 'sm'}),
     o: c => {
       const R = rnd(5);
-      let b = G.tag(230, 4);
+      let b = '';
       [[64, 46, '1:100'], [160, 14, '1:1,000'], [256, 4, '1:10,000']].forEach(p => {
         b += G.c(p[0], 60, 27, {f: c, o: .1});
         for (let k = 0; k < p[1]; k++) {
@@ -2587,7 +2598,7 @@ window.PROTOCOLS = {
         else if (v >= .94) { xtal++;
           b += G.p(`M${x + 6.5} ${y + 2}L${x + 11} ${y + 5.5}L${x + 6.5} ${y + 9}L${x + 2} ${y + 5.5}Z`, {f: c, o: .85}); }
       }
-      b = G.tag(230, 4) + G.t(36, 16, xtal + ' crystal hits in this block of 80', {c: 'sm', a: 'start'}) + b;
+      b = G.t(36, 16, xtal + ' crystal hits in this block of 80', {c: 'sm', a: 'start'}) + b;
       return b + G.r(36, 100, 13, 11, {r: 1.5, c: 'mu'}) + G.t(54, 109, 'clear', {c: 'sm', a: 'start'})
         + G.r(96, 100, 13, 11, {r: 1.5, c: 'mu'}) + G.dot(100, 104, 1) + G.dot(104, 107, 1) + G.dot(102, 109, 1)
         + G.t(114, 109, 'precipitate', {c: 'sm', a: 'start'})
@@ -2614,7 +2625,7 @@ window.PROTOCOLS = {
       + G.t(160, 128, 'free once 4.7 works: a compound source plate instead of designs', {c: 'sm'}),
     o: c => {
       const R = rnd(23);
-      let b = G.tag(230, 4) + G.t(36, 16, "Z' = 0.74 on the plate's own controls", {c: 'sm', a: 'start'});
+      let b = G.t(36, 16, "Z' = 0.74 on the plate's own controls", {c: 'sm', a: 'start'});
       for (let i = 0; i < 32; i++) for (let j = 0; j < 12; j++) {
         const x = 36 + i * 8, y = 22 + j * 6;
         let v = 0.06 + R() * 0.12;
@@ -2651,7 +2662,7 @@ window.PROTOCOLS = {
     o: c => {
       const v = [6.8, 5.9, 4.4, 3.6, 2.9, 2.4, 2.0, 1.7, 1.5, 1.3, 1.1, 1.0];
       const Y = f => 100 - f * 10.5;
-      let b = G.ax(44, 16, 262, 84) + G.tag(230, 4);
+      let b = G.ax(44, 16, 262, 84);
       v.forEach((f, i) => {
         const x = 52 + i * 20.5, h = 100 - Y(f);
         b += G.r(x, Y(f), 15, h, {r: 1, f: c, o: i < 3 ? .75 : .3, c: 'mu'});
@@ -2928,7 +2939,7 @@ window.PROTOCOLS = {
         <span class="n">&times;${s0.n}</span>
         <button class="s" data-u="${i}" aria-label="one more">+</button>
         <button class="x" data-rm="${i}" aria-label="remove">&times;</button></span>`;
-    }).join('') : `<span class="empty2">Nothing yet \u2014 pick a route, or add protocols below.</span>`;
+    }).join('') : `<span class="empty2">Nothing yet \u2014 pick a route, or add protocols from the list above.</span>`;
 
     cascade();
 
@@ -2978,11 +2989,17 @@ window.PROTOCOLS = {
   });
   // A project style on the landing page links here with its route in the hash,
   // so arriving from one lands on that campaign rather than on the default.
+  const toPlan = () => {
+    const el = document.querySelector('.plan');
+    if (el && el.scrollIntoView) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+  };
   const fromHash = decodeURIComponent((location.hash || '').slice(1));
-  setRoute(P.routes.some(r => r.id === fromHash) ? fromHash : P.routes[0].id);
+  const known = P.routes.some(r => r.id === fromHash);
+  setRoute(known ? fromHash : P.routes[0].id);
+  if (known) toPlan();
   window.addEventListener('hashchange', () => {
     const h = decodeURIComponent((location.hash || '').slice(1));
-    if (P.routes.some(r => r.id === h)) setRoute(h);
+    if (P.routes.some(r => r.id === h)) { setRoute(h); toPlan(); }
   });
 
   function loopSvg(lp) {

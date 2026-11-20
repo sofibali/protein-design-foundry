@@ -78,21 +78,20 @@ def nulls(obj, path=""):
             yield from nulls(v, f"{path}[{i}]")
 
 
-def figures():
-    """What the planner page can draw, read back out of the page itself.
+def figures(page, marker, keys):
+    """What a page can draw, read back out of the page itself.
 
-    The figures are drawing code, so they live in pages/workflows.html rather
-    than in the YAML. This reads the registry between the FIGURES markers so
-    the build can still check that every protocol has one.
+    The figures are drawing code, so they live in the pages rather than in the
+    YAML. This reads a registry between its markers so the build can still
+    check that every protocol, and every cart, has one.
     """
-    src = (PAGES / "workflows.html").read_text(encoding="utf-8")
-    m = re.search(r"// FIGURES START(.*?)// FIGURES END", src, re.S)
+    src = (PAGES / page).read_text(encoding="utf-8")
+    m = re.search(r"// %s START(.*?)// %s END" % (marker, marker), src, re.S)
     if not m:
-        sys.exit("pages/workflows.html has no FIGURES block - the protocol "
-                 "library has nothing to draw with")
+        sys.exit(f"pages/{page} has no {marker} block - it has nothing to draw with")
     block = m.group(1)
     ids = set(re.findall(r"^  '([^']+)': \{", block, re.M))
-    shapes = {k: len(re.findall(r"^    %s:" % k, block, re.M)) for k in ("s", "o", "oc")}
+    shapes = {k: len(re.findall(r"^    %s:" % k, block, re.M)) for k in keys}
     return ids, shapes
 
 
@@ -239,7 +238,7 @@ def check(gates, stages, protos, progs):
     # because they are drawing code, but a protocol added to the YAML with no
     # figure would render as a card with a hole in it, so the build checks the
     # registry here rather than letting the page fall back silently.
-    drawn, shapes = figures()
+    drawn, shapes = figures("workflows.html", "FIGURES", ("s", "o", "oc"))
     for wid in sorted({w["id"] for w in protos["workflows"]} - drawn):
         errs.append(f"workflow {wid!r} has no figure - add a '{wid}' entry to the FIGURES "
                     f"block in pages/workflows.html, with s:, o: and oc:")
@@ -250,6 +249,19 @@ def check(gates, stages, protos, progs):
             errs.append(f"the FIGURES block has {len(drawn)} protocols but {n} {key!r} keys - "
                         f"every protocol needs a schematic (s:), a sample output (o:) and "
                         f"its caption (oc:)")
+
+    # Every cart is drawn too, on the blueprint: what the unit operation does
+    # to a plate, as against the elevation, which is how the cart is built.
+    cdrawn, cshapes = figures("blueprint.html", "CART FIGURES", ("s",))
+    cart_ids = {r["id"] for r in protos.get("racs", [])}
+    for rid in sorted(cart_ids - cdrawn):
+        errs.append(f"cart {rid!r} has no figure - add a '{rid}' entry to the CART FIGURES "
+                    f"block in pages/blueprint.html")
+    for rid in sorted(cdrawn - cart_ids):
+        errs.append(f"pages/blueprint.html draws a figure for {rid!r}, which is not a cart")
+    if cshapes["s"] != len(cdrawn):
+        errs.append(f"the CART FIGURES block has {len(cdrawn)} carts but "
+                    f"{cshapes['s']} s: keys")
 
     # --- the carts, against the instruments ---
     # The capability map and the floor plan have to describe the same machine.
@@ -554,6 +566,14 @@ def bundle(page, src_tag, var, payload):
     if tag not in html:
         sys.exit(f"Expected {tag} in {page}")
     html = html.replace(tag, f"<script>\nwindow.{var} = {blob};\n</script>")
+
+    # the shared drawing kit, inlined wherever a page asks for it. It is one
+    # file so the protocol panels and the cart panels cannot drift into two
+    # different hands.
+    kit_tag = '<script src="figkit.js"></script>'
+    if kit_tag in html:
+        html = html.replace(kit_tag, "<script>\n%s</script>"
+                            % (PAGES / "figkit.js").read_text(encoding="utf-8"))
 
     leftover = re.findall(r'<script src="([^"]+)"', html)
     if leftover:

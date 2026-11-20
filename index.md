@@ -15,9 +15,9 @@ is useless to someone trying to work out whether their experiment will run here.
   <div class="card"><h3><a href="{{ '/static/pages/foundry.html' | relative_url }}">Project styles</a></h3>
     <p>The five kinds of work the foundry takes on, each with its problem, its
     strategy, the loop it runs and where it sits on the risk scale.</p></div>
-  <div class="card"><h3><a href="{{ '/static/pages/workflows.html' | relative_url }}">Plan a campaign</a></h3>
-    <p>Chain protocols into a campaign and see what each decision sends forward,
-    what it drops, and what the chain costs the deck.</p></div>
+  <div class="card"><h3><a href="{{ '/static/pages/workflows.html' | relative_url }}">Sample protocols</a></h3>
+    <p>Every protocol drawn: what happens on the deck, what the readout looks like, what
+    goes in and what comes back. Chain them into a campaign at the foot of the page.</p></div>
   <div class="card"><h3><a href="{{ '/static/pages/blueprint.html' | relative_url }}">System blueprint</a></h3>
     <p>{{ site.data.instruments.racs | where: "status", "installed" | size }} carts on the track,
     {{ site.data.instruments.racs | where: "status", "phase2" | size }} more reserved. Click one for

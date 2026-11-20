@@ -12,3 +12,7 @@ private/
 
 # generated beside the page templates by scripts/build_pages.py
 pages/*.js
+# except this one, which is written by hand: the drawing kit the figures on
+# workflows.html and blueprint.html are made of. The build inlines it into
+# both, it is not generated, and deleting it breaks the build.
+!pages/figkit.js
