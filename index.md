@@ -19,9 +19,8 @@ is useless to someone trying to work out whether their experiment will run here.
     <p>Every protocol drawn: what happens on the deck, what the readout looks like, what
     goes in and what comes back. Chain them into a campaign at the foot of the page.</p></div>
   <div class="card"><h3><a href="{{ '/static/pages/blueprint.html' | relative_url }}">System blueprint</a></h3>
-    <p>{{ site.data.instruments.racs | where: "status", "installed" | size }} carts on the track,
-    {{ site.data.instruments.racs | where: "status", "phase2" | size }} more reserved. Click one for
-    its specs, its class and the protocols that run through it.</p></div>
+    <p>{{ site.data.instruments.racs | size }} carts on the track, each drawn: what the cart
+    does to a plate, what is inside it and the protocols that run through it.</p></div>
   <div class="card"><h3><a href="{{ '/static/pages/intake.html' | relative_url }}">Propose a campaign</a></h3>
     <p>What to send, and how to shape a binder question so it comes back with an
     interpretable answer.</p></div>

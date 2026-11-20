@@ -48,6 +48,12 @@ KINDS = {"deck": "deck", "store": "holds", "consumable": "holds", "virtual": "de
 COST_KEYS = ("bravo", "echo", "reader")
 RAC_STATUSES = ("installed", "phase2")
 
+# Sofia, 2026-11-20: hide all phase 2 crystallography from the pages. The data
+# stays in _data/ and is still checked - phase 2 carts, the phase 2 entries in
+# future.yml and the phase 2 programme are simply not bundled into any page.
+# Putting it back is this one line.
+SHOW_PHASE2 = False
+
 
 def load():
     data = ROOT / "_data"
@@ -254,7 +260,9 @@ def check(gates, stages, protos, progs):
     # to a plate, as against the elevation, which is how the cart is built.
     cdrawn, cshapes = figures("blueprint.html", "CART FIGURES", ("s",))
     cart_ids = {r["id"] for r in protos.get("racs", [])}
-    for rid in sorted(cart_ids - cdrawn):
+    shown = {r["id"] for r in protos.get("racs", [])
+             if SHOW_PHASE2 or r["status"] == "installed"}
+    for rid in sorted(shown - cdrawn):
         errs.append(f"cart {rid!r} has no figure - add a '{rid}' entry to the CART FIGURES "
                     f"block in pages/blueprint.html")
     for rid in sorted(cdrawn - cart_ids):
@@ -262,6 +270,9 @@ def check(gates, stages, protos, progs):
     if cshapes["s"] != len(cdrawn):
         errs.append(f"the CART FIGURES block has {len(cdrawn)} carts but "
                     f"{cshapes['s']} s: keys")
+    if not SHOW_PHASE2 and (cdrawn - shown):
+        errs.append(f"pages/blueprint.html still draws {sorted(cdrawn - shown)}, which "
+                    f"phase 2 hiding takes off the page - drop the figure or set SHOW_PHASE2")
 
     # --- the carts, against the instruments ---
     # The capability map and the floor plan have to describe the same machine.
@@ -463,6 +474,21 @@ def pipeline(protos):
     }
 
 
+def hide_phase2(protos, progs):
+    """The pages' view of the data, with everything phase 2 left out.
+
+    These pages are mailed and dropped in Slack, so hiding has to mean not
+    shipped rather than not displayed: a reader who opens the source should
+    not find the reserved carts in it either.
+    """
+    protos = dict(protos)
+    protos["racs"] = [r for r in protos["racs"] if r["status"] == "installed"]
+    progs = dict(progs)
+    progs["programmes"] = [p for p in progs["programmes"]
+                           if str(p.get("status", "")).replace(" ", "") != "phase2"]
+    return protos, progs
+
+
 def derive(protos):
     """Turn each workflow's machine-time cost into a share of the day.
 
@@ -551,6 +577,70 @@ def sheet_specs():
     return out
 
 
+# The four pages are a path, not a ring. Every page used to link to every
+# other one, which gives a reader twelve edges, no sense of where they are and
+# no way to tell they have seen everything - the endless loop. This is the
+# order instead: what the place does, what it runs, what it runs on, how to
+# ask for it. Each page says where it sits, and offers exactly one next step.
+PATH = [
+    ("foundry.html",   "What happens here", "what the foundry is for"),
+    ("workflows.html", "Sample protocols",  "what it runs, and what each step decides"),
+    ("blueprint.html", "System blueprint",  "the machine the protocols run on"),
+    ("intake.html",    "Propose a campaign", "send us a target"),
+]
+PATHCSS = """<style>
+  .path{display:flex;flex-wrap:wrap;gap:2px;margin:0 0 20px;padding:0;list-style:none;
+        border:1px solid var(--rule);border-radius:9px;overflow:hidden}
+  .path li{flex:1 1 150px;min-width:0}
+  .path a,.path span{display:block;padding:9px 12px;font-size:12.5px;text-decoration:none;
+        color:var(--muted);background:transparent;border-left:1px solid var(--rule);
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .path li:first-child a,.path li:first-child span{border-left:0}
+  .path a:hover{color:var(--ink);background:var(--tab-bg)}
+  .path a:focus-visible,.path span:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+  .path .n{font-variant-numeric:tabular-nums;margin-right:7px;opacity:.65}
+  .path [aria-current=step]{color:var(--ink);font-weight:500;background:var(--tab-bg)}
+  .next{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:34px 0 0;
+        padding:15px 17px;border:1px solid var(--rule);border-radius:10px}
+  .next .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .next a{font-size:15px;color:var(--ink);text-decoration:none;font-weight:500;
+        border-bottom:1px solid var(--rule)}
+  .next a:hover{border-bottom-color:var(--ink)}
+  .next .w{flex:1 1 100%;font-size:12.5px;color:var(--muted);margin-top:1px}
+  .skip{position:absolute;left:-9999px}
+  .skip:focus{left:8px;top:8px;z-index:50;position:fixed;background:var(--bg);color:var(--ink);
+        border:1px solid var(--ink);border-radius:7px;padding:9px 13px;font-size:13px}
+</style>"""
+
+
+def pathbar(page):
+    """Where this page sits in the path, as an ordered list."""
+    out = [PATHCSS, '<nav aria-label="Where you are"><ol class="path">']
+    for n, (href, label, _) in enumerate(PATH, 1):
+        num = f'<span class="n">{n}</span>'
+        if href == page:
+            out.append(f'<li><span aria-current="step">{num}{label}</span></li>')
+        else:
+            out.append(f'<li><a href="{href}">{num}{label}</a></li>')
+    out.append('</ol></nav>')
+    return "\n".join(out)
+
+
+def nextstep(page):
+    """Exactly one way onward, so the path has a direction and an end."""
+    ids = [h for h, _, _ in PATH]
+    i = ids.index(page)
+    if i + 1 < len(PATH):
+        href, label, why = PATH[i + 1]
+        return (f'<div class="next"><span class="k">Next</span>'
+                f'<a href="{href}">{label} &rarr;</a>'
+                f'<span class="w">{why.capitalize()}.</span></div>')
+    return ('<div class="next"><span class="k">That is the path</span>'
+            '<a href="{{SITE}}/">Back to the foundry site &rarr;</a>'
+            '<span class="w">Capabilities, projects, decisions and the cost model '
+            'are on the main site.</span></div>')
+
+
 def bundle(page, src_tag, var, payload):
     """Inline one data blob into one page and write it to dist/."""
     blob = json.dumps(payload, indent=1, sort_keys=False)
@@ -558,9 +648,16 @@ def bundle(page, src_tag, var, payload):
 
     html = (PAGES / page).read_text(encoding="utf-8")
 
-    # {{SITE}} is how a built page points back at the Jekyll site it belongs
-    # to. The address lives in _config.yml and nowhere else.
+    # {{PATH}} and {{NEXT}} put the same four-step path on every page, so a
+    # reader always knows where they are and has one way onward. {{SITE}} is
+    # how a built page points back at the Jekyll site it belongs to. All three
+    # are defined once, here.
+    html = html.replace("{{PATH}}", pathbar(page))
+    html = html.replace("{{NEXT}}", nextstep(page))
     html = html.replace("{{SITE}}", site_url())
+    for ph in ("{{PATH}}", "{{NEXT}}"):
+        if ph in html:
+            sys.exit(f"{page}: {ph} survived substitution")
 
     tag = f'<script src="{src_tag}"></script>'
     if tag not in html:
@@ -612,7 +709,10 @@ def write_inventory(protos):
     # machine as quoted and should not have to carry an absence.
     fut = ROOT / "_data" / "future.yml"
     if fut.exists():
-        insts += (yaml.safe_load(fut.read_text()) or {}).get("future", [])
+        later = (yaml.safe_load(fut.read_text()) or {}).get("future", [])
+        if not SHOW_PHASE2:
+            later = [i for i in later if i.get("status") != "phase2"]
+        insts += later
 
     racs.sort(key=lambda r: r["id"])
     insts.sort(key=lambda i: (i["rac"] or 99, i["key"]))
@@ -632,6 +732,8 @@ def main():
     gates, stages, protos, progs = load()
     n = check(gates, stages, protos, progs)
     protos = derive(protos)
+    if not SHOW_PHASE2:
+        protos, progs = hide_phase2(protos, progs)
 
     # The landing page answers "can the foundry take my project". It needs the
     # programmes, the loops each one runs, and the gates those loops decide at
@@ -683,8 +785,8 @@ def main():
           f"{sum(len(s['protocols']) for s in stages['stages'])} protocols")
     print(f"  {len(protos.get('routes', []))} costed routes")
     rs = protos["racs"]
-    print(f"  {len(rs)} carts: {sum(1 for r in rs if r['status'] == 'installed')} installed, "
-          f"{sum(1 for r in rs if r['status'] == 'phase2')} phase 2")
+    print(f"  {len(rs)} carts on the pages" if SHOW_PHASE2 else
+          f"  {len(rs)} carts on the pages, phase 2 hidden")
     print(f"  {len(protos['workflows'])} workflows across "
           f"{len(protos['instruments'])} instruments, {len(protos['loops'])} loops, "
           f"{sum(len(w['inputs']) for w in protos['workflows'])} inputs")

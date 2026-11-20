@@ -5,8 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Protein Design Foundry</title>
 <style>
+  /* --muted carries most of the explanatory text on this page. At #8e8e93 on
+     white it is 3.26:1, under the 4.5:1 WCAG AA needs for body text. #6e6e73
+     is 5.07:1 and passes. It cannot be one value for both themes: #6e6e73 on
+     the dark background is only 3.63:1, so dark keeps #8e8e93, which is
+     5.64:1 there. */
+
+  /* A visible focus ring on everything keyboard-reachable. The cart tiles are
+     SVG <g role=button>, which gets no focus ring at all in Safari, so the
+     fifteen of them were invisible to a keyboard user. */
+  a:focus-visible, button:focus-visible, summary:focus-visible,
+  [tabindex]:focus-visible, input:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--ink); outline-offset:2px; border-radius:3px}
+  .tile:focus{outline:none}
+  .tile:focus-visible rect.box{stroke:#fff;stroke-width:3}
+  .tile:focus-visible{outline:2px solid #fff;outline-offset:2px}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{transition-duration:.01ms !important;
+      animation-duration:.01ms !important;scroll-behavior:auto !important}
+  }
+
+  /* These pages get printed for meetings, and <details> prints collapsed by
+     default - which on the blueprint means fifteen headings and no specs. */
+  @media print{
+    :root{--bg:#fff;--ink:#000;--muted:#333;--rule:#999}
+    .path,.next,.skip,.nav{display:none !important}
+    details{display:block !important}
+    details > *{display:revert !important}
+    details .ddb,details .why,details .gitems{display:block !important}
+    .sheet,.elev{background:#fff !important}
+    a[href^="http"]::after{content:" (" attr(href) ")";font-size:10px;color:#555}
+    section,article,.lev,.gi,.wf{break-inside:avoid}
+  }
+
   :root {
-    --bg:#fff; --ink:#1d1d1f; --muted:#8e8e93; --rule:#d2d2d7; --tab-bg:#f2f2f4;
+    --bg:#fff; --ink:#1d1d1f; --muted:#6e6e73; --rule:#d2d2d7; --tab-bg:#f2f2f4;
     --fillop:0.14;
     --font:"Helvetica Neue",Helvetica,Arial,sans-serif;
   }
@@ -176,20 +210,48 @@
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 <div class="wrap">
+<style>
+  .path{display:flex;flex-wrap:wrap;gap:2px;margin:0 0 20px;padding:0;list-style:none;
+        border:1px solid var(--rule);border-radius:9px;overflow:hidden}
+  .path li{flex:1 1 150px;min-width:0}
+  .path a,.path span{display:block;padding:9px 12px;font-size:12.5px;text-decoration:none;
+        color:var(--muted);background:transparent;border-left:1px solid var(--rule);
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .path li:first-child a,.path li:first-child span{border-left:0}
+  .path a:hover{color:var(--ink);background:var(--tab-bg)}
+  .path a:focus-visible,.path span:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+  .path .n{font-variant-numeric:tabular-nums;margin-right:7px;opacity:.65}
+  .path [aria-current=step]{color:var(--ink);font-weight:500;background:var(--tab-bg)}
+  .next{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:34px 0 0;
+        padding:15px 17px;border:1px solid var(--rule);border-radius:10px}
+  .next .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .next a{font-size:15px;color:var(--ink);text-decoration:none;font-weight:500;
+        border-bottom:1px solid var(--rule)}
+  .next a:hover{border-bottom-color:var(--ink)}
+  .next .w{flex:1 1 100%;font-size:12.5px;color:var(--muted);margin-top:1px}
+  .skip{position:absolute;left:-9999px}
+  .skip:focus{left:8px;top:8px;z-index:50;position:fixed;background:var(--bg);color:var(--ink);
+        border:1px solid var(--ink);border-radius:7px;padding:9px 13px;font-size:13px}
+</style>
+<nav aria-label="Where you are"><ol class="path">
+<li><span aria-current="step"><span class="n">1</span>What happens here</span></li>
+<li><a href="workflows.html"><span class="n">2</span>Sample protocols</a></li>
+<li><a href="blueprint.html"><span class="n">3</span>System blueprint</a></li>
+<li><a href="intake.html"><span class="n">4</span>Propose a campaign</a></li>
+</ol></nav>
+<main id="main">
 
   <div class="hero">
     <h1 id="t"></h1>
     <div class="sub" id="s"></div>
     <p class="lede" id="lede"></p>
     <div class="note" id="n"></div>
-    <nav class="top">
+    <nav class="top" aria-label="On this page">
+      <a href="#happens">What happens here</a>
       <a href="#styles">Project styles</a>
       <a href="#take">Can it take yours?</a>
-      <a href="workflows.html">Sample protocols</a>
-      <a href="blueprint.html">System blueprint</a>
-      <a href="intake.html">Propose a campaign</a>
-      <a href="https://sofibali.github.io/protein-design-foundry/">Foundry site</a>
     </nav>
   </div>
 
@@ -234,6 +296,8 @@
     <div class="levels" id="rs"></div>
   </section>
 
+  <div class="next"><span class="k">Next</span><a href="workflows.html">Sample protocols &rarr;</a><span class="w">What it runs, and what each step decides.</span></div>
+</main>
   <div class="foot" id="foot"></div>
 </div>
 
@@ -694,26 +758,6 @@ window.FOUNDRY = {
     ],
     "bring": "A sequence and a structure, one mutable hotspot, and a close homolog.",
     "back": "A verdict per design per gate, an affinity where one was determined, and an epitope verdict. Every measured negative comes back too."
-   },
-   {
-    "id": "structure",
-    "name": "Structural biology and construct workflow",
-    "sub": "which construct crystallises",
-    "status": "phase 2",
-    "problem": "A construct that expresses is not a construct that diffracts, and the distance between the two is usually paid for in months of hand work. The screen is cheap per drop and expensive per hour, which is exactly the shape of problem automation is for.",
-    "areas": [
-     "crystallisation screening",
-     "co-crystallisation against soaking",
-     "construct series"
-    ],
-    "strategy": "Acoustic drop setting from an Echo source plate, trays held in ambient random-access storage, and the solved interface compared against the design model rather than only scored for resolution.",
-    "loop": "structure",
-    "gates": [
-     "D7",
-     "D8"
-    ],
-    "bring": "A construct series, or hits from a binder campaign worth solving.",
-    "back": "Whether the binder sits where the model said it did. This is the only loop that tests the models about place rather than about strength."
    },
    {
     "id": "enzymes",
@@ -1234,9 +1278,10 @@ window.FOUNDRY = {
     'taking proposals': {c:'#0072B2'},
     'phase 2':          {c:'#8e8e93'}
   };
+  const COUNT = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'];
   document.getElementById('pr-lede').textContent =
-    'Five shapes of project, each running one of the loops. Click one for the loop it runs, ' +
-    'what it decides, and the exchange.';
+    (COUNT[PR.length - 1] || PR.length) + ' shapes of project, each running one of the loops. ' +
+    'Click one for the loop it runs, what it decides, and the exchange.';
 
   document.getElementById('progs').innerHTML = PR.map(p => {
     const st = STYLE[p.status] || {c:'var(--muted)'};

@@ -5,8 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>System Blueprint</title>
 <style>
+  /* --muted carries most of the explanatory text on this page. At #8e8e93 on
+     white it is 3.26:1, under the 4.5:1 WCAG AA needs for body text. #6e6e73
+     is 5.07:1 and passes. It cannot be one value for both themes: #6e6e73 on
+     the dark background is only 3.63:1, so dark keeps #8e8e93, which is
+     5.64:1 there. */
+
+  /* A visible focus ring on everything keyboard-reachable. The cart tiles are
+     SVG <g role=button>, which gets no focus ring at all in Safari, so the
+     fifteen of them were invisible to a keyboard user. */
+  a:focus-visible, button:focus-visible, summary:focus-visible,
+  [tabindex]:focus-visible, input:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--ink); outline-offset:2px; border-radius:3px}
+  .tile:focus{outline:none}
+  .tile:focus-visible rect.box{stroke:#fff;stroke-width:3}
+  .tile:focus-visible{outline:2px solid #fff;outline-offset:2px}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{transition-duration:.01ms !important;
+      animation-duration:.01ms !important;scroll-behavior:auto !important}
+  }
+
+  /* These pages get printed for meetings, and <details> prints collapsed by
+     default - which on the blueprint means fifteen headings and no specs. */
+  @media print{
+    :root{--bg:#fff;--ink:#000;--muted:#333;--rule:#999}
+    .path,.next,.skip,.nav{display:none !important}
+    details{display:block !important}
+    details > *{display:revert !important}
+    details .ddb,details .why,details .gitems{display:block !important}
+    .sheet,.elev{background:#fff !important}
+    a[href^="http"]::after{content:" (" attr(href) ")";font-size:10px;color:#555}
+    section,article,.lev,.gi,.wf{break-inside:avoid}
+  }
+
   :root {
-    --bg:#fff; --ink:#1d1d1f; --muted:#8e8e93; --rule:#d2d2d7; --tab-bg:#f2f2f4;
+    --bg:#fff; --ink:#1d1d1f; --muted:#6e6e73; --rule:#d2d2d7; --tab-bg:#f2f2f4;
     --font:"Helvetica Neue",Helvetica,Arial,sans-serif;
     /* the drawing is a technical drawing: blueprint paper in either theme */
     --paper:#0f1b2a; --grid:#24415e; --line:#e8eef5; --dim:#8fa6bd; --accent:#56B4E9;
@@ -157,27 +191,58 @@
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 <div class="wrap">
+<style>
+  .path{display:flex;flex-wrap:wrap;gap:2px;margin:0 0 20px;padding:0;list-style:none;
+        border:1px solid var(--rule);border-radius:9px;overflow:hidden}
+  .path li{flex:1 1 150px;min-width:0}
+  .path a,.path span{display:block;padding:9px 12px;font-size:12.5px;text-decoration:none;
+        color:var(--muted);background:transparent;border-left:1px solid var(--rule);
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .path li:first-child a,.path li:first-child span{border-left:0}
+  .path a:hover{color:var(--ink);background:var(--tab-bg)}
+  .path a:focus-visible,.path span:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+  .path .n{font-variant-numeric:tabular-nums;margin-right:7px;opacity:.65}
+  .path [aria-current=step]{color:var(--ink);font-weight:500;background:var(--tab-bg)}
+  .next{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:34px 0 0;
+        padding:15px 17px;border:1px solid var(--rule);border-radius:10px}
+  .next .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .next a{font-size:15px;color:var(--ink);text-decoration:none;font-weight:500;
+        border-bottom:1px solid var(--rule)}
+  .next a:hover{border-bottom-color:var(--ink)}
+  .next .w{flex:1 1 100%;font-size:12.5px;color:var(--muted);margin-top:1px}
+  .skip{position:absolute;left:-9999px}
+  .skip:focus{left:8px;top:8px;z-index:50;position:fixed;background:var(--bg);color:var(--ink);
+        border:1px solid var(--ink);border-radius:7px;padding:9px 13px;font-size:13px}
+</style>
+<nav aria-label="Where you are"><ol class="path">
+<li><a href="foundry.html"><span class="n">1</span>What happens here</a></li>
+<li><a href="workflows.html"><span class="n">2</span>Sample protocols</a></li>
+<li><span aria-current="step"><span class="n">3</span>System blueprint</span></li>
+<li><a href="intake.html"><span class="n">4</span>Propose a campaign</a></li>
+</ol></nav>
+<main id="main">
   <header>
     <h1 id="t"></h1>
     <div class="sub" id="s"></div>
     <div class="note" id="n"></div>
-    <div class="nav"><a href="foundry.html">what happens here</a>
-      &nbsp;&middot;&nbsp; <a href="workflows.html">sample protocols</a>
-      &nbsp;&middot;&nbsp; <a href="intake.html">propose a campaign</a>
-      &nbsp;&middot;&nbsp; <a href="https://sofibali.github.io/protein-design-foundry/">foundry site</a></div>
+    <div class="nav">Click any cart for what it does, the protocols through it,
+      and how it is built.</div>
   </header>
 
   <div class="sheet"><div id="sheet"></div></div>
   <div class="bar" id="legend"></div>
   <div class="detail" id="detail"></div>
 
-  <section class="p2sec">
-    <h2>Phase 2 &middot; pending</h2>
+  <section class="p2sec" id="p2sec" hidden>
+    <h2 id="p2h"></h2>
     <div class="intro" id="p2intro"></div>
     <div class="p2grid" id="p2"></div>
   </section>
 
+  <div class="next"><span class="k">Next</span><a href="intake.html">Propose a campaign &rarr;</a><span class="w">Send us a target.</span></div>
+</main>
   <div class="foot" id="foot"></div>
 </div>
 
@@ -603,58 +668,6 @@ window.BLUEPRINT = {
     "4.12",
     "CF2H"
    ]
-  },
-  {
-   "n": 16,
-   "id": "imaging",
-   "unitop": "Crystal imaging",
-   "class": [
-    "assaying"
-   ],
-   "instruments": [],
-   "status": "phase2",
-   "io": false,
-   "note": "Crystal imaging and automated scoring. The crystallography protocol puts 560 imaging events in a campaign: 9 h on an imager cart against 37 h at a microscope. This is the cart that lets Aim 3 run unattended.\n",
-   "runs": []
-  },
-  {
-   "n": 17,
-   "id": "ambient2",
-   "unitop": "Ambient random access storage",
-   "class": [
-    "storage"
-   ],
-   "instruments": [],
-   "status": "phase2",
-   "io": true,
-   "note": "A second AmbiStore, doubling ambient random-access capacity to 432 standard positions. Crystallography raises the tray count, and this is what lets trays rotate without displacing assay plates in flight.\n",
-   "runs": []
-  },
-  {
-   "n": 18,
-   "id": "sealer2",
-   "unitop": "Microplate sealing",
-   "class": [
-    "sealing"
-   ],
-   "instruments": [],
-   "status": "phase2",
-   "io": false,
-   "note": "A third seal type resident on the system, so a crystallography seal sits alongside the foil and breathable rolls and a tray run needs no changeover.\n",
-   "runs": []
-  },
-  {
-   "n": 19,
-   "id": "handler2",
-   "unitop": "Contact stamping pipetting",
-   "class": [
-    "liquid handling"
-   ],
-   "instruments": [],
-   "status": "phase2",
-   "io": false,
-   "note": "A second liquid handler. It is what raises the ~75 two-plate protocols a day ceiling without changing the Bravo's head.\n",
-   "runs": []
   }
  ],
  "instruments": [
@@ -1640,72 +1653,6 @@ window.BLUEPRINT = {
       return b + G.t(160, 114, 'every readout in the spec, 6 to 3,456 wells', {c: 'lb'})
         + G.t(160, 128, 'tied with the Bravo as the system bottleneck: 150 384-well plates a day', {c: 'sm'});
     }
-  },
-
-  'imaging': {
-    s: c =>
-      G.r(116, 12, 88, 30, {r: 3, c: 'ln dash'}) + G.c(160, 27, 9, {c: 'mu'})
-      + G.t(160, 56, 'camera', {c: 'sm'})
-      + G.l(142, 42, 128, 66, {c: 'mu dash'}) + G.l(178, 42, 192, 66, {c: 'mu dash'})
-      + G.well(104, 66, 112, 30) + G.liq(104, 66, 112, 30, 76, c)
-      + G.p('M150 76A12 7 0 0 1 174 76Z', {f: c, o: .6, c: 'ln'})
-      + G.p('M158 70L164 73L160 78L154 75Z', {f: 'var(--ink)', o: .7, c: 'ln'})
-      + G.t(160, 110, 'one subwell of a tray', {c: 'sm'})
-      + G.r(240, 54, 62, 44, {r: 2, c: 'mu'})
-      + G.p('M264 70L272 74L267 81L259 77Z', {f: c, o: .8, c: 'ln'})
-      + G.t(271, 48, 'scored image', {c: 'sm'})
-      + G.a(222, 76, 236, 76, {h: 3.5})
-      + G.t(160, 128, '560 imaging events a campaign: 9 h on a cart against 37 h at a microscope', {c: 'sm'})
-  },
-
-  'ambient2': {
-    s: c => {
-      const wheel = (cx, cy, dashed) => {
-        let s = G.c(cx, cy, 36, {f: dashed ? null : c, o: .1, c: dashed ? 'ln dash' : 'ln'})
-          + G.c(cx, cy, 7, {c: 'mu'});
-        for (let a = 0; a < 10; a++) {
-          const th = a * 36 * Math.PI / 180;
-          s += G.l(cx + 10 * Math.cos(th), cy + 10 * Math.sin(th),
-                   cx + 35 * Math.cos(th), cy + 35 * Math.sin(th), {c: 'mu'});
-        }
-        return s;
-      };
-      return wheel(76, 58, false) + wheel(190, 58, true)
-        + G.t(76, 108, 'installed', {c: 'sm'}) + G.t(190, 108, 'phase 2', {c: 'sm'})
-        + G.a(120, 58, 148, 58)
-        + G.t(262, 50, '216', {c: 'lb'}) + G.t(262, 64, 'to 432', {c: 'lb'})
-        + G.t(262, 78, 'positions', {c: 'sm'})
-        + G.t(160, 128, 'so trays can rotate without displacing assay plates in flight', {c: 'sm'});
-    }
-  },
-
-  'sealer2': {
-    s: c => {
-      let b = '';
-      [[52, 'foil', false], [152, 'breathable', false], [252, 'third type', true]].forEach(r => {
-        b += G.c(r[0], 40, 17, {c: r[2] ? 'ln dash' : 'ln'}) + G.c(r[0], 40, 6, {c: 'mu'})
-          + G.t(r[0], 20, r[1], {c: 'sm'})
-          + G.l(r[0] - 17, 57, r[0] + 17, 57, {c: r[2] ? 'mu dash' : 'mu'});
-      });
-      return b + G.plate(52, 70, 200, 26, 12, 2, {f: c})
-        + G.t(152, 112, 'three rolls resident, no changeover mid-run', {c: 'lb'})
-        + G.t(152, 128, 'a crystallography seal alongside the foil and breathable rolls', {c: 'sm'});
-    }
-  },
-
-  'handler2': {
-    s: c => {
-      const head = (x, dashed) => {
-        let s = G.r(x, 18, 104, 13, {r: 2, f: dashed ? null : c, c: dashed ? 'ln dash' : 'ln'});
-        for (let i = 0; i < 10; i++) s += G.l(x + 8 + i * 10, 31, x + 8 + i * 10, 44,
-                                              {c: dashed ? 'mu dash' : 'ln'});
-        return s + G.plate(x, 48, 104, 24, 12, 2, {f: c, c: dashed ? 'ln dash' : 'ln'});
-      };
-      return head(14, false) + head(160, true)
-        + G.t(66, 88, 'the Bravo', {c: 'lb'}) + G.t(212, 88, 'a second head', {c: 'sm'})
-        + G.t(160, 112, 'about 75 two-plate protocols a day, doubled', {c: 'lb'})
-        + G.t(160, 128, 'the ceiling moves without changing the Bravo', {c: 'sm'});
-    }
   }
 
   };
@@ -2042,7 +1989,12 @@ window.BLUEPRINT = {
     const t = e.target.closest('.tile'); if (t) { e.preventDefault(); pick(t.dataset.r); }
   });
 
-  // ---- phase 2, in its own section ----
+  // ---- phase 2, in its own section. Nothing phase 2 is bundled into the
+  // page while it is hidden, so this section renders only if there is
+  // something to put in it. ----
+  if (PEND.length) {
+  document.getElementById('p2sec').hidden = false;
+  document.getElementById('p2h').textContent = 'Phase 2 \u00b7 pending';
   document.getElementById('p2intro').textContent =
     `Four carts the floor plan reserves, all of them driven by crystallography. They are ` +
     `not on the track above because they are not on the track: the room is laid out for ` +
@@ -2058,6 +2010,7 @@ window.BLUEPRINT = {
       ${cartFig(r)}
       <div class="classes">${classChips(r)}</div>
     </article>`).join('');
+  }
 
   const placed = RACS.reduce((a, r) => a + r.instruments.length, 0);
   document.getElementById('foot').innerHTML =

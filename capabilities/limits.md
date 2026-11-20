@@ -44,10 +44,8 @@ expression, and no amount of scheduling moves it.
 Named but not specified. A gap is not a plan, it is an admission.
 
 {% assign gaps = site.data.instruments.instruments | where: "status", "gap" %}
-{% assign later = site.data.instruments.instruments | where: "status", "phase2" %}
 <table class="wide">
 <thead><tr><th>Status</th><th>Capability</th><th>Why it matters</th></tr></thead>
 <tbody>
 {%- for i in gaps -%}<tr><td>{% include status.html s=i.status %}</td><td><strong>{{ i.name }}</strong></td><td>{{ i.note }}</td></tr>{%- endfor -%}
-{%- for i in later -%}<tr><td>{% include status.html s=i.status %}</td><td><strong>{{ i.name }}</strong></td><td>{{ i.note | default: i.role }}</td></tr>{%- endfor -%}
 </tbody></table>

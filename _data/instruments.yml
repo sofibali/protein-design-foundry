@@ -98,30 +98,6 @@ racs:
   - sealing
   status: installed
   io: false
-- id: 16
-  name: Crystal imaging
-  classes:
-  - assaying
-  status: phase2
-  io: false
-- id: 17
-  name: Ambient random access storage
-  classes:
-  - storage
-  status: phase2
-  io: true
-- id: 18
-  name: Microplate sealing
-  classes:
-  - sealing
-  status: phase2
-  io: false
-- id: 19
-  name: Contact stamping pipetting
-  classes:
-  - liquid handling
-  status: phase2
-  io: false
 instruments:
 - key: plateloc
   name: PlateLoc
@@ -308,20 +284,6 @@ instruments:
     is what lets a gas-permeable culture seal and a foil PCR seal both be resident without a manual roll
     change mid-run. It also covers the agar plates and the filter-plus-carrier stacks that are too tall
     for the PlateLoc.
-- key: imager
-  name: Crystallisation plate imager
-  vendor: TBC
-  rac: 16
-  status: phase2
-  role: Scheduled imaging of crystallisation trays.
-  note: The largest single automation win available. A campaign of 80 trays at 7 timepoints is 560 imaging
-    events, which is roughly 37 h of human time against 9 h of robot time.
-- key: second_ambistore
-  name: Second ambient store
-  vendor: LiCONiC
-  rac: 17
-  status: phase2
-  role: Crystallography tray capacity beyond 150 positions.
 - key: drop_setter
   name: Dedicated crystallisation drop setter
   vendor: null

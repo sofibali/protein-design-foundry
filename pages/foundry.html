@@ -5,8 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Protein Design Foundry</title>
 <style>
+  /* --muted carries most of the explanatory text on this page. At #8e8e93 on
+     white it is 3.26:1, under the 4.5:1 WCAG AA needs for body text. #6e6e73
+     is 5.07:1 and passes. It cannot be one value for both themes: #6e6e73 on
+     the dark background is only 3.63:1, so dark keeps #8e8e93, which is
+     5.64:1 there. */
+
+  /* A visible focus ring on everything keyboard-reachable. The cart tiles are
+     SVG <g role=button>, which gets no focus ring at all in Safari, so the
+     fifteen of them were invisible to a keyboard user. */
+  a:focus-visible, button:focus-visible, summary:focus-visible,
+  [tabindex]:focus-visible, input:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--ink); outline-offset:2px; border-radius:3px}
+  .tile:focus{outline:none}
+  .tile:focus-visible rect.box{stroke:#fff;stroke-width:3}
+  .tile:focus-visible{outline:2px solid #fff;outline-offset:2px}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{transition-duration:.01ms !important;
+      animation-duration:.01ms !important;scroll-behavior:auto !important}
+  }
+
+  /* These pages get printed for meetings, and <details> prints collapsed by
+     default - which on the blueprint means fifteen headings and no specs. */
+  @media print{
+    :root{--bg:#fff;--ink:#000;--muted:#333;--rule:#999}
+    .path,.next,.skip,.nav{display:none !important}
+    details{display:block !important}
+    details > *{display:revert !important}
+    details .ddb,details .why,details .gitems{display:block !important}
+    .sheet,.elev{background:#fff !important}
+    a[href^="http"]::after{content:" (" attr(href) ")";font-size:10px;color:#555}
+    section,article,.lev,.gi,.wf{break-inside:avoid}
+  }
+
   :root {
-    --bg:#fff; --ink:#1d1d1f; --muted:#8e8e93; --rule:#d2d2d7; --tab-bg:#f2f2f4;
+    --bg:#fff; --ink:#1d1d1f; --muted:#6e6e73; --rule:#d2d2d7; --tab-bg:#f2f2f4;
     --fillop:0.14;
     --font:"Helvetica Neue",Helvetica,Arial,sans-serif;
   }
@@ -176,20 +210,20 @@
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 <div class="wrap">
+{{PATH}}
+<main id="main">
 
   <div class="hero">
     <h1 id="t"></h1>
     <div class="sub" id="s"></div>
     <p class="lede" id="lede"></p>
     <div class="note" id="n"></div>
-    <nav class="top">
+    <nav class="top" aria-label="On this page">
+      <a href="#happens">What happens here</a>
       <a href="#styles">Project styles</a>
       <a href="#take">Can it take yours?</a>
-      <a href="workflows.html">Sample protocols</a>
-      <a href="blueprint.html">System blueprint</a>
-      <a href="intake.html">Propose a campaign</a>
-      <a href="{{SITE}}/">Foundry site</a>
     </nav>
   </div>
 
@@ -234,6 +268,8 @@
     <div class="levels" id="rs"></div>
   </section>
 
+  {{NEXT}}
+</main>
   <div class="foot" id="foot"></div>
 </div>
 
@@ -347,9 +383,10 @@
     'taking proposals': {c:'#0072B2'},
     'phase 2':          {c:'#8e8e93'}
   };
+  const COUNT = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'];
   document.getElementById('pr-lede').textContent =
-    'Five shapes of project, each running one of the loops. Click one for the loop it runs, ' +
-    'what it decides, and the exchange.';
+    (COUNT[PR.length - 1] || PR.length) + ' shapes of project, each running one of the loops. ' +
+    'Click one for the loop it runs, what it decides, and the exchange.';
 
   document.getElementById('progs').innerHTML = PR.map(p => {
     const st = STYLE[p.status] || {c:'var(--muted)'};

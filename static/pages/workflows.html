@@ -5,8 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sample Protocols</title>
 <style>
+  /* --muted carries most of the explanatory text on this page. At #8e8e93 on
+     white it is 3.26:1, under the 4.5:1 WCAG AA needs for body text. #6e6e73
+     is 5.07:1 and passes. It cannot be one value for both themes: #6e6e73 on
+     the dark background is only 3.63:1, so dark keeps #8e8e93, which is
+     5.64:1 there. */
+
+  /* A visible focus ring on everything keyboard-reachable. The cart tiles are
+     SVG <g role=button>, which gets no focus ring at all in Safari, so the
+     fifteen of them were invisible to a keyboard user. */
+  a:focus-visible, button:focus-visible, summary:focus-visible,
+  [tabindex]:focus-visible, input:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--ink); outline-offset:2px; border-radius:3px}
+  .tile:focus{outline:none}
+  .tile:focus-visible rect.box{stroke:#fff;stroke-width:3}
+  .tile:focus-visible{outline:2px solid #fff;outline-offset:2px}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{transition-duration:.01ms !important;
+      animation-duration:.01ms !important;scroll-behavior:auto !important}
+  }
+
+  /* These pages get printed for meetings, and <details> prints collapsed by
+     default - which on the blueprint means fifteen headings and no specs. */
+  @media print{
+    :root{--bg:#fff;--ink:#000;--muted:#333;--rule:#999}
+    .path,.next,.skip,.nav{display:none !important}
+    details{display:block !important}
+    details > *{display:revert !important}
+    details .ddb,details .why,details .gitems{display:block !important}
+    .sheet,.elev{background:#fff !important}
+    a[href^="http"]::after{content:" (" attr(href) ")";font-size:10px;color:#555}
+    section,article,.lev,.gi,.wf{break-inside:avoid}
+  }
+
   :root {
-    --bg:#fff; --ink:#1d1d1f; --muted:#8e8e93; --rule:#d2d2d7; --tab-bg:#f2f2f4;
+    --bg:#fff; --ink:#1d1d1f; --muted:#6e6e73; --rule:#d2d2d7; --tab-bg:#f2f2f4;
     --fillop:0.14; --chipop:0.10; --warn:#E69F00;
     --font:"Helvetica Neue",Helvetica,Arial,sans-serif;
   }
@@ -261,16 +295,45 @@
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 <div class="wrap">
+<style>
+  .path{display:flex;flex-wrap:wrap;gap:2px;margin:0 0 20px;padding:0;list-style:none;
+        border:1px solid var(--rule);border-radius:9px;overflow:hidden}
+  .path li{flex:1 1 150px;min-width:0}
+  .path a,.path span{display:block;padding:9px 12px;font-size:12.5px;text-decoration:none;
+        color:var(--muted);background:transparent;border-left:1px solid var(--rule);
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .path li:first-child a,.path li:first-child span{border-left:0}
+  .path a:hover{color:var(--ink);background:var(--tab-bg)}
+  .path a:focus-visible,.path span:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+  .path .n{font-variant-numeric:tabular-nums;margin-right:7px;opacity:.65}
+  .path [aria-current=step]{color:var(--ink);font-weight:500;background:var(--tab-bg)}
+  .next{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:34px 0 0;
+        padding:15px 17px;border:1px solid var(--rule);border-radius:10px}
+  .next .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .next a{font-size:15px;color:var(--ink);text-decoration:none;font-weight:500;
+        border-bottom:1px solid var(--rule)}
+  .next a:hover{border-bottom-color:var(--ink)}
+  .next .w{flex:1 1 100%;font-size:12.5px;color:var(--muted);margin-top:1px}
+  .skip{position:absolute;left:-9999px}
+  .skip:focus{left:8px;top:8px;z-index:50;position:fixed;background:var(--bg);color:var(--ink);
+        border:1px solid var(--ink);border-radius:7px;padding:9px 13px;font-size:13px}
+</style>
+<nav aria-label="Where you are"><ol class="path">
+<li><a href="foundry.html"><span class="n">1</span>What happens here</a></li>
+<li><span aria-current="step"><span class="n">2</span>Sample protocols</span></li>
+<li><a href="blueprint.html"><span class="n">3</span>System blueprint</a></li>
+<li><a href="intake.html"><span class="n">4</span>Propose a campaign</a></li>
+</ol></nav>
+<main id="main">
   <header>
     <h1 id="t"></h1>
     <div class="sub" id="s"></div>
     <div class="note" id="n"></div>
-    <div class="nav"><a href="foundry.html">&larr; what happens here</a>
-      &nbsp;&middot;&nbsp; <a href="blueprint.html">system blueprint &rarr;</a>
-      &nbsp;&middot;&nbsp; <a href="intake.html">propose a campaign &rarr;</a>
-      &nbsp;&middot;&nbsp; <a href="https://sofibali.github.io/protein-design-foundry/">foundry site</a>
-      &nbsp;&middot;&nbsp; full input spec in <code>reference/constructs.md</code></div>
+    <div class="nav">Every panel below is drawn, not measured &mdash; they show the
+      <i>shape</i> of each readout, not results. Full input spec in
+      <code>reference/constructs.md</code>.</div>
   </header>
 
   <div class="bar">
@@ -311,6 +374,8 @@
     <div class="intro" id="lm-note"></div>
     <ul class="limits" id="lm"></ul>
   </section>
+  <div class="next"><span class="k">Next</span><a href="blueprint.html">System blueprint &rarr;</a><span class="w">The machine the protocols run on.</span></div>
+</main>
 </div>
 
 <script>
@@ -912,58 +977,6 @@ window.PROTOCOLS = {
     "4.12",
     "CF2H"
    ]
-  },
-  {
-   "n": 16,
-   "id": "imaging",
-   "unitop": "Crystal imaging",
-   "class": [
-    "assaying"
-   ],
-   "instruments": [],
-   "status": "phase2",
-   "io": false,
-   "note": "Crystal imaging and automated scoring. The crystallography protocol puts 560 imaging events in a campaign: 9 h on an imager cart against 37 h at a microscope. This is the cart that lets Aim 3 run unattended.\n",
-   "runs": []
-  },
-  {
-   "n": 17,
-   "id": "ambient2",
-   "unitop": "Ambient random access storage",
-   "class": [
-    "storage"
-   ],
-   "instruments": [],
-   "status": "phase2",
-   "io": true,
-   "note": "A second AmbiStore, doubling ambient random-access capacity to 432 standard positions. Crystallography raises the tray count, and this is what lets trays rotate without displacing assay plates in flight.\n",
-   "runs": []
-  },
-  {
-   "n": 18,
-   "id": "sealer2",
-   "unitop": "Microplate sealing",
-   "class": [
-    "sealing"
-   ],
-   "instruments": [],
-   "status": "phase2",
-   "io": false,
-   "note": "A third seal type resident on the system, so a crystallography seal sits alongside the foil and breathable rolls and a tray run needs no changeover.\n",
-   "runs": []
-  },
-  {
-   "n": 19,
-   "id": "handler2",
-   "unitop": "Contact stamping pipetting",
-   "class": [
-    "liquid handling"
-   ],
-   "instruments": [],
-   "status": "phase2",
-   "io": false,
-   "note": "A second liquid handler. It is what raises the ~75 two-plate protocols a day ceiling without changing the Bravo's head.\n",
-   "runs": []
   }
  ],
  "phases": [
