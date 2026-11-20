@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Foundry Blueprint</title>
+<title>System Blueprint</title>
 <style>
   :root {
     --bg:#fff; --ink:#1d1d1f; --muted:#8e8e93; --rule:#d2d2d7; --tab-bg:#f2f2f4;
@@ -36,43 +36,72 @@
   .io-l{font-size:8.5px;fill:var(--dim);letter-spacing:.04em}
   .tile{cursor:pointer}
   .tile rect.box{fill:#16263a;stroke:var(--line);stroke-width:1.3}
-  rect.box.p2{fill:none;stroke:var(--dim);stroke-dasharray:5 4}
   .tile:hover rect.box{fill:#21384f}
   .tile[aria-pressed=true] rect.box{fill:#27405a;stroke:var(--accent);stroke-width:2}
   .tile.dim{opacity:.3}
   .glyph{fill:none;stroke:var(--line);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-  .glyph.p2{stroke:var(--dim)}
-  .cart-l.p2{fill:var(--dim)}
 
-  /* legend + detail */
+  /* legend */
   .bar{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:12.5px;color:var(--muted);
        margin:14px 2px 0;align-items:center}
   .bar span{display:inline-flex;align-items:center;gap:7px}
   .key{width:17px;height:12px;border-radius:3px;flex:none;border:1.3px solid var(--ink)}
-  .key.p2{border-style:dashed;background:transparent;opacity:.6}
   .key.inst{background:var(--tab-bg)}
   .key.io{width:12px;height:12px;border-radius:999px}
 
-  .detail{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;margin-top:16px;
-          min-height:118px}
-  .detail .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-  .detail h3{font-size:16px;font-weight:400;margin:0}
-  .detail .n{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
-  .detail .st{font-size:11px;border-radius:999px;padding:1px 8px;border:1px solid}
-  .detail p{font-size:13px;line-height:1.5;margin:8px 0 0;color:var(--ink)}
-  .detail .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;
-               color:var(--muted);margin-top:11px}
-  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
-  .chip{font-size:12px;background:var(--tab-bg);border:1px solid transparent;
-        border-radius:7px;padding:3px 9px}
-  .chip.wf{background:transparent;border-color:var(--rule);
-           font-variant-numeric:tabular-nums}
-  .spec{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:5px}
-  .empty{color:var(--muted);font-size:13px;line-height:1.5;margin:0}
+  /* ---------- the cart detail sheet ---------- */
+  .detail{border:1px solid var(--rule);border-radius:12px;margin-top:16px;overflow:hidden}
+  .ttl{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--rule);
+       font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted)}
+  .ttl .r{margin-left:auto;letter-spacing:.09em}
+  .dbody{padding:15px 16px 17px}
+  .dhd{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .dhd h3{font-size:19px;font-weight:400;margin:0;letter-spacing:-.01em}
+  .dhd .no{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+  .classes{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+  .cls{font-size:11.5px;border-radius:999px;padding:2px 10px;border:1px solid;
+       text-transform:lowercase;letter-spacing:.01em}
+  .detail p.lead{font-size:13.5px;line-height:1.52;margin:11px 0 0;max-width:76ch}
+  .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;
+       color:var(--muted);margin-top:16px;font-weight:500}
+  .split{display:grid;grid-template-columns:270px minmax(0,1fr);gap:20px;margin-top:7px;
+         align-items:start}
+  .elev{background:var(--paper);border-radius:9px;padding:5px}
+  .elev svg{display:block;width:100%;height:auto;font-family:var(--font)}
+  .el-l{font-size:9px;fill:var(--dim);letter-spacing:.03em}
+  .el-i{font-size:10px;fill:var(--line)}
+  .el-d{font-size:8.5px;fill:var(--dim);font-variant-numeric:tabular-nums}
+  .spec{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:8px}
+  .spec:first-child{margin-top:0}
+  .spec b{color:var(--ink);font-weight:500}
+  .protos{display:grid;gap:5px;margin-top:6px}
+  .pr{display:grid;grid-template-columns:34px minmax(0,1fr);gap:9px;font-size:12.5px;
+      align-items:baseline;border-left:3px solid;padding:3px 0 3px 9px}
+  .pr .pid{color:var(--muted);font-variant-numeric:tabular-nums}
+  .empty{color:var(--muted);font-size:13px;line-height:1.55;margin:0}
 
-  .foot{font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:22px;
+  /* ---------- phase 2 ---------- */
+  .p2sec{margin-top:40px}
+  .p2sec > h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:500;
+              margin:0 0 4px;padding-bottom:6px;border-bottom:2px solid var(--rule)}
+  .p2sec .intro{color:var(--muted);font-size:12.5px;margin:10px 0 14px;max-width:78ch;line-height:1.55}
+  .p2grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:11px}
+  .p2card{border:1px dashed var(--rule);border-radius:11px;padding:13px 14px 14px}
+  .p2card .ph{display:flex;align-items:center;gap:10px}
+  .p2card .mini{width:40px;height:40px;border-radius:9px;border:1.3px dashed var(--muted);
+                flex:none;display:grid;place-items:center}
+  .p2card .mini svg{display:block;width:24px;height:24px}
+  .p2card .mini path{fill:none;stroke:var(--muted);stroke-width:1.5;
+                     stroke-linecap:round;stroke-linejoin:round}
+  .p2card h3{font-size:14.5px;font-weight:500;margin:0;letter-spacing:-.005em}
+  .p2card .n2{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:1px}
+  .p2card p{font-size:12.5px;line-height:1.5;color:var(--muted);margin:10px 0 0}
+  .p2card .classes{margin-top:10px}
+
+  .foot{font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:28px;
         border-top:1px solid var(--rule);padding-top:12px}
   .foot b{color:var(--ink);font-weight:500}
+  @media (max-width:700px){ .split{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
@@ -81,13 +110,21 @@
     <h1 id="t"></h1>
     <div class="sub" id="s"></div>
     <div class="note" id="n"></div>
-    <div class="nav"><a href="foundry.html">the loop and the gates</a>
-      &nbsp;&middot;&nbsp; <a href="workflows.html">every workflow as a deck sequence</a></div>
+    <div class="nav"><a href="foundry.html">what happens here</a>
+      &nbsp;&middot;&nbsp; <a href="workflows.html">plan a campaign</a>
+      &nbsp;&middot;&nbsp; <a href="intake.html">propose a campaign</a></div>
   </header>
 
   <div class="sheet"><div id="sheet"></div></div>
   <div class="bar" id="legend"></div>
   <div class="detail" id="detail"></div>
+
+  <section class="p2sec">
+    <h2>Phase 2 &middot; pending</h2>
+    <div class="intro" id="p2intro"></div>
+    <div class="p2grid" id="p2"></div>
+  </section>
+
   <div class="foot" id="foot"></div>
 </div>
 
@@ -438,7 +475,7 @@ window.BLUEPRINT = {
    "instruments": [],
    "status": "phase2",
    "io": false,
-   "note": "Not quoted. The crystallography protocol puts 560 imaging events in a campaign - 37 h by hand against 9 h on an imager cart - and it is what makes Aim 3 unattended.\n",
+   "note": "Crystal imaging and automated scoring. The crystallography protocol puts 560 imaging events in a campaign: 9 h on an imager cart against 37 h at a microscope. This is the cart that lets Aim 3 run unattended.\n",
    "runs": []
   },
   {
@@ -451,7 +488,7 @@ window.BLUEPRINT = {
    "instruments": [],
    "status": "phase2",
    "io": true,
-   "note": "A second AmbiStore. Crystallography raises the tray count, and 216 standard positions is 2x headroom only until trays start rotating.\n",
+   "note": "A second AmbiStore, doubling ambient random-access capacity to 432 standard positions. Crystallography raises the tray count, and this is what lets trays rotate without displacing assay plates in flight.\n",
    "runs": []
   },
   {
@@ -464,7 +501,7 @@ window.BLUEPRINT = {
    "instruments": [],
    "status": "phase2",
    "io": false,
-   "note": "A third seal type resident. Flagged in the notes as needing a fit check - there is no space in the sealer/peeler cart.\n",
+   "note": "A third seal type resident on the system, so a crystallography seal sits alongside the foil and breathable rolls and a tray run needs no changeover.\n",
    "runs": []
   },
   {
@@ -477,7 +514,7 @@ window.BLUEPRINT = {
    "instruments": [],
    "status": "phase2",
    "io": false,
-   "note": "A second liquid handler is the only thing that moves the ~75 two-plate protocols a day ceiling without changing the Bravo's head.\n",
+   "note": "A second liquid handler. It is what raises the ~75 two-plate protocols a day ceiling without changing the Bravo's head.\n",
    "runs": []
   }
  ],
@@ -734,22 +771,23 @@ window.BLUEPRINT = {
 </script>
 <script>
 (() => {
-  const B = window.BLUEPRINT, RACS = B.racs;
-  const INST = Object.fromEntries(B.instruments.map(i => [i.id, i]));
-  const WF = Object.fromEntries(B.workflows.map(w => [w.id, w]));
-  const PH = Object.fromEntries(B.phases.map(p => [p.id, p]));
+  const B = window.BLUEPRINT;
+  const RACS  = B.racs.filter(r => r.status === 'installed');
+  const PEND  = B.racs.filter(r => r.status === 'phase2');
+  const INST = {}; B.instruments.forEach(i => { INST[i.id] = i; });
+  const WF   = {}; B.workflows.forEach(w => { WF[w.id] = w; });
+  const PH   = {}; B.phases.forEach(p => { PH[p.id] = p; });
   const esc = t => String(t).replace(/[&<>"]/g, m =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 
   document.getElementById('t').textContent = B.title;
   document.getElementById('s').textContent = B.subtitle;
-  const inst = RACS.filter(r => r.status === 'installed').length;
-  const p2 = RACS.filter(r => r.status === 'phase2').length;
   document.getElementById('n').textContent =
-    `${inst} carts at install, ${p2} more the floor plan leaves room for. ` +
-    `Each cart is named for what it does, not what is in it — click one.`;
+    `${RACS.length} carts on the track at install. Each is named for the unit operation it ` +
+    `performs rather than the instrument inside it — click one for what it does, what runs ` +
+    `through it, and how it is built.`;
 
-  // ---- line glyphs, one per kind of unit operation ----
+  // one line glyph per kind of unit operation
   const G = {
     acoustic: 'M4 16h16M6 16V9M10 16V9M14 16V9M18 16V9M5 7h14',
     bulk:     'M4 17h16M7 17V9a3 3 0 0 1 6 0v8M16 9c0-2 2-2 2-4M13 12h5',
@@ -787,18 +825,30 @@ window.BLUEPRINT = {
     'Plate reading': 'reader',
     'Crystal imaging': 'imaging',
   };
+  const gpath = u => G[GLYPH[u]] || G.ambient;
 
-  // ---- lay the carts out around a rounded-rectangle track ----
-  // Ginkgo's own sheets run the track as a closed loop with the carts sitting
-  // on it and the labels outside, and the I/O badges just inside. Same here,
-  // sized to the cart count rather than hand-placed.
+  // what each cart class is, in a word. These are the labels Sofia asked for:
+  // a cart is one or more of these, and the chips say which.
+  const CLASS = {
+    'storage':         {c:'#0072B2', t:'storage'},
+    'liquid handling': {c:'#009E73', t:'liquid handling'},
+    'incubating':      {c:'#E69F00', t:'incubating'},
+    'assaying':        {c:'#CC79A7', t:'assaying'},
+    'sealing':         {c:'#56B4E9', t:'sealing'},
+    'centrifugation':  {c:'#D55E00', t:'centrifugation'}
+  };
+  const classChips = r => (r.class || []).map(c => {
+    const k = CLASS[c] || {c:'var(--muted)', t:c};
+    return `<span class="cls" style="color:${k.c};border-color:${k.c}">${esc(k.t)}</span>`;
+  }).join('');
+
+  // ---- lay the installed carts out around a closed track ----
   const VW = 1200, TILE = 74, LBL = 170, GAPV = 26;
   const n = RACS.length;
   const topN = Math.min(4, Math.ceil(n / 5));
   const botN = Math.min(4, Math.max(1, Math.floor((n - topN) / 5)));
-  let side = Math.floor((n - topN - botN) / 2);
-  const extra = n - topN - botN - 2 * side;          // 0 or 1, goes to the bottom
-  const botTotal = botN + extra;
+  const side = Math.floor((n - topN - botN) / 2);
+  const botTotal = botN + (n - topN - botN - 2 * side);
 
   const trackL = LBL, trackR = VW - LBL - TILE;
   const trackT = 120, trackH = Math.max(1, side) * (TILE + GAPV) - GAPV;
@@ -806,24 +856,18 @@ window.BLUEPRINT = {
   const yTop = trackT - 58, yBot = trackB + 58;
 
   const pos = [];
-  const spreadX = (count, y, at) => {
-    const span = trackR - trackL;
-    for (let i = 0; i < count; i++)
-      pos.push({x: trackL + span * (i + 1) / (count + 1), y, at});
-  };
-  spreadX(topN, yTop, 'top');
-  for (let i = 0; i < side; i++) pos.push({x: trackR, y: trackT + i * (TILE + GAPV), at: 'right'});
   {
     const span = trackR - trackL;
+    for (let i = 0; i < topN; i++)
+      pos.push({x: trackL + span * (i + 1) / (topN + 1), y: yTop, at: 'top'});
+    for (let i = 0; i < side; i++)
+      pos.push({x: trackR, y: trackT + i * (TILE + GAPV), at: 'right'});
     for (let i = 0; i < botTotal; i++)
       pos.push({x: trackR - span * (i + 1) / (botTotal + 1), y: yBot, at: 'bottom'});
+    for (let i = side - 1; i >= 0; i--)
+      pos.push({x: trackL, y: trackT + i * (TILE + GAPV), at: 'left'});
   }
-  for (let i = side - 1; i >= 0; i--) pos.push({x: trackL, y: trackT + i * (TILE + GAPV), at: 'left'});
-
   const H = yBot + TILE + 62;
-
-  const glyph = (u, p2) => `<path class="glyph${p2 ? ' p2' : ''}" d="${G[GLYPH[u]] || G.ambient}"
-      transform="translate(${(TILE - 24) / 2} ${(TILE - 24) / 2 - 3})"/>`;
 
   function wrap(text, max) {
     const words = String(text).split(' '), lines = [];
@@ -844,7 +888,6 @@ window.BLUEPRINT = {
     parts.push(`<rect width="${VW}" height="${H}" fill="var(--paper)"/>`);
     parts.push(`<rect width="${VW}" height="${H}" fill="url(#gr)"/>`);
 
-    // the track, drawn through the cart centres
     const c = TILE / 2;
     const x0 = trackL + c, x1 = trackR + c, y0 = yTop + c, y1 = yBot + c;
     parts.push(`<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}"
@@ -852,10 +895,8 @@ window.BLUEPRINT = {
 
     RACS.forEach((r, i) => {
       const p = pos[i]; if (!p) return;
-      const p2 = r.status === 'phase2' ? ' p2' : '';
       const cxp = p.x + TILE / 2, cyp = p.y + TILE / 2;
 
-      // label outside the ring
       let lx, ly, anchor, lines;
       if (p.at === 'left' || p.at === 'right') {
         lines = wrap(r.unitop, 18);
@@ -869,9 +910,8 @@ window.BLUEPRINT = {
       }
       const label = lines.map((t, k) =>
         `<text x="${lx}" y="${ly + k * 15}" text-anchor="${anchor}"
-           class="cart-l${p2}">${esc(t)}</text>`).join('');
+           class="cart-l">${esc(t)}</text>`).join('');
 
-      // I/O badge, placed inside the ring so it never collides with a label
       let ix = cxp, iy = cyp;
       if (p.at === 'top') iy = p.y + TILE + 22;
       else if (p.at === 'bottom') iy = p.y - 22;
@@ -881,13 +921,13 @@ window.BLUEPRINT = {
           stroke="var(--line)" stroke-width="1.2"/>
         <text x="${ix}" y="${iy + 3.3}" text-anchor="middle" class="io-l">I/O</text></g>` : '';
 
-      parts.push(`<g class="tile" data-r="${esc(r.id)}" data-status="${esc(r.status)}"
+      parts.push(`<g class="tile" data-r="${esc(r.id)}"
           aria-pressed="false" role="button" tabindex="0"
           aria-label="${esc(r.unitop)}, cart ${r.n}">
         <g transform="translate(${p.x} ${p.y})">
-          <rect class="box${p2}" width="${TILE}" height="${TILE}" rx="13"${
-            p2 ? ' fill="none" stroke-dasharray="5 4"' : ''}/>
-          ${glyph(r.unitop, p2)}
+          <rect class="box" width="${TILE}" height="${TILE}" rx="13"/>
+          <path class="glyph" d="${gpath(r.unitop)}"
+            transform="translate(${(TILE - 24) / 2} ${(TILE - 24) / 2 - 3})"/>
           <text x="${TILE - 7}" y="${TILE - 6}" text-anchor="end" class="cart-n">${r.n}</text>
         </g>${label}${io}</g>`);
     });
@@ -895,50 +935,109 @@ window.BLUEPRINT = {
     return `<svg viewBox="0 0 ${VW} ${H}" role="img"
       aria-label="${esc(B.title)} RAC system blueprint, ${n} carts">${parts.join('')}</svg>`;
   }
-
   document.getElementById('sheet').innerHTML = sheet();
 
   document.getElementById('legend').innerHTML =
-    `<span><i class="key inst"></i>at install</span>` +
-    `<span><i class="key p2"></i>phase 2 — space reserved, not quoted</span>` +
+    `<span><i class="key inst"></i>on the track at install</span>` +
     `<span><i class="key io"></i>material enters or leaves here by hand</span>` +
-    `<span>cart number is Ginkgo's, confirmed 2026-11-04</span>`;
+    `<span>cart numbers are Ginkgo's, confirmed 2026-11-04</span>`;
 
-  const STATUS = {installed: {c:'#009E73', t:'at install'},
-                  phase2:    {c:'#8e8e93', t:'phase 2'}};
+  // ---- the cart elevation, drawn in the style of the Ginkgo layout sheets ----
+  // The one dimension on it is real: 1800 mm overall height, from the
+  // preliminary RAC layout. Width is schematic and carries no dimension,
+  // because the per-cart width is not in the sheet we have.
+  function elevation(r) {
+    const W = 250, HT = 220, X = 52, Y = 14, CW = 118, CH = 176;
+    const deckY = Y + 56, baseY = Y + CH - 26;
+    const names = r.instruments.map(i => INST[i] ? INST[i].label : i);
+    const slots = Math.max(1, names.length);
+    const sh = (baseY - deckY - 10) / slots;
+    const boxes = names.map((nm, k) => {
+      const by = deckY + 6 + k * sh;
+      return `<rect x="${X + 11}" y="${by}" width="${CW - 22}" height="${sh - 7}" rx="3"
+          fill="#1d3049" stroke="var(--dim)" stroke-width="0.8"/>` +
+        `<text x="${X + CW / 2}" y="${by + (sh - 7) / 2 + 3.5}" text-anchor="middle"
+          class="el-i">${esc(nm.length > 17 ? nm.slice(0, 16) + '…' : nm)}</text>`;
+    }).join('');
+    return `<svg viewBox="0 0 ${W} ${HT}" role="img"
+       aria-label="Schematic elevation of cart ${r.n}">
+      <defs><pattern id="gr2" width="13" height="13" patternUnits="userSpaceOnUse">
+        <path d="M13 0H0V13" fill="none" stroke="var(--grid)" stroke-width="0.5"
+          opacity="0.5"/></pattern></defs>
+      <rect width="${W}" height="${HT}" fill="var(--paper)"/>
+      <rect width="${W}" height="${HT}" fill="url(#gr2)"/>
+      <!-- enclosure -->
+      <rect x="${X}" y="${Y}" width="${CW}" height="${CH}" rx="6" fill="none"
+        stroke="var(--line)" stroke-width="1.4"/>
+      <!-- top service band -->
+      <line x1="${X}" y1="${Y + 26}" x2="${X + CW}" y2="${Y + 26}" stroke="var(--dim)"
+        stroke-width="1"/>
+      <text x="${X + CW / 2}" y="${Y + 17}" text-anchor="middle" class="el-l">SERVICE</text>
+      <!-- deck -->
+      <line x1="${X}" y1="${deckY}" x2="${X + CW}" y2="${deckY}" stroke="var(--line)"
+        stroke-width="1.6"/>
+      <text x="${X + CW + 7}" y="${deckY + 3}" class="el-l">DECK</text>
+      ${boxes}
+      <!-- track pass-through -->
+      <line x1="${X - 20}" y1="${baseY}" x2="${X + CW + 20}" y2="${baseY}" stroke="var(--accent)"
+        stroke-width="2"/>
+      <text x="${X + CW + 7}" y="${baseY - 5}" class="el-l">TRACK</text>
+      <!-- base -->
+      <line x1="${X}" y1="${Y + CH}" x2="${X + CW}" y2="${Y + CH}" stroke="var(--line)"
+        stroke-width="1.4"/>
+      <circle cx="${X + 16}" cy="${Y + CH + 5}" r="4.5" fill="none" stroke="var(--dim)"/>
+      <circle cx="${X + CW - 16}" cy="${Y + CH + 5}" r="4.5" fill="none" stroke="var(--dim)"/>
+      <!-- the one real dimension -->
+      <line x1="${X - 26}" y1="${Y}" x2="${X - 26}" y2="${Y + CH}" stroke="var(--dim)"
+        stroke-width="0.9"/>
+      <line x1="${X - 30}" y1="${Y}" x2="${X - 22}" y2="${Y}" stroke="var(--dim)" stroke-width="0.9"/>
+      <line x1="${X - 30}" y1="${Y + CH}" x2="${X - 22}" y2="${Y + CH}" stroke="var(--dim)"
+        stroke-width="0.9"/>
+      <text x="${X - 32}" y="${Y + CH / 2}" text-anchor="middle" class="el-d"
+        transform="rotate(-90 ${X - 32} ${Y + CH / 2})">1800 mm</text>
+      <text x="${X + CW / 2}" y="${HT - 4}" text-anchor="middle" class="el-l"
+        >SCHEMATIC ELEVATION &middot; RAC ${r.n}</text>
+    </svg>`;
+  }
 
+  const detail = document.getElementById('detail');
   function show(id) {
     const r = RACS.find(x => x.id === id);
-    const el = document.getElementById('detail');
     if (!r) {
-      el.innerHTML = `<p class="empty">Nineteen carts, each named for its unit
-        operation rather than its instrument — that is how Ginkgo draws its own
-        published blueprints, and it is the altitude that lets someone plan
-        against the machine without knowing the model numbers.
-        Click a cart for what is in it and what runs through it.</p>`;
+      detail.innerHTML = `<div class="dbody"><p class="empty">Each cart is named for its unit
+        operation rather than its instrument — the way Ginkgo draws its own published
+        Application Blueprints, and the altitude that lets someone plan against the machine
+        without knowing the model numbers. <b>Click a cart</b> for what it can do, which
+        protocols run through it, and a schematic elevation of how it is built.</p></div>`;
       return;
     }
-    const st = STATUS[r.status];
-    const instr = r.instruments.map(i =>
-      `<span class="chip">${esc(INST[i] ? INST[i].label : i)}</span>`).join('') ||
-      `<span class="chip" style="opacity:.6">not quoted</span>`;
-    const runs = (r.runs || []).map(w => {
-      const c = WF[w] && PH[WF[w].phase] ? PH[WF[w].phase].c : 'var(--rule)';
-      return `<span class="chip wf" style="border-color:${c}"
-        title="${esc(WF[w] ? WF[w].name : w)}">${esc(w)}</span>`;
+    const specs = r.instruments.map(i => INST[i]).filter(Boolean).map(i =>
+      `<div class="spec"><b>${esc(i.label)}</b>${i.vendor ? ' · ' + esc(i.vendor) : ''} — ${esc(i.spec)}</div>`
+    ).join('');
+    const protos = (r.runs || []).map(w => {
+      const wf = WF[w], c = wf && PH[wf.phase] ? PH[wf.phase].c : 'var(--rule)';
+      return `<div class="pr" style="border-left-color:${c}">
+        <span class="pid">${esc(w)}</span><span>${esc(wf ? wf.name : w)}</span></div>`;
     }).join('');
-    const specs = r.instruments.map(i => INST[i])
-      .filter(Boolean).map(i => `<div class="spec"><b>${esc(i.label)}</b> — ${esc(i.spec)}</div>`)
-      .join('');
-    el.innerHTML = `
-      <div class="hd"><h3>${esc(r.unitop)}</h3>
-        <span class="n">cart ${r.n}</span>
-        <span class="st" style="color:${st.c};border-color:${st.c}">${st.t}</span></div>
-      <p>${esc(r.note)}</p>
-      <div class="lbl">what is on it</div><div class="chips">${instr}</div>
-      ${specs ? `<div style="margin-top:7px">${specs}</div>` : ''}
-      ${runs ? `<div class="lbl">what runs through it &middot; ${r.runs.length}</div>
-                <div class="chips">${runs}</div>` : ''}`;
+    detail.innerHTML = `
+      <div class="ttl"><span>Fraser Lab &middot; UCSF</span>
+        <span>Cart detail</span><span class="r">RAC ${r.n}</span></div>
+      <div class="dbody">
+        <div class="dhd"><h3>${esc(r.unitop)}</h3><span class="no">cart ${r.n}</span></div>
+        <div class="classes">${classChips(r)}${r.io
+          ? '<span class="cls" style="color:var(--muted);border-color:var(--rule)">hand I/O</span>'
+          : ''}</div>
+        <p class="lead">${esc(r.note)}</p>
+        <div class="split">
+          <div><div class="lbl" style="margin-top:0">How it is built</div>
+            <div class="elev">${elevation(r)}</div></div>
+          <div>
+            <div class="lbl" style="margin-top:0">What it can do</div>${specs}
+            ${protos ? `<div class="lbl">Protocols that run through it &middot; ${r.runs.length}</div>
+              <div class="protos">${protos}</div>` : ''}
+          </div>
+        </div>
+      </div>`;
   }
   show(null);
 
@@ -959,21 +1058,35 @@ window.BLUEPRINT = {
     const t = e.target.closest('.tile'); if (t) { e.preventDefault(); pick(t.dataset.r); }
   });
 
-  // ---- the footnote: what this sheet is, and what it is not ----
+  // ---- phase 2, in its own section ----
+  document.getElementById('p2intro').textContent =
+    `Four carts the floor plan reserves, all of them driven by crystallography. They are ` +
+    `not on the track above because they are not on the track: the room is laid out for ` +
+    `them and the system grows from ${RACS.length} carts to ${B.racs.length} when they land.`;
+
+  document.getElementById('p2').innerHTML = PEND.map(r => `
+    <article class="p2card">
+      <div class="ph">
+        <span class="mini"><svg viewBox="0 0 24 24"><path d="${gpath(r.unitop)}"/></svg></span>
+        <span><h3>${esc(r.unitop)}</h3><div class="n2">cart ${r.n} &middot; phase 2</div></span>
+      </div>
+      <p>${esc(r.note)}</p>
+      <div class="classes">${classChips(r)}</div>
+    </article>`).join('');
+
   const placed = RACS.reduce((a, r) => a + r.instruments.length, 0);
   document.getElementById('foot').innerHTML =
-    `<b>${placed} instruments across ${inst} carts</b>, generated from the same
-     <code>data/protocols.yml</code> that drives the workflow page — the build fails if an
-     instrument is on the capability map and on no cart, or on two. The shape is
-     borrowed from Ginkgo's published Application Blueprints, which label a cart by
-     its unit operation rather than its instrument; where they have a term for
-     something we have, the term here is theirs.
+    `<b>${placed} instruments across ${RACS.length} carts</b>, generated from the same
+     <code>_data/protocols.yml</code> that drives the campaign planner — the build fails if an
+     instrument is on the capability map and on no cart, or on two. The shape is borrowed from
+     Ginkgo's published Application Blueprints, which label a cart by its unit operation rather
+     than its instrument; where they have a term for something we have, the term here is theirs.
      <br><br>
-     <b>What this is not:</b> a floor plan. Cart order here reads as a workflow loop,
-     not as the physical layout — the real block is 8,338&nbsp;mm long at 15 carts and
-     10,338&nbsp;mm at 19, and the orientation in the room is forced.
-     <b>Colony picking</b> has no cart: it stays out of scope, though Ginkgo's own
-     transformation note says it can be onboarded with a further cart.`;
+     <b>What this is not:</b> a floor plan. Cart order here reads as a workflow loop rather than
+     as the physical layout. The real block is 8,338&nbsp;mm long and 3,900&nbsp;mm wide at
+     ${RACS.length} carts, 1,800&nbsp;mm high, about 32.5&nbsp;m², and its orientation in room 515
+     is forced. The elevation on each cart detail is schematic: the height is the system figure,
+     the width is drawn to fit the page.`;
 })();
 </script>
 </body>

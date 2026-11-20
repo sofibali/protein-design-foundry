@@ -54,7 +54,8 @@ def load():
     gates = {g["id"]: g for g in yaml.safe_load((data / "gates.yml").read_text())["gates"]}
     stages = yaml.safe_load((data / "stages.yml").read_text())
     protos = yaml.safe_load((data / "protocols.yml").read_text())
-    return gates, stages, protos
+    progs = yaml.safe_load((data / "programmes.yml").read_text())
+    return gates, stages, protos, progs
 
 
 def nulls(obj, path=""):
@@ -77,14 +78,15 @@ def nulls(obj, path=""):
             yield from nulls(v, f"{path}[{i}]")
 
 
-def check(gates, stages, protos):
+def check(gates, stages, protos, progs):
     """Fail the build rather than ship pages that disagree with each other."""
     errs = []
 
     # --- the YAML flow-mapping comma trap, before anything else is checked ---
     for label, blob in (("gates.yml", {"gates": gates}),
                         ("data/stages.yml", stages),
-                        ("data/protocols.yml", protos)):
+                        ("data/protocols.yml", protos),
+                        ("data/programmes.yml", progs)):
         for where, key in nulls(blob):
             errs.append(f"{label}: {where} has a null-valued key — quote the value. "
                         f"An unquoted comma in a flow mapping split it, and the text "
@@ -313,6 +315,36 @@ def check(gates, stages, protos):
             elif not str(it["v"]).rstrip().endswith((".", "?", "!")):
                 errs.append(f"{key}: value looks truncated (no end punctuation): {it['v']!r}")
 
+    # --- the programmes on the landing page ---
+    # Each one claims a loop and sometimes a route. A programme pointing at a
+    # loop that does not exist is a landing page promising work the machine
+    # has no shape for, which is the one thing this page must not do.
+    loop_ids = {lp["id"] for lp in protos["loops"]}
+    route_ids = {r["id"] for r in protos.get("routes", [])}
+    wf_ids = {w["id"] for w in protos["workflows"]}
+    if not progs.get("lede"):
+        errs.append("programmes.yml has no lede")
+    seen_pr = set()
+    for p in progs.get("programmes", []):
+        pid = p.get("id", "?")
+        if pid in seen_pr:
+            errs.append(f"programme {pid!r} is defined twice")
+        seen_pr.add(pid)
+        for k in ("id", "name", "sub", "status", "problem", "strategy", "bring", "back"):
+            if not p.get(k):
+                errs.append(f"programme {pid!r} is missing {k!r}")
+        if not p.get("areas"):
+            errs.append(f"programme {pid!r} names no areas")
+        if p.get("loop") not in loop_ids:
+            errs.append(f"programme {pid!r}: unknown loop {p.get('loop')!r}")
+        if p.get("route") and p["route"] not in route_ids:
+            errs.append(f"programme {pid!r}: unknown route {p['route']!r}")
+        for gid in p.get("gates", []):
+            if gid not in gates:
+                errs.append(f"programme {pid!r}: unknown gate {gid!r}")
+    if len(seen_pr) < 2:
+        errs.append("programmes.yml lists fewer than two programmes")
+
     if errs:
         print("Build failed:", file=sys.stderr)
         for e in errs:
@@ -441,14 +473,32 @@ def write_inventory(protos):
 
 
 def main():
-    gates, stages, protos = load()
-    n = check(gates, stages, protos)
+    gates, stages, protos, progs = load()
+    n = check(gates, stages, protos, progs)
     protos = derive(protos)
 
+    # The landing page answers "can the foundry take my project". It needs the
+    # programmes, the loops each one runs, and the gates those loops decide at
+    # — but not the limits block, which moved to the capability page where a
+    # reader is already looking at what the deck does.
     loop = dict(stages)
+    loop.pop("limits", None)
     loop["gates"] = gates
+    loop["programmes"] = progs
+    loop["loops"] = protos["loops"]
+    loop["routes"] = protos.get("routes", [])
+    loop["wf"] = {w["id"]: {"name": w["name"], "short": w["short"],
+                            "phase": w["phase"], "gates": w.get("gates", [])}
+                  for w in protos["workflows"]}
+    loop["phases"] = protos["phases"]
     imgs = bundle("foundry.html", "data.js", "FOUNDRY", loop)
-    imgs += bundle("workflows.html", "protocols.js", "PROTOCOLS", protos)
+
+    # The campaign planner needs each gate's three outcomes, because what a
+    # campaign is, is the chain those outcomes pick out.
+    wfdata = dict(protos)
+    wfdata["gates"] = gates
+    wfdata["limits"] = stages["limits"]
+    imgs += bundle("workflows.html", "protocols.js", "PROTOCOLS", wfdata)
     imgs += bundle("blueprint.html", "blueprint.js", "BLUEPRINT", {
         "title": "UCSF Protein Design Foundry",
         "subtitle": "RAC system blueprint",

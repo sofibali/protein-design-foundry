@@ -1,0 +1,139 @@
+# The project styles the foundry takes on. One entry per kind of project,
+# not per target.
+#
+# Source: the 2026-11-19 "Targets and risk tiering" session with Jamie, in the
+# internal repo's notes/meeting_record.md. Two things in that record are
+# deliberately NOT here. The owning group for each target area, because naming
+# a colleague's programme on a public page is theirs to do and not ours. And
+# the risk tier, because the meeting settled that a tier is agreed WITH the
+# owning group rather than assigned to it, and none has been agreed yet.
+# Publishing an unagreed rating against someone else's project would make this
+# page wrong in the one way that matters. Both live in the internal repo.
+#
+# QUOTE EVERY VALUE WITH A COMMA IN IT, or use a block scalar. An unquoted
+# comma inside a flow mapping truncates the value and turns the rest into a
+# null-valued key; the build fails on it now, but it is easier not to write.
+
+lede: >-
+  The foundry runs campaigns, not samples. You bring a target and a question;
+  what comes back is a verdict per design at every gate it passed through,
+  with the failures kept. These are the shapes of project it takes.
+
+aside:
+  title: How a project is taken on
+  body: >-
+    A proposal is scored against D0's four preconditions, and the answer is one
+    of three: onboarded and assigned an expression route, declined with the
+    missing precondition named, or run as a feasibility arm first. Risk is
+    rated per target, and rated with the group that owns it rather than
+    assigned to them.
+
+programmes:
+
+  - id: binders
+    name: Binder campaigns
+    sub: the spine of the machine
+    status: running
+    problem: >-
+      A protein with a face worth blocking and no reagent that binds it. The
+      design models will propose thousands of candidates against that face;
+      the question is which of them actually bind it, and whether the ones
+      that bind landed where they were designed to land.
+    areas: [Parkinson's, the avoidome, autism genes, HIV, neurosurgery, hearing]
+    strategy: >-
+      RFdiffusion, ProteinMPNN and BindCraft propose; the deck expresses,
+      purifies and screens them against an on-plate counter-target; dose
+      response confirms the primaries; a hotspot-mutant counter-screen asks
+      whether the binder found the designed face or a different one.
+    loop: binder
+    route: cellfree
+    gates: [D0, D1, D2, D3, D4, D5, D6]
+    bring: "A sequence and a structure, one mutable hotspot, and a close homolog."
+    back: >-
+      A verdict per design per gate, an affinity where one was determined, and
+      an epitope verdict. Every measured negative comes back too.
+
+  - id: structure
+    name: Structural biology and construct workflow
+    sub: which construct crystallises
+    status: phase 2
+    problem: >-
+      A construct that expresses is not a construct that diffracts, and the
+      distance between the two is usually paid for in months of hand work. The
+      screen is cheap per drop and expensive per hour, which is exactly the
+      shape of problem automation is for.
+    areas: [crystallisation screening, co-crystallisation against soaking, construct series]
+    strategy: >-
+      Acoustic drop setting from an Echo source plate, trays held in ambient
+      random-access storage, and the solved interface compared against the
+      design model rather than only scored for resolution.
+    loop: structure
+    # no route: the crystallisation protocol is the only one in this chain and
+    # routes need at least two steps. The key is omitted rather than left
+    # empty, because an empty value is the comma-trap signature the build
+    # rejects on sight.
+    gates: [D7, D8]
+    bring: "A construct series, or hits from a binder campaign worth solving."
+    back: >-
+      Whether the binder sits where the model said it did. This is the only
+      loop that tests the models about place rather than about strength.
+
+  - id: enzymes
+    name: Enzyme design
+    sub: active or inactive, at plate scale
+    status: taking proposals
+    problem: >-
+      A designed or redesigned enzyme is a binding problem with a turnover
+      readout bolted on. The deck's limit is not the chemistry, it is whether
+      the assay fits in a well and reads on the PHERAstar.
+    areas: [designed actives, redesigned specificity, substrate scope]
+    strategy: >-
+      The same express-purify-QC spine as a binder campaign, with the binding
+      block replaced by a kinetic endpoint. Dose response gives the
+      concentration series; the counter-screen becomes a substrate panel.
+    loop: binder
+    route: ecoli
+    gates: [D1, D2, D3, D4]
+    bring: "A construct set and an assay that reads in a plate at endpoint."
+    back: "Activity per variant against the panel, on a normalised plate."
+
+  - id: family
+    name: Cell-free family screening
+    sub: a UniProt family, expressed and sorted
+    status: taking proposals
+    problem: >-
+      For most protein families, which members are active is unknown because
+      nobody has expressed them all. Cell-free makes the whole family a
+      pipetting problem rather than a cloning programme.
+    areas: [UniProt family members, active against inactive, orthologue panels]
+    strategy: >-
+      In-vitro assembly so the plasmid never sees a cell, cell-free expression
+      arrayed across the family, then the family screened in one block against
+      the same readout.
+    loop: expression
+    route: invitro
+    gates: [D1, D2, D3]
+    bring: "A family definition and one assay that works for all of it."
+    back: >-
+      An expressed-and-measured call for every member, and the expression
+      conditions that got there.
+
+  - id: ptm
+    name: Linkage-specific PTM reagents
+    sub: starting with ADP-ribosylation
+    status: taking proposals
+    problem: >-
+      Reagents against modified proteins mostly read the modification or the
+      sequence, not both, and almost none read the linkage. A reagent that
+      distinguishes linkage by geometry is a binder design problem with an
+      unusually well-defined face.
+    areas: [ADP-ribosylation first, sequence-context specificity, linkage geometry]
+    strategy: >-
+      A binder campaign where the counter-target is the same peptide carrying a
+      different linkage, so selectivity is measured on the plate rather than
+      argued from a model.
+    loop: binder
+    route: selectivity
+    gates: [D0, D3, D4, D6]
+    bring: "Modified and unmodified peptide, and the linkage you need told apart."
+    back: "A selectivity index per design, against the linkage and against the sequence."

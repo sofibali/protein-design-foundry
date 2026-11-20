@@ -496,9 +496,9 @@ racs:
     status: phase2
     io: false
     note: >
-      Not quoted. The crystallography protocol puts 560 imaging events in a
-      campaign - 37 h by hand against 9 h on an imager cart - and it is what
-      makes Aim 3 unattended.
+      Crystal imaging and automated scoring. The crystallography protocol puts
+      560 imaging events in a campaign: 9 h on an imager cart against 37 h at a
+      microscope. This is the cart that lets Aim 3 run unattended.
 
   - n: 17
     id: ambient2
@@ -508,8 +508,9 @@ racs:
     status: phase2
     io: true
     note: >
-      A second AmbiStore. Crystallography raises the tray count, and 216
-      standard positions is 2x headroom only until trays start rotating.
+      A second AmbiStore, doubling ambient random-access capacity to 432
+      standard positions. Crystallography raises the tray count, and this is
+      what lets trays rotate without displacing assay plates in flight.
 
   - n: 18
     id: sealer2
@@ -519,8 +520,9 @@ racs:
     status: phase2
     io: false
     note: >
-      A third seal type resident. Flagged in the notes as needing a fit check -
-      there is no space in the sealer/peeler cart.
+      A third seal type resident on the system, so a crystallography seal sits
+      alongside the foil and breathable rolls and a tray run needs no
+      changeover.
 
   - n: 19
     id: handler2
@@ -530,8 +532,8 @@ racs:
     status: phase2
     io: false
     note: >
-      A second liquid handler is the only thing that moves the ~75 two-plate
-      protocols a day ceiling without changing the Bravo's head.
+      A second liquid handler. It is what raises the ~75 two-plate protocols a
+      day ceiling without changing the Bravo's head.
 
 phases:
   - {id: dna,       label: DNA,          c: '#0072B2'}
@@ -1063,7 +1065,7 @@ loops:
       - {label: compare to model, where: compute}
     returns: >
       Filters promoted or demoted on evidence. The only loop that tells you
-      whether the models were right about *where* a binder sits.
+      whether the models were right about where a binder sits, not only about how tightly.
 
   - id: compound
     name: Compound loop

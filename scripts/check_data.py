@@ -148,8 +148,8 @@ def main():
     try:
         sys.path.insert(0, str(ROOT / "scripts"))
         import build_pages
-        g, st, pr = build_pages.load()
-        build_pages.check(g, st, pr)
+        g, st, pr, pg = build_pages.load()
+        build_pages.check(g, st, pr, pg)
     except SystemExit:
         fail("build_pages.check", "the device set, gates and workflows disagree - "
                                   "run python3 scripts/build_pages.py for the detail")

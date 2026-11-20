@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Foundry Protocols</title>
+<title>Plan a Campaign</title>
 <style>
   :root {
     --bg:#fff; --ink:#1d1d1f; --muted:#8e8e93; --rule:#d2d2d7; --tab-bg:#f2f2f4;
@@ -73,6 +73,59 @@
   .verdict b{font-weight:500}
   .verdict .cult{color:#D55E00;font-weight:500}
   .plan .empty2{color:var(--muted);font-size:12.5px;font-style:italic}
+
+  /* --- the cascade: a protocol, its gate, and where each outcome goes --- */
+  .cascade{display:grid;gap:0;margin-top:4px}
+  .cascade .empty2{padding:6px 0}
+  .cstep{border:1px solid var(--rule);border-left-width:3px;border-radius:10px;
+         padding:11px 13px 12px}
+  .cstep .ch{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+  .cstep .ord{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;
+              border:1px solid var(--rule);border-radius:999px;width:21px;height:21px;
+              display:inline-grid;place-items:center;flex:none;align-self:center}
+  .cstep .cid{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .cstep .cnm{font-size:15px}
+  .cstep .cgv{font-size:12.5px;color:var(--muted);margin-top:3px;margin-left:30px}
+  .cstep .creps{font-size:11.5px;color:var(--muted);margin-left:auto}
+  .gatebox{margin:10px 0 0 30px;border:1px solid var(--rule);border-radius:9px;
+           padding:9px 11px 10px}
+  .gatebox + .gatebox{margin-top:7px}
+  .gatebox.defer{border-style:dashed}
+  .gatebox .gh{font-size:13px;font-weight:500}
+  .gatebox .gh .gi{color:var(--muted);font-weight:400;font-variant-numeric:tabular-nums;
+                   margin-right:6px}
+  .gatebox .gm{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.45}
+  .branches{display:grid;gap:5px;margin-top:9px}
+  .br{display:grid;grid-template-columns:62px minmax(0,1fr);gap:10px;align-items:start;
+      font-size:12.5px;line-height:1.45}
+  .br .bk{font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:500;
+          padding-top:1px}
+  .br .bv{color:var(--muted)}
+  .br .bv b{color:var(--ink);font-weight:500}
+  .br.pass .bk{color:#009E73} .br.fail .bk{color:#D55E00} .br.amb .bk{color:#E69F00}
+  .feeds{display:flex;align-items:stretch;gap:10px;margin:0 0 0 40px;padding:0}
+  .feeds .rail{width:2px;background:var(--rule);flex:none;margin-left:9px}
+  .feeds .ftxt{font-size:12px;color:var(--muted);padding:9px 0;line-height:1.45;max-width:78ch}
+  .feeds .ftxt b{color:var(--ink);font-weight:500}
+  .cend{margin:0 0 0 40px;display:flex;align-items:center;gap:10px;padding:10px 0 0;
+        font-size:12.5px;color:var(--muted)}
+  .cend .dot2{width:9px;height:9px;border-radius:999px;background:var(--ink);flex:none;
+              margin-left:5px}
+  .deckcost{margin-top:16px;border-top:1px solid var(--rule);padding-top:10px}
+  .deckcost > summary{font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+       color:var(--muted);cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px}
+  .deckcost > summary::-webkit-details-marker{display:none}
+  .deckcost > summary::before{content:"+";font-size:13px;line-height:1;width:11px;text-align:center}
+  .deckcost[open] > summary::before{content:"\2212"}
+  .deckcost > summary:hover{color:var(--ink)}
+  .deckcost .bars{margin-top:11px}
+  .libhead{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:500;
+           margin:40px 0 0;padding-bottom:6px;border-bottom:2px solid var(--rule)}
+  .libnote{color:var(--muted);font-size:12.5px;margin:9px 0 0}
+  .limits{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:7px}
+  .limits li{color:var(--muted);font-size:13.5px;padding-left:19px;position:relative;
+             line-height:1.45}
+  .limits li::before{content:"\00d7";position:absolute;left:3px;top:-1px;color:#D55E00;font-size:15px}
   @media (max-width:560px){ .barrow{grid-template-columns:62px minmax(0,1fr) 80px;gap:8px} }
   .ceil{border-top:1px solid var(--rule);margin-top:11px;padding-top:9px;
         font-size:12px;color:var(--muted);line-height:1.5}
@@ -177,9 +230,9 @@
     <h1 id="t"></h1>
     <div class="sub" id="s"></div>
     <div class="note" id="n"></div>
-    <div class="nav"><a href="foundry.html">&larr; the loop and the gates</a>
-      &nbsp;&middot;&nbsp; <a href="blueprint.html">the system blueprint &rarr;</a>
-      &nbsp;&middot;&nbsp; <a href="maps.html">one-page maps &rarr;</a>
+    <div class="nav"><a href="foundry.html">&larr; what happens here</a>
+      &nbsp;&middot;&nbsp; <a href="blueprint.html">system blueprint &rarr;</a>
+      &nbsp;&middot;&nbsp; <a href="intake.html">propose a campaign &rarr;</a>
       &nbsp;&middot;&nbsp; full input spec in <code>reference/constructs.md</code></div>
   </header>
 
@@ -192,14 +245,20 @@
   <div class="legend" id="legend"></div>
 
   <section class="plan">
-    <h2>Plan a day</h2>
+    <h2>Plan a campaign</h2>
     <div class="lede" id="plan-lede"></div>
     <div class="routes" id="routes"></div>
     <div class="chain-edit" id="chain-edit"></div>
-    <div class="bars" id="bars"></div>
-    <div class="verdict" id="verdict"></div>
+    <div class="cascade" id="cascade"></div>
+    <details class="deckcost"><summary>What the chain costs the deck</summary>
+      <div class="bars" id="bars"></div>
+      <div class="verdict" id="verdict"></div>
+    </details>
   </section>
 
+  <h2 class="libhead">The protocol library</h2>
+  <p class="libnote">Fifteen protocols. Add any of them to the campaign above; the gates
+    come with them.</p>
   <div id="phases"></div>
 
   <section class="loops">
@@ -207,6 +266,12 @@
     <div class="intro" id="lintro"></div>
     <div id="loops"></div>
     <div class="legend" id="wlegend" style="margin-top:16px"></div>
+  </section>
+
+  <section class="loops" id="cannot">
+    <h2 id="lm-t"></h2>
+    <div class="intro" id="lm-note"></div>
+    <ul class="limits" id="lm"></ul>
   </section>
 </div>
 
@@ -310,7 +375,7 @@
         </div>
         ${cost(w)}
         ${w.ends ? `<div class="ends">hands off to &rarr; ${esc(w.ends)}</div>` : ''}
-        <button class="rt" data-add="${esc(w.id)}" style="margin-top:9px">+ add to the day</button>
+        <button class="rt" data-add="${esc(w.id)}" style="margin-top:9px">+ add to the campaign</button>
         ${fmts ? `<ul class="fmts">${fmts}</ul>` : ''}
         ${w.note ? `<p class="body">${esc(w.note)}</p>` : ''}
         <details class="ins"><summary>what goes in &middot; ${w.inputs.length}</summary>
@@ -344,10 +409,14 @@
   const COST = [['bravo', 'Bravo'], ['echo', 'Echo'], ['reader', 'PHERAstar']];
   let plan = [];   // [{id, n}]
 
-  document.getElementById('plan-lede').textContent =
-    'Pick a route, or build a chain. Minutes are modelled off Ginkgo’s own throughput figures '
-    + 'against a ' + (R.day_min / 60) + '-hour day — trust the ratio between two chains more than '
-    + 'either absolute number.';
+  document.getElementById('plan-lede').innerHTML =
+    'A campaign is protocols stitched end to end, where what comes out of one decides what goes '
+    + 'into the next. Each protocol ends in a named gate; the gate sorts the plate into pass, fail '
+    + 'and unclear, and each of those three goes somewhere different. Pick a route below or build '
+    + 'your own chain, and the cascade shows what carries forward at every step.'
+    + '<br><b style="color:var(--ink);font-weight:500">Scheduling the day is Catalyst\u2019s job, '
+    + 'not this page\u2019s.</b> What is planned here is the order of the science and the '
+    + 'selection between steps.';
 
   document.getElementById('routes').innerHTML =
     P.routes.map(r => `<button class="rt" data-r="${esc(r.id)}" title="${esc(r.sub)}">${esc(r.name)}</button>`).join('')
@@ -360,20 +429,110 @@
     draw();
   }
 
+  const GATES = P.gates || {};
+  const OUT = [['pass', 'pass', 'pass'], ['fail', 'fail', 'fail'], ['ambiguous', 'unclear', 'amb']];
+
+  // A gate is decided ONCE, however many protocols carry it. D2 sits on the
+  // expression, purification and QC protocols because all three feed it, but
+  // the plate is sorted after the last of them, not three times. So the gate
+  // box is drawn at the final protocol in the chain that carries it, and the
+  // earlier ones say where the decision actually lands. What carries forward
+  // out of a step is then the pass set of the last gate DECIDED there; a step
+  // that decides nothing passes its whole plate on, which is a real property
+  // of the chain rather than a gap, and the cascade says so.
+  function cascade() {
+    const box = document.getElementById('cascade');
+    if (!plan.length) {
+      box.innerHTML = '<span class="empty2">Nothing to cascade yet.</span>';
+      return;
+    }
+    // where each gate in the chain is finally decided
+    const decidedAt = {};
+    plan.forEach((s0, i) => (BY[s0.id].gates || []).forEach(g => { decidedAt[g] = i; }));
+
+    const html = [];
+    plan.forEach((s0, i) => {
+      const w = BY[s0.id], ph = PH[w.phase];
+      const carried = (w.gates || []).map(g => GATES[g]).filter(Boolean);
+      const mine = carried.filter(g => decidedAt[g.id] === i);
+      const later = carried.filter(g => decidedAt[g.id] > i);
+      const next = plan[i + 1] ? BY[plan[i + 1].id] : null;
+      const last = mine[mine.length - 1];
+
+      const gboxes = mine.map((g, gi) => {
+        const isLast = gi === mine.length - 1;
+        const rows = OUT.map(([k, label, cls]) => {
+          const act = (g.then && g.then[k]) ? g.then[k] : '';
+          const arrow = (k === 'pass' && isLast && next)
+            ? ` &rarr; <b>${esc(next.id)} ${esc(next.short)}</b>` : '';
+          return `<div class="br ${cls}"><span class="bk">${esc(label)}</span>
+            <span class="bv">${esc(g[k])}<br>${act ? '<b>' + esc(act) + '</b>' : ''}${arrow}</span></div>`;
+        }).join('');
+        return `<div class="gatebox">
+          <div class="gh"><span class="gi">${esc(g.id)}</span>${esc(g.name)}</div>
+          <div class="gm">${esc(g.measure)}</div>
+          <div class="branches">${rows}</div>
+          <div class="gm" style="margin-top:7px">decided by ${esc(String(g.by).replace(/_/g, ' '))}</div>
+        </div>`;
+      }).join('');
+
+      const deferred = later.map(g => {
+        const at = BY[plan[decidedAt[g.id]].id];
+        return `<div class="gatebox defer"><div class="gm">
+          <b>${esc(g.id)} ${esc(g.name)}</b> &mdash; this protocol feeds it, but the plate is
+          sorted after <b>${esc(at.id)} ${esc(at.short)}</b>, where the last of its
+          measurements is taken.</div></div>`;
+      }).join('');
+
+      const nogate = !carried.length
+        ? `<div class="gatebox defer"><div class="gm">No gate. Nothing is selected here
+            &mdash; this protocol makes the material the selection is made on.</div></div>` : '';
+
+      html.push(`<div class="cstep" style="border-left-color:${ph.c}">
+        <div class="ch"><span class="ord">${i + 1}</span>
+          <span><span class="cid">${esc(w.id)}</span> <span class="cnm">${esc(w.name)}</span></span>
+          ${s0.n > 1 ? `<span class="creps">&times;${s0.n} plates</span>` : ''}</div>
+        <div class="cgv">${esc(w.gives)} &middot; ${esc(w.scale)} &middot; ${esc(w.time)}</div>
+        ${gboxes}${deferred}${nogate}
+      </div>`);
+
+      if (next) {
+        const line = last
+          ? `What carries forward into <b>${esc(next.id)} ${esc(next.short)}</b>, on
+             <b>${esc(last.id)}</b>: ${esc(last.pass)}.`
+          : `Nothing is decided here, so the whole plate carries forward into
+             <b>${esc(next.id)} ${esc(next.short)}</b>.`;
+        html.push(`<div class="feeds"><div class="rail"></div>
+          <div class="ftxt">${line}</div></div>`);
+      }
+    });
+
+    const gids = Object.keys(decidedAt);
+    const human = gids.filter(g => GATES[g] && /human/.test(GATES[g].by)).length;
+    html.push(`<div class="cend"><span class="dot2"></span>
+      <span>${plan.length} protocols, ${gids.length} ${gids.length === 1 ? 'decision' : 'decisions'}${
+        gids.length ? ' &mdash; ' + gids.join(', ') : ''}.
+      ${human ? `${human} of them ${human === 1 ? 'needs' : 'need'} a human to confirm; the agent
+                 makes the rest.` : 'The agent makes every one of them.'}</span></div>`);
+    box.innerHTML = html.join('');
+  }
+
   function draw() {
     const ce = document.getElementById('chain-edit');
-    ce.innerHTML = plan.length ? plan.map((s, i) => {
-      const w = BY[s.id], ph = PH[w.phase];
+    ce.innerHTML = plan.length ? plan.map((s0, i) => {
+      const w = BY[s0.id], ph = PH[w.phase];
       return `<span class="pill2" style="border-left:3px solid ${ph.c}">
         <span>${esc(w.id)} ${esc(w.name)}</span>
         <button class="s" data-d="${i}" aria-label="one fewer">&minus;</button>
-        <span class="n">&times;${s.n}</span>
+        <span class="n">&times;${s0.n}</span>
         <button class="s" data-u="${i}" aria-label="one more">+</button>
         <button class="x" data-rm="${i}" aria-label="remove">&times;</button></span>`;
-    }).join('') : `<span class="empty2">Nothing chained yet — pick a route above, or add from any card below.</span>`;
+    }).join('') : `<span class="empty2">No campaign yet \u2014 pick a route above, or add protocols from the library below.</span>`;
+
+    cascade();
 
     const tot = { bravo: 0, echo: 0, reader: 0 };
-    plan.forEach(s => COST.forEach(([k]) => { tot[k] += (BY[s.id].cost?.[k] || 0) * s.n; }));
+    plan.forEach(s0 => COST.forEach(([k]) => { tot[k] += (BY[s0.id].cost?.[k] || 0) * s0.n; }));
     const worst = Math.max(...COST.map(([k]) => tot[k]), 0);
 
     document.getElementById('bars').innerHTML = COST.map(([k, label]) => {
@@ -388,12 +547,14 @@
     if (!plan.length) { v.innerHTML = ''; return; }
     const binder = COST.find(([k]) => tot[k] === worst);
     const rounds = worst > 0 ? Math.floor(R.day_min / worst) : Infinity;
-    const culture = plan.map(s => BY[s.id]).filter(w => /Cytomat/i.test(w.cost?.binds || ''));
+    const culture = plan.map(s0 => BY[s0.id]).filter(w => /Cytomat/i.test(w.cost?.binds || ''));
     v.innerHTML =
-      `<b>${esc(binder[1])}</b> is the binding instrument at <b>${worst} min</b>, so this chain runs `
-      + `<b>${rounds === Infinity ? '—' : rounds}×</b> in a ${R.day_min / 60}-hour day.`
+      `One pass of this chain costs <b>${esc(binder[1])}</b> the most, at <b>${worst} min</b>, `
+      + `so the deck has room for <b>${rounds === Infinity ? '\u2014' : rounds}\u00d7</b> `
+      + `in a ${R.day_min / 60}-hour day. That is a ceiling, not a schedule \u2014 how the passes `
+      + `interleave is Catalyst\u2019s to work out.`
       + (culture.length ? `<br><span class="cult">But ${esc(culture[0].id)} cultures.</span> `
-          + esc(culture[0].cost.binds) + ' — a concurrency cap, not a minutes one, so the day'
+          + esc(culture[0].cost.binds) + ' \u2014 a concurrency cap, not a minutes one, so the'
           + ' arithmetic above does not describe it.' : '');
   }
 
@@ -416,7 +577,14 @@
     draw();
     document.querySelector('.plan').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
-  setRoute(P.routes[0].id);
+  // A project style on the landing page links here with its route in the hash,
+  // so arriving from one lands on that campaign rather than on the default.
+  const fromHash = decodeURIComponent((location.hash || '').slice(1));
+  setRoute(P.routes.some(r => r.id === fromHash) ? fromHash : P.routes[0].id);
+  window.addEventListener('hashchange', () => {
+    const h = decodeURIComponent((location.hash || '').slice(1));
+    if (P.routes.some(r => r.id === h)) setRoute(h);
+  });
 
   function loopSvg(lp) {
     const n = lp.steps.length, VW = 840, PAD = 8;
@@ -457,6 +625,15 @@
 
   document.getElementById('wlegend').innerHTML = Object.values(WHERE).map(w =>
     `<span><i class="dot" style="background:${w.c}"></i>${esc(w.label)}</span>`).join('');
+
+  // ---- what the deck does not do. It moved here from the landing page:
+  // a reader on this page is already looking at capability, and a limit is
+  // only useful next to the thing it limits.
+  const LM = P.limits;
+  document.getElementById('lm-t').textContent = LM.title;
+  document.getElementById('lm-note').textContent = LM.note || '';
+  document.getElementById('lm').innerHTML =
+    LM.items.map(x => `<li>${esc(x)}</li>`).join('');
 
   // click an instrument: dim every workflow that does not use it
   let sel = null;
