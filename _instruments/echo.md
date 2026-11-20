@@ -3,7 +3,7 @@ key: echo
 title: Echo acoustic liquid handler, 6XX series
 standfirst: Tipless nanolitre transfer. The one instrument on the system that does something no person can match.
 specs:
-  - {label: Method, value: Acoustic droplet ejection — no tips, no contact, no carryover}
+  - {label: Method, value: "Acoustic droplet ejection — no tips, no contact, no carryover"}
   - {label: Throughput, value: "~400 plates per 20-hour day at 384 format (modelled)"}
   - {label: Per plate, value: "~3 min"}
   - {label: Per crystallography tray, value: "~9 min"}

@@ -5,8 +5,8 @@ standfirst: Four independently programmable blocks in one cart, which is what ma
 specs:
   - {label: Configuration, value: "3 × 96-well blocks + 1 × 384-well block, all four in a single cart"}
   - {label: Independent programs, value: Four at once}
-  - {label: Fill volume, 96-well, value: 10–100 µL}
-  - {label: Fill volume, 384-well, value: 5–20 µL}
+  - {label: "Fill volume, 96-well", value: "10–100 µL"}
+  - {label: "Fill volume, 384-well", value: "5–20 µL"}
   - {label: Optical detection, value: None}
   - {label: Uses here, value: "PCR, Golden Gate cycling at 37/16 °C, heat lysis at 95 °C, held-temperature cell-free incubation, thermal-challenge ladders"}
 unknown:

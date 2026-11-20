@@ -4,9 +4,9 @@ title: XPeel Automated Plate Seal Remover
 standfirst: De-sealing between steps. It shares cart 1 with the PlateLoc, so a plate can be opened and reclosed without leaving the enclosure.
 specs:
   - {label: Function, value: Automated removal of adhesive and heat seals}
-  - {label: Method, value: Adhesive peel tape, applied and pulled across the seal}
+  - {label: Method, value: "Adhesive peel tape, applied and pulled across the seal"}
   - {label: Consumable, value: Peel tape roll}
-  - {label: Cart, value: Shares cart 1 with the PlateLoc, so seal and peel are one stop}
+  - {label: Cart, value: "Shares cart 1 with the PlateLoc, so seal and peel are one stop"}
 unknown:
   - Tape roll length and plates per roll, which sets how often a run needs a consumable change
   - Whether it lifts all three seal types in use here, particularly the foil

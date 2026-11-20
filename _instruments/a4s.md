@@ -5,7 +5,7 @@ standfirst: The second sealer. Recorded as a lidder for most of the planning per
 specs:
   - {label: Function, value: Roll heat sealing}
   - {label: Temperature range, value: "100–195 °C"}
-  - {label: Seal stock, value: Roll-fed, so a long run does not need a film change}
+  - {label: Seal stock, value: "Roll-fed, so a long run does not need a film change"}
   - {label: Role here, value: Holds the gas-permeable culture roll while the PlateLoc holds foil}
   - {label: Lidding, value: "None — this instrument does not handle lids"}
 unknown:

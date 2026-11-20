@@ -74,6 +74,46 @@
   .spec{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:8px}
   .spec:first-child{margin-top:0}
   .spec b{color:var(--ink);font-weight:500}
+
+  /* a spec is a table of rows, not a paragraph to pick apart */
+  .kv{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed}
+  .kv td{padding:6px 0;border-top:1px solid var(--rule);vertical-align:top;line-height:1.45}
+  .kv tr:first-child td{border-top:0}
+  .kv td.k{color:var(--muted);width:38%;padding-right:16px;word-break:break-word}
+  .kv td.v{color:var(--ink)}
+  .kv td.v em{font-style:normal;color:var(--muted)}
+
+  /* everything past the first paragraph is behind a disclosure, so a cart
+     opens at a glance and goes deeper only when asked */
+  .dd{border-top:1px solid var(--rule)}
+  .dd:last-of-type{border-bottom:1px solid var(--rule)}
+  .dd>summary{list-style:none;cursor:pointer;padding:10px 0;display:flex;
+              align-items:baseline;gap:9px;font-size:13px}
+  .dd>summary::-webkit-details-marker{display:none}
+  .dd>summary::before{content:"";flex:none;width:7px;height:7px;margin-top:4px;
+       border-right:1.6px solid var(--muted);border-bottom:1.6px solid var(--muted);
+       transform:rotate(-45deg);transition:transform .15s}
+  .dd[open]>summary::before{transform:rotate(45deg)}
+  .dd>summary:hover{color:var(--accent)}
+  .dd .cnt{margin-left:auto;color:var(--muted);font-size:11.5px;
+           font-variant-numeric:tabular-nums;letter-spacing:.02em}
+  .dd .sv{color:var(--muted);font-size:12px}
+  .ddb{padding:2px 0 14px}
+  .prose{font-size:12.5px;color:var(--muted);line-height:1.5;margin:11px 0 0;max-width:76ch}
+  .more{display:inline-block;margin-top:11px;font-size:12px;color:var(--accent);
+        text-decoration:none;border-bottom:1px solid transparent}
+  .more:hover{border-bottom-color:var(--accent)}
+
+  .ptab{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed}
+  .ptab th{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+           font-weight:500;text-align:left;padding:0 0 6px;border-bottom:1px solid var(--rule)}
+  .ptab td{padding:6px 0;border-top:1px solid var(--rule);line-height:1.4;vertical-align:top}
+  .ptab td.id{width:46px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .ptab td.ph{width:112px}
+  .ptab .dot{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:6px;
+             vertical-align:middle}
+  .ptab th.id{width:46px} .ptab th.ph{width:112px}
+
   .protos{display:grid;gap:5px;margin-top:6px}
   .pr{display:grid;grid-template-columns:34px minmax(0,1fr);gap:9px;font-size:12.5px;
       align-items:baseline;border-left:3px solid;padding:3px 0 3px 9px}
@@ -371,13 +411,41 @@
         protocols run through it, and a schematic elevation of how it is built.</p></div>`;
       return;
     }
-    const specs = r.instruments.map(i => INST[i]).filter(Boolean).map(i =>
-      `<div class="spec"><b>${esc(i.label)}</b>${i.vendor ? ' · ' + esc(i.vendor) : ''} — ${esc(i.spec)}</div>`
-    ).join('');
+    // One disclosure per instrument. The summary is the name, the vendor and
+    // what it is for; opening it gives the spec sheet's own rows as a table
+    // and the paragraph underneath, so the detail is there without being in
+    // the way. The first is open so a cart never opens onto nothing.
+    const insts = r.instruments.map(i => INST[i]).filter(Boolean);
+    const specs = insts.map((i, n) => {
+      const rows = (i.rows || []).map(s =>
+        `<tr><td class="k">${esc(s.label)}</td><td class="v">${esc(s.value)}</td></tr>`
+      ).join('');
+      return `<details class="dd"${n === 0 ? ' open' : ''}>
+        <summary><span>${esc(i.label)}</span>
+          <span class="sv">${i.vendor ? esc(i.vendor) : ''}</span>
+          <span class="cnt">${rows ? i.rows.length + ' specs' : 'no spec sheet'}</span></summary>
+        <div class="ddb">
+          ${i.role ? `<p class="prose" style="margin-top:0">${esc(i.role)}</p>` : ''}
+          ${rows ? `<table class="kv">${rows}</table>` : ''}
+          ${/* The paragraph and the table are the same facts twice over - the
+                Bravo's 8 min, 32 min and ~75 protocols are rows above and a
+                sentence below. Where there are rows, they are the better form
+                and the paragraph is dropped. Where there is no spec sheet the
+                paragraph is all there is, so it stays. */ ''}
+          ${!rows && i.spec ? `<p class="prose">${esc(i.spec)}</p>` : ''}
+          ${rows ? `<a class="more" href="${esc(i.url || '#')}">Full specification sheet &rarr;</a>` : ''}
+        </div></details>`;
+    }).join('');
+
+    // The protocol list was the longest thing on the sheet. As a table it is
+    // three narrow columns and reads at a glance; the phase is a named column
+    // rather than a colour you have to decode against the legend.
     const protos = (r.runs || []).map(w => {
-      const wf = WF[w], c = wf && PH[wf.phase] ? PH[wf.phase].c : 'var(--rule)';
-      return `<div class="pr" style="border-left-color:${c}">
-        <span class="pid">${esc(w)}</span><span>${esc(wf ? wf.name : w)}</span></div>`;
+      const wf = WF[w], ph = wf && PH[wf.phase];
+      return `<tr><td class="id">${esc(w)}</td>
+        <td>${esc(wf ? wf.name : w)}</td>
+        <td class="ph"><span class="dot" style="background:${ph ? ph.c : 'var(--rule)'}"></span>${
+          esc(ph ? ph.label : '—')}</td></tr>`;
     }).join('');
     detail.innerHTML = `
       <div class="ttl"><span>Fraser Lab &middot; UCSF</span>
@@ -388,15 +456,27 @@
           ? '<span class="cls" style="color:var(--muted);border-color:var(--rule)">hand I/O</span>'
           : ''}</div>
         <p class="lead">${esc(r.note)}</p>
-        <div class="split">
-          <div><div class="lbl" style="margin-top:0">How it is built</div>
-            <div class="elev">${elevation(r)}</div></div>
-          <div>
-            <div class="lbl" style="margin-top:0">What it can do</div>${specs}
-            ${protos ? `<div class="lbl">Protocols that run through it &middot; ${r.runs.length}</div>
-              <div class="protos">${protos}</div>` : ''}
-          </div>
-        </div>
+        <table class="kv" style="margin-top:13px">
+          <tr><td class="k">Unit operation</td><td class="v">${esc(r.unitop)}</td></tr>
+          <tr><td class="k">Cart class</td><td class="v">${esc((r.class || []).join(', ') || '—')}</td></tr>
+          <tr><td class="k">On the cart</td><td class="v">${
+            insts.length ? insts.map(i => esc(i.label)).join(', ') : '—'}</td></tr>
+          <tr><td class="k">Protocols through it</td><td class="v">${
+            (r.runs || []).length}${(r.runs || []).length ? ' of ' + B.workflows.length : ''}</td></tr>
+          <tr><td class="k">Material by hand</td><td class="v">${
+            r.io ? 'Yes — this is where material enters or leaves' : '<em>No — the track feeds it</em>'}</td></tr>
+        </table>
+        <div class="lbl">What it can do</div>
+        ${specs}
+        ${protos ? `<details class="dd"><summary><span>Protocols that run through it</span>
+            <span class="cnt">${r.runs.length}</span></summary>
+          <div class="ddb"><table class="ptab">
+            <tr><th class="id">No.</th><th>Protocol</th><th class="ph">Phase</th></tr>
+            ${protos}</table></div></details>` : ''}
+        <details class="dd"><summary><span>How it is built</span>
+          <span class="cnt">elevation</span></summary>
+          <div class="ddb"><div class="elev" style="max-width:300px">${elevation(r)}</div></div>
+        </details>
       </div>`;
   }
   show(null);

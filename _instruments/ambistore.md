@@ -5,7 +5,7 @@ standfirst: Controlled ambient storage, and the reason an 80-tray crystallograph
 specs:
   - {label: Capacity, value: "216 standard + 50 deep-well positions"}
   - {label: Allocation, value: "9 standard stackers + 5 deep-well"}
-  - {label: Access, value: Random-access carousel, up to six transfer nests}
+  - {label: Access, value: "Random-access carousel, up to six transfer nests"}
   - {label: Retrieval time, value: As little as 12 s to present a plate}
   - {label: Holds, value: "Crystallography trays, bulk precipitant, compound source plates, plates in flight"}
   - {label: Chassis range, value: "Specified down to −20 °C, though configured here for ambient"}

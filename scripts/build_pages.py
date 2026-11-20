@@ -408,6 +408,51 @@ def embed_images(text):
     return re.sub(r"(images/[\w.\-]+\.(?:png|jpe?g|svg))", repl, text), used
 
 
+def sheet_specs():
+    """The structured spec rows from _instruments/*.md, keyed by instrument id.
+
+    Each sheet already carries a `specs:` list of {label, value} - that is what
+    the inventory pages render as a table, and it is the same fact in a shape a
+    table can use. The blueprint's own `spec:` string stays as the one-paragraph
+    summary; these rows are what the cart detail opens into, so the reader gets
+    a table instead of a wall of prose.
+
+    A sheet is optional. An instrument with none keeps its paragraph and shows
+    no table, which is what `offline` does.
+    """
+    # An absolute URL, not a root-relative one. These pages are built to be
+    # self-contained - opened from the file system, mailed, dropped in Slack -
+    # so "/inventory/echo/" would resolve against whatever host the file
+    # happens to be sitting on, and on the site itself it would miss the
+    # project baseurl entirely. The one from _config.yml is the real address.
+    cfg = yaml.safe_load((ROOT / "_config.yml").read_text(encoding="utf-8"))
+    site = (cfg.get("url", "") + cfg.get("baseurl", "")).rstrip("/")
+
+    out = {}
+    for path in sorted((ROOT / "_instruments").glob("*.md")):
+        text = path.read_text(encoding="utf-8")
+        if not text.startswith("---"):
+            continue
+        _, fm, _ = text.split("---", 2)
+        front = yaml.safe_load(fm) or {}
+        key, rows = front.get("key"), front.get("specs") or []
+        if not key:
+            continue
+        clean = []
+        for row in rows:
+            # The flow-mapping comma trap puts a third, null-valued key on the
+            # row and drops the text after the comma. check_data.py fails the
+            # build on it; refuse to render one here too rather than publish a
+            # half sentence.
+            stray = [k for k in row if k not in ("label", "value")]
+            if stray:
+                sys.exit(f"{path.name}: spec row {row!r} has stray key(s) "
+                         f"{stray} - quote the value")
+            clean.append({"label": str(row["label"]), "value": str(row["value"])})
+        out[key] = {"rows": clean, "url": site + "/inventory/%s/" % key}
+    return out
+
+
 def bundle(page, src_tag, var, payload):
     """Inline one data blob into one page and write it to dist/."""
     blob = json.dumps(payload, indent=1, sort_keys=False)
@@ -499,11 +544,13 @@ def main():
     wfdata["gates"] = gates
     wfdata["limits"] = stages["limits"]
     imgs += bundle("workflows.html", "protocols.js", "PROTOCOLS", wfdata)
+    sheets = sheet_specs()
     imgs += bundle("blueprint.html", "blueprint.js", "BLUEPRINT", {
         "title": "UCSF Protein Design Foundry",
         "subtitle": "RAC system blueprint",
         "racs": protos["racs"],
-        "instruments": protos["instruments"],
+        "instruments": [dict(i, **sheets.get(i["id"], {}))
+                        for i in protos["instruments"]],
         "workflows": [{"id": w["id"], "name": w["name"], "phase": w["phase"]}
                       for w in protos["workflows"]],
         "phases": protos["phases"],

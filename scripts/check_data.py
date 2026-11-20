@@ -136,6 +136,16 @@ def main():
         for s in specs:
             if not s.get("label") or s.get("value") in (None, ""):
                 fail(path.name, f"spec row with an empty side: {s!r}")
+            # `{label: Seal stock, value: Roll-fed, so a long run does not need
+            # a film change}` is a flow mapping, so YAML reads the clause after
+            # the second comma as a THIRD key with a null value and the spec
+            # table silently loses it. label and value both survive, which is
+            # why the check above waves it through. Any other key is that trap.
+            for k, v in s.items():
+                if k not in ("label", "value"):
+                    fail(path.name, f"spec row has a stray key {k!r} "
+                                    f"(value {v!r}) - this is the flow-mapping "
+                                    f"comma trap: quote the value")
         if len(body.strip()) < 400:
             fail(path.name, "almost no prose; the table alone is a datasheet, not a page")
 

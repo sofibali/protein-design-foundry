@@ -3,7 +3,7 @@ key: bioshake
 title: BioShake, on-deck orbital shaker
 standfirst: Mixing and bead resuspension without the plate leaving the Bravo deck.
 specs:
-  - {label: Mounting, value: A deck position on the Bravo, not a cart of its own}
+  - {label: Mounting, value: "A deck position on the Bravo, not a cart of its own"}
   - {label: Microplate speed, value: "200–3,000 rpm"}
   - {label: Orbit, value: "2.0 mm standard; 3.0 mm for deep-well, 1.2 mm for 384/1536 at up to 5,000 rpm"}
   - {label: Temperature, value: "T variants are heater-shakers, ambient to 99 °C"}

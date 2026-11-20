@@ -74,6 +74,46 @@
   .spec{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:8px}
   .spec:first-child{margin-top:0}
   .spec b{color:var(--ink);font-weight:500}
+
+  /* a spec is a table of rows, not a paragraph to pick apart */
+  .kv{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed}
+  .kv td{padding:6px 0;border-top:1px solid var(--rule);vertical-align:top;line-height:1.45}
+  .kv tr:first-child td{border-top:0}
+  .kv td.k{color:var(--muted);width:38%;padding-right:16px;word-break:break-word}
+  .kv td.v{color:var(--ink)}
+  .kv td.v em{font-style:normal;color:var(--muted)}
+
+  /* everything past the first paragraph is behind a disclosure, so a cart
+     opens at a glance and goes deeper only when asked */
+  .dd{border-top:1px solid var(--rule)}
+  .dd:last-of-type{border-bottom:1px solid var(--rule)}
+  .dd>summary{list-style:none;cursor:pointer;padding:10px 0;display:flex;
+              align-items:baseline;gap:9px;font-size:13px}
+  .dd>summary::-webkit-details-marker{display:none}
+  .dd>summary::before{content:"";flex:none;width:7px;height:7px;margin-top:4px;
+       border-right:1.6px solid var(--muted);border-bottom:1.6px solid var(--muted);
+       transform:rotate(-45deg);transition:transform .15s}
+  .dd[open]>summary::before{transform:rotate(45deg)}
+  .dd>summary:hover{color:var(--accent)}
+  .dd .cnt{margin-left:auto;color:var(--muted);font-size:11.5px;
+           font-variant-numeric:tabular-nums;letter-spacing:.02em}
+  .dd .sv{color:var(--muted);font-size:12px}
+  .ddb{padding:2px 0 14px}
+  .prose{font-size:12.5px;color:var(--muted);line-height:1.5;margin:11px 0 0;max-width:76ch}
+  .more{display:inline-block;margin-top:11px;font-size:12px;color:var(--accent);
+        text-decoration:none;border-bottom:1px solid transparent}
+  .more:hover{border-bottom-color:var(--accent)}
+
+  .ptab{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:fixed}
+  .ptab th{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+           font-weight:500;text-align:left;padding:0 0 6px;border-bottom:1px solid var(--rule)}
+  .ptab td{padding:6px 0;border-top:1px solid var(--rule);line-height:1.4;vertical-align:top}
+  .ptab td.id{width:46px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .ptab td.ph{width:112px}
+  .ptab .dot{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:6px;
+             vertical-align:middle}
+  .ptab th.id{width:46px} .ptab th.ph{width:112px}
+
   .protos{display:grid;gap:5px;margin-top:6px}
   .pr{display:grid;grid-template-columns:34px minmax(0,1fr);gap:9px;font-size:12.5px;
       align-items:baseline;border-left:3px solid;padding:3px 0 3px 9px}
@@ -525,7 +565,42 @@ window.BLUEPRINT = {
    "vendor": "Beckman Coulter",
    "kind": "deck",
    "role": "acoustic nL transfer \u2014 and the only way around the Bravo's 4x cost at 384",
-   "spec": "Beckman Coulter, 600 Series. 2.5 nL drop, 2.5-5,000 nL transfer range, 96/384/1536, DMSO to 100% from 384PP 2.0 and LDV plates, glycerol to 50%, proteins and nucleic acids. Tipless, so no carryover and no consumable per sample. 74.6 cm deep, 130 kg. ~400 384-well plates per 20 h day.\n"
+   "spec": "Beckman Coulter, 600 Series. 2.5 nL drop, 2.5-5,000 nL transfer range, 96/384/1536, DMSO to 100% from 384PP 2.0 and LDV plates, glycerol to 50%, proteins and nucleic acids. Tipless, so no carryover and no consumable per sample. 74.6 cm deep, 130 kg. ~400 384-well plates per 20 h day.\n",
+   "rows": [
+    {
+     "label": "Method",
+     "value": "Acoustic droplet ejection \u2014 no tips, no contact, no carryover"
+    },
+    {
+     "label": "Throughput",
+     "value": "~400 plates per 20-hour day at 384 format (modelled)"
+    },
+    {
+     "label": "Per plate",
+     "value": "~3 min"
+    },
+    {
+     "label": "Per crystallography tray",
+     "value": "~9 min"
+    },
+    {
+     "label": "Destination formats",
+     "value": "Up to 1536"
+    },
+    {
+     "label": "DMSO",
+     "value": "Supported on the 6XX series \u2014 required for fragment screening"
+    },
+    {
+     "label": "Source",
+     "value": "Plates only; no source tubes"
+    },
+    {
+     "label": "Required model",
+     "value": "6XX. The proposal line reads Echo 525, which cannot do DMSO, 1536, or the drop volumes crystallography needs"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/echo/"
   },
   {
    "id": "multiflo",
@@ -533,7 +608,26 @@ window.BLUEPRINT = {
    "vendor": "Agilent",
    "kind": "deck",
    "role": "bulk dispense \u2014 anything added to every well",
-   "spec": "Agilent (BioTek). Peristaltic cassettes at 1, 5 and 10 uL, giving recommended per-well ranges of 1-50 uL, 5-2,500 uL and 10-3,000 uL. 6- through 1536-well plates, standard, deep-well and PCR. A whole 1536 plate at 1 uL a well takes 21 s, accuracy +/-5% at 1 uL \u2014 so the 2.5 uL cell-free dispense into 1536 sits comfortably inside the 1 uL cassette.\n"
+   "spec": "Agilent (BioTek). Peristaltic cassettes at 1, 5 and 10 uL, giving recommended per-well ranges of 1-50 uL, 5-2,500 uL and 10-3,000 uL. 6- through 1536-well plates, standard, deep-well and PCR. A whole 1536 plate at 1 uL a well takes 21 s, accuracy +/-5% at 1 uL \u2014 so the 2.5 uL cell-free dispense into 1536 sits comfortably inside the 1 uL cassette.\n",
+   "rows": [
+    {
+     "label": "Function",
+     "value": "Bulk reagent addition \u2014 the same liquid into every well"
+    },
+    {
+     "label": "1536 performance",
+     "value": "1 \u00b5L per well, full plate in 21 s"
+    },
+    {
+     "label": "Formats",
+     "value": "96 through 1536"
+    },
+    {
+     "label": "Uses here",
+     "value": "Cell-free master mix, detection reagent, SOC after transformation, inoculation, lysis buffer"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/multiflo/"
   },
   {
    "id": "bravo",
@@ -541,7 +635,38 @@ window.BLUEPRINT = {
    "vendor": "Agilent",
    "kind": "deck",
    "role": "96-channel pipetting, bead handling, and the two temperature-controlled deck nests. The system throughput ceiling",
-   "spec": "Agilent, 96-channel head, nine deck positions. Carries the magnet plate for bead work and TWO temperature-controlled nests held at 4 C and 42 C \u2014 QInstruments Peltier blocks, -20 to 99.9 C, 12 K/min. Those two fixed positions with a plate move between them are what gives a 45-second heat shock. ~75 two-plate protocols per 20 h day; one 96-well transfer step is ~8 min and a 384-well plate is four offset quadrant transfers, so ~32 min.\n"
+   "spec": "Agilent, 96-channel head, nine deck positions. Carries the magnet plate for bead work and TWO temperature-controlled nests held at 4 C and 42 C \u2014 QInstruments Peltier blocks, -20 to 99.9 C, 12 K/min. Those two fixed positions with a plate move between them are what gives a 45-second heat shock. ~75 two-plate protocols per 20 h day; one 96-well transfer step is ~8 min and a 384-well plate is four offset quadrant transfers, so ~32 min.\n",
+   "rows": [
+    {
+     "label": "Head",
+     "value": "96-channel fixed-span"
+    },
+    {
+     "label": "Throughput ceiling",
+     "value": "~75 two-plate protocols per 20-hour day (modelled)"
+    },
+    {
+     "label": "One 96-well transfer",
+     "value": "~8 min"
+    },
+    {
+     "label": "One 384-well transfer",
+     "value": "~32 min \u2014 four offset quadrant transfers"
+    },
+    {
+     "label": "Deck magnet",
+     "value": "Bead separation for magnetic purification"
+    },
+    {
+     "label": "Deck temperature nests",
+     "value": "Two Peltier positions, \u221220 to 99.9 \u00b0C, 12 K/min, held at 4 \u00b0C and 42 \u00b0C"
+    },
+    {
+     "label": "Bead purification rate",
+     "value": "~60 min per 96-well plate (96 lysates/hour)"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/bravo/"
   },
   {
    "id": "bioshake",
@@ -549,7 +674,30 @@ window.BLUEPRINT = {
    "vendor": "QInstruments",
    "kind": "deck",
    "role": "on-deck orbital shaking \u2014 mixing and bead resuspension without the plate leaving the Bravo",
-   "spec": "QInstruments, elm series, mounted as a Bravo deck position. 200-3,000 rpm on microplates with a 2.0 mm orbit (D30 variant 3.0 mm for deep-well, 5000 variant 1.2 mm and up to 5,000 rpm for 384/1536). T variants are heater-shakers, ambient to 99 C. 142 x 170 x 80 mm, 2.7 kg.\n"
+   "spec": "QInstruments, elm series, mounted as a Bravo deck position. 200-3,000 rpm on microplates with a 2.0 mm orbit (D30 variant 3.0 mm for deep-well, 5000 variant 1.2 mm and up to 5,000 rpm for 384/1536). T variants are heater-shakers, ambient to 99 C. 142 x 170 x 80 mm, 2.7 kg.\n",
+   "rows": [
+    {
+     "label": "Mounting",
+     "value": "A deck position on the Bravo, not a cart of its own"
+    },
+    {
+     "label": "Microplate speed",
+     "value": "200\u20133,000 rpm"
+    },
+    {
+     "label": "Orbit",
+     "value": "2.0 mm standard; 3.0 mm for deep-well, 1.2 mm for 384/1536 at up to 5,000 rpm"
+    },
+    {
+     "label": "Temperature",
+     "value": "T variants are heater-shakers, ambient to 99 \u00b0C"
+    },
+    {
+     "label": "Footprint",
+     "value": "142 \u00d7 170 \u00d7 80 mm, 2.7 kg"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/bioshake/"
   },
   {
    "id": "lynx",
@@ -557,7 +705,38 @@ window.BLUEPRINT = {
    "vendor": "Dynamic Devices",
    "kind": "deck",
    "role": "variable-volume pipetting with per-channel volume verification \u2014 concentration normalisation before assay",
-   "spec": "Dynamic Devices. 900 mm X travel, 30 microplate deck positions, ~40 x 36 x 40 in. VVP tools come as 96-channel and 8-channel heads. Volume Verified Pipetting puts an in-line flow sensor on every channel and measures what was actually aspirated and dispensed, in real time, per channel \u2014 which is what makes normalising a plate to a target mass trustworthy rather than nominal. 1 uL minimum, 2 uL at 2% CV. Three tip types, 35 / 300 / 1200 uL, filter tips included. Tip detection per channel, contact dispense and mixing by pipetting are standard. VVP 2.0 ships at SLAS at no price difference \u2014 take the upgrade path in writing.\n"
+   "spec": "Dynamic Devices. 900 mm X travel, 30 microplate deck positions, ~40 x 36 x 40 in. VVP tools come as 96-channel and 8-channel heads. Volume Verified Pipetting puts an in-line flow sensor on every channel and measures what was actually aspirated and dispensed, in real time, per channel \u2014 which is what makes normalising a plate to a target mass trustworthy rather than nominal. 1 uL minimum, 2 uL at 2% CV. Three tip types, 35 / 300 / 1200 uL, filter tips included. Tip detection per channel, contact dispense and mixing by pipetting are standard. VVP 2.0 ships at SLAS at no price difference \u2014 take the upgrade path in writing.\n",
+   "rows": [
+    {
+     "label": "Heads",
+     "value": "96-channel and 8-channel, both Volume Verified Pipetting"
+    },
+    {
+     "label": "Minimum volume",
+     "value": "1 \u00b5L"
+    },
+    {
+     "label": "Best accuracy",
+     "value": "2 \u00b5L at 2% CV"
+    },
+    {
+     "label": "Tip types",
+     "value": "35 \u00b5L, 300 \u00b5L, 1200 \u00b5L \u2014 filter tips available in all three"
+    },
+    {
+     "label": "Verification",
+     "value": "In-line flow sensor on every channel, measuring aspirate and dispense in real time"
+    },
+    {
+     "label": "Per-channel features",
+     "value": "Tip detection, contact dispense, mixing by pipetting"
+    },
+    {
+     "label": "Primary job",
+     "value": "Concentration normalisation before assay"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/lynx/"
   },
   {
    "id": "magniflex",
@@ -565,7 +744,38 @@ window.BLUEPRINT = {
    "vendor": "Tecan",
    "kind": "deck",
    "role": "the system's positive-displacement, variable-spacing channel \u2014 viscous and tube-based reagents the Echo cannot transfer",
-   "spec": "Tecan Cavro Magni Flex, an OEM liquid-handling framework. Two, four or eight independent Y and Z channels with variable tip spacing from 9 to 445 mm, so it reformats between tubes, troughs and plates. Cavro Pulssar PBC piston pumps \u2014 positive displacement \u2014 over 5-1,000 uL; the optional Air Restriction Pipettor covers 1 uL to 5 mL by air displacement. Fixed or disposable tips. 100-240 V, 480 VA. Note the name: Magni Flex is a pipetting framework, NOT a magnet. Bead separation is the Bravo's job.\n"
+   "spec": "Tecan Cavro Magni Flex, an OEM liquid-handling framework. Two, four or eight independent Y and Z channels with variable tip spacing from 9 to 445 mm, so it reformats between tubes, troughs and plates. Cavro Pulssar PBC piston pumps \u2014 positive displacement \u2014 over 5-1,000 uL; the optional Air Restriction Pipettor covers 1 uL to 5 mL by air displacement. Fixed or disposable tips. 100-240 V, 480 VA. Note the name: Magni Flex is a pipetting framework, NOT a magnet. Bead separation is the Bravo's job.\n",
+   "rows": [
+    {
+     "label": "Type",
+     "value": "OEM pipetting framework"
+    },
+    {
+     "label": "Channels",
+     "value": "2, 4 or 8 independent"
+    },
+    {
+     "label": "Tip spacing",
+     "value": "Variable, 9 to 445 mm"
+    },
+    {
+     "label": "Pumps",
+     "value": "Cavro Pulssar PBC piston pumps"
+    },
+    {
+     "label": "Volume range",
+     "value": "5\u20131,000 \u00b5L"
+    },
+    {
+     "label": "Displacement",
+     "value": "Positive displacement, so viscosity does not defeat it"
+    },
+    {
+     "label": "Source format",
+     "value": "Tubes at variable spacing, as well as plates"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/magniflex/"
   },
   {
    "id": "atc",
@@ -573,7 +783,34 @@ window.BLUEPRINT = {
    "vendor": "Thermo Fisher",
    "kind": "deck",
    "role": "four thermal cyclers running independent programs \u2014 PCR, Golden Gate, heat lysis, melts, and held temperatures",
-   "spec": "Thermo Fisher Applied Biosystems Automated Thermal Cycler, four units on one cart: three 96-well and one 384-well. The 96-well blocks take 10-100 uL full-skirted; the 384-well block is a 0.02 mL block and takes 5-20 uL, which is the number that decides what can run in it. Both formats 0-105 C, ramp 2.8 C/s block and 1.6 C/s sample, accuracy +/-0.25 C from 35 to 99.9 C, uniformity under 0.5 C twenty seconds after reaching 95 C. All four run independent programs at once.\n"
+   "spec": "Thermo Fisher Applied Biosystems Automated Thermal Cycler, four units on one cart: three 96-well and one 384-well. The 96-well blocks take 10-100 uL full-skirted; the 384-well block is a 0.02 mL block and takes 5-20 uL, which is the number that decides what can run in it. Both formats 0-105 C, ramp 2.8 C/s block and 1.6 C/s sample, accuracy +/-0.25 C from 35 to 99.9 C, uniformity under 0.5 C twenty seconds after reaching 95 C. All four run independent programs at once.\n",
+   "rows": [
+    {
+     "label": "Configuration",
+     "value": "3 \u00d7 96-well blocks + 1 \u00d7 384-well block, all four in a single cart"
+    },
+    {
+     "label": "Independent programs",
+     "value": "Four at once"
+    },
+    {
+     "label": "Fill volume, 96-well",
+     "value": "10\u2013100 \u00b5L"
+    },
+    {
+     "label": "Fill volume, 384-well",
+     "value": "5\u201320 \u00b5L"
+    },
+    {
+     "label": "Optical detection",
+     "value": "None"
+    },
+    {
+     "label": "Uses here",
+     "value": "PCR, Golden Gate cycling at 37/16 \u00b0C, heat lysis at 95 \u00b0C, held-temperature cell-free incubation, thermal-challenge ladders"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/atc/"
   },
   {
    "id": "plateloc",
@@ -581,7 +818,34 @@ window.BLUEPRINT = {
    "vendor": "Agilent",
    "kind": "deck",
    "role": "heat seal \u2014 foil and PCR seals",
-   "spec": "Agilent thermal microplate sealer. 30-200 C, temperature held to +/-2 C, seal time set per seal type, about 8 s a plate end to end and 2.5 min to warm up. One seal roll resident, which is why the a4s carries the second seal type.\n"
+   "spec": "Agilent thermal microplate sealer. 30-200 C, temperature held to +/-2 C, seal time set per seal type, about 8 s a plate end to end and 2.5 min to warm up. One seal roll resident, which is why the a4s carries the second seal type.\n",
+   "rows": [
+    {
+     "label": "Function",
+     "value": "Thermal (heat) sealing of SBS-format plates"
+    },
+    {
+     "label": "Settable temperature",
+     "value": "30\u2013200 \u00b0C"
+    },
+    {
+     "label": "Working range here",
+     "value": "130\u2013180 \u00b0C"
+    },
+    {
+     "label": "Seal time",
+     "value": "1\u20133 s"
+    },
+    {
+     "label": "Seal stock",
+     "value": "Roll or sheet, changed by hand"
+    },
+    {
+     "label": "Seal types in use",
+     "value": "Gas-permeable for culture, foil for anaerobic deep-well, clear peelable for crystallography"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/plateloc/"
   },
   {
    "id": "xpeel",
@@ -589,7 +853,26 @@ window.BLUEPRINT = {
    "vendor": "Azenta",
    "kind": "deck",
    "role": "peel \u2014 the only de-sealer on the system",
-   "spec": "Azenta Automated Plate Seal Remover. Up to 200 seals an hour. Removes both heat-applied and pressure-applied full-plate seals using a proprietary tape good for about 400 removals a roll. Takes full-skirted PCR plates, low-base microplates and deep-well plates to 2 mL. 35 kg.\n"
+   "spec": "Azenta Automated Plate Seal Remover. Up to 200 seals an hour. Removes both heat-applied and pressure-applied full-plate seals using a proprietary tape good for about 400 removals a roll. Takes full-skirted PCR plates, low-base microplates and deep-well plates to 2 mL. 35 kg.\n",
+   "rows": [
+    {
+     "label": "Function",
+     "value": "Automated removal of adhesive and heat seals"
+    },
+    {
+     "label": "Method",
+     "value": "Adhesive peel tape, applied and pulled across the seal"
+    },
+    {
+     "label": "Consumable",
+     "value": "Peel tape roll"
+    },
+    {
+     "label": "Cart",
+     "value": "Shares cart 1 with the PlateLoc, so seal and peel are one stop"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/xpeel/"
   },
   {
    "id": "a4s",
@@ -597,7 +880,30 @@ window.BLUEPRINT = {
    "vendor": "Azenta",
    "kind": "deck",
    "role": "the second sealer \u2014 the seal type the PlateLoc is not holding, plus agar plates and over-tall stacks",
-   "spec": "Azenta a4S, now sold as the Automated Roll Heat Sealer (4ti-0665). 100-195 C, seal time 0.1-10 s, SBS footprint from 96 through 1536, 230 x 507 x 276 mm, 27 kg, RS-232 and USB. Having two sealers is what lets a gas-permeable culture seal and a foil PCR seal both be resident without a manual roll change mid-run. It also covers the agar plates and the filter-plus-carrier stacks that are too tall for the PlateLoc.\n"
+   "spec": "Azenta a4S, now sold as the Automated Roll Heat Sealer (4ti-0665). 100-195 C, seal time 0.1-10 s, SBS footprint from 96 through 1536, 230 x 507 x 276 mm, 27 kg, RS-232 and USB. Having two sealers is what lets a gas-permeable culture seal and a foil PCR seal both be resident without a manual roll change mid-run. It also covers the agar plates and the filter-plus-carrier stacks that are too tall for the PlateLoc.\n",
+   "rows": [
+    {
+     "label": "Function",
+     "value": "Roll heat sealing"
+    },
+    {
+     "label": "Temperature range",
+     "value": "100\u2013195 \u00b0C"
+    },
+    {
+     "label": "Seal stock",
+     "value": "Roll-fed, so a long run does not need a film change"
+    },
+    {
+     "label": "Role here",
+     "value": "Holds the gas-permeable culture roll while the PlateLoc holds foil"
+    },
+    {
+     "label": "Lidding",
+     "value": "None \u2014 this instrument does not handle lids"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/a4s/"
   },
   {
    "id": "pherastar",
@@ -605,7 +911,50 @@ window.BLUEPRINT = {
    "vendor": "BMG LABTECH",
    "kind": "deck",
    "role": "every readout on this page. Tied with the Bravo as the system bottleneck",
-   "spec": "BMG LABTECH. Every detection method in well formats from 6 through 3456. FI, FP, luminescence, BRET; absorbance spectrometer 220-1000 nm; High-End TRF/HTRF with two red-sensitive photon-counting PMTs; HTS AlphaScreen laser; simultaneous dual emission; two reagent injectors. Optic modules for DAPI, FITC, TAMRA, Cy5, AlphaScreen, AlphaLISA, NanoBRET, FP, LanthaScreen and HTRF, filling five of six slots. Incubation caps at 45 C, so melts run in an ATC and are read after. ~8 min a 384-well TR-FRET plate, ~3 min luminescence; 150 plates per 20 h day.\n"
+   "spec": "BMG LABTECH. Every detection method in well formats from 6 through 3456. FI, FP, luminescence, BRET; absorbance spectrometer 220-1000 nm; High-End TRF/HTRF with two red-sensitive photon-counting PMTs; HTS AlphaScreen laser; simultaneous dual emission; two reagent injectors. Optic modules for DAPI, FITC, TAMRA, Cy5, AlphaScreen, AlphaLISA, NanoBRET, FP, LanthaScreen and HTRF, filling five of six slots. Incubation caps at 45 C, so melts run in an ATC and are read after. ~8 min a 384-well TR-FRET plate, ~3 min luminescence; 150 plates per 20 h day.\n",
+   "rows": [
+    {
+     "label": "Detection modes",
+     "value": "Fluorescence intensity and polarisation, luminescence, BRET, absorbance 220\u20131000 nm, time-resolved FRET/HTRF, AlphaScreen"
+    },
+    {
+     "label": "Plate formats",
+     "value": "Every detection method from 6-well through 3456-well"
+    },
+    {
+     "label": "Throughput ceiling",
+     "value": "150 384-well TR-FRET plates per 20-hour day (modelled)"
+    },
+    {
+     "label": "Per TR-FRET or FI read",
+     "value": "~8 min"
+    },
+    {
+     "label": "Per luminescence read",
+     "value": "~3 min"
+    },
+    {
+     "label": "TRF module",
+     "value": "High-End TRF/HTRF with two red-sensitive photon-counting PMTs"
+    },
+    {
+     "label": "AlphaScreen",
+     "value": "HTS laser included"
+    },
+    {
+     "label": "Injectors",
+     "value": "Two reagent injectors"
+    },
+    {
+     "label": "FP precision",
+     "value": "\u00b13\u20135 mP"
+    },
+    {
+     "label": "Absorbance noise floor",
+     "value": "~0.005 AU"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/pherastar/"
   },
   {
    "id": "hig3",
@@ -613,7 +962,22 @@ window.BLUEPRINT = {
    "vendor": "BioNex",
    "kind": "deck",
    "role": "plate centrifuge \u2014 cell harvest",
-   "spec": "BioNex. Two plates a run, direct robotic access, about 20 s to speed. 5,000 g maximum, 100 g imbalance tolerance, fan cooling. Chosen over the HiG 4 deliberately: the HiG 4 trades down to 4,000 g and halves imbalance tolerance to 50 g for a Peltier that only holds ambient, and odd plate counts fault twice as often at 50 g.\n"
+   "spec": "BioNex. Two plates a run, direct robotic access, about 20 s to speed. 5,000 g maximum, 100 g imbalance tolerance, fan cooling. Chosen over the HiG 4 deliberately: the HiG 4 trades down to 4,000 g and halves imbalance tolerance to 50 g for a Peltier that only holds ambient, and odd plate counts fault twice as often at 50 g.\n",
+   "rows": [
+    {
+     "label": "Maximum force",
+     "value": "5,000 g"
+    },
+    {
+     "label": "Refrigeration",
+     "value": "None"
+    },
+    {
+     "label": "Uses here",
+     "value": "Cell harvest, plate clarification, filter-plate spins"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/hig3/"
   },
   {
    "id": "cytomat",
@@ -621,7 +985,38 @@ window.BLUEPRINT = {
    "vendor": "Thermo Fisher",
    "kind": "deck",
    "role": "the deck's only shaking incubator, and so the cap on everything that cultures",
-   "spec": "Thermo Fisher Cytomat 2 C-LiN. Two stackers, 11 standard or 7 deep-well positions each, so 14 deep-well culture positions and 7 concurrent culture protocols. Series range is ambient +4 C to 50 C on the C450-LiN and to 70 C on the C470 \u2014 30 C for yeast and 37 C for E. coli are both well inside it. The floor is the catch: ambient +4 C means a 25 C setpoint needs a room at 21 C or below. Tower Shaker gives 100-1200 rpm at 850 g a position on a 1-3 mm amplitude; the Selector variant offers 25 mm at 100-350 rpm with active clamping, which is the orbit published deep-well microbial protocols actually use.\n"
+   "spec": "Thermo Fisher Cytomat 2 C-LiN. Two stackers, 11 standard or 7 deep-well positions each, so 14 deep-well culture positions and 7 concurrent culture protocols. Series range is ambient +4 C to 50 C on the C450-LiN and to 70 C on the C470 \u2014 30 C for yeast and 37 C for E. coli are both well inside it. The floor is the catch: ambient +4 C means a 25 C setpoint needs a room at 21 C or below. Tower Shaker gives 100-1200 rpm at 850 g a position on a 1-3 mm amplitude; the Selector variant offers 25 mm at 100-350 rpm with active clamping, which is the orbit published deep-well microbial protocols actually use.\n",
+   "rows": [
+    {
+     "label": "Capacity",
+     "value": "14 deep-well positions"
+    },
+    {
+     "label": "Concurrent culture protocols",
+     "value": "7"
+    },
+    {
+     "label": "Function",
+     "value": "Shaking and incubation in one unit"
+    },
+    {
+     "label": "Temperature range",
+     "value": "To 50 \u00b0C (70 \u00b0C on the C470 variant)"
+    },
+    {
+     "label": "Quoted orbit",
+     "value": "1\u20133 mm at 100\u20131200 rpm"
+    },
+    {
+     "label": "Orbit wanted",
+     "value": "25 mm at 100\u2013350 rpm, offered on the Selector variant"
+    },
+    {
+     "label": "Vendor validation",
+     "value": "Tested and used by the integrator for E. coli"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/cytomat/"
   },
   {
    "id": "ambistore",
@@ -629,7 +1024,34 @@ window.BLUEPRINT = {
    "vendor": "HighRes Biosolutions",
    "kind": "store",
    "role": "controlled ambient storage \u2014 crystallography trays, Echo source plates, assay plates in flight",
-   "spec": "HighRes Biosolutions random-access carousel. 14 stackers, each holding 24 standard or 10 deep-well plates, so 336 standard or 140 deep-well at the extremes. Configured here as 9 standard + 5 deep-well = 216 + 50. Up to six transfer nests and a plate delivered in as few as 12 seconds. The same chassis is also specified down to -20 C, which is the route to frozen storage on the system if it is ever wanted.\n"
+   "spec": "HighRes Biosolutions random-access carousel. 14 stackers, each holding 24 standard or 10 deep-well plates, so 336 standard or 140 deep-well at the extremes. Configured here as 9 standard + 5 deep-well = 216 + 50. Up to six transfer nests and a plate delivered in as few as 12 seconds. The same chassis is also specified down to -20 C, which is the route to frozen storage on the system if it is ever wanted.\n",
+   "rows": [
+    {
+     "label": "Capacity",
+     "value": "216 standard + 50 deep-well positions"
+    },
+    {
+     "label": "Allocation",
+     "value": "9 standard stackers + 5 deep-well"
+    },
+    {
+     "label": "Access",
+     "value": "Random-access carousel, up to six transfer nests"
+    },
+    {
+     "label": "Retrieval time",
+     "value": "As little as 12 s to present a plate"
+    },
+    {
+     "label": "Holds",
+     "value": "Crystallography trays, bulk precipitant, compound source plates, plates in flight"
+    },
+    {
+     "label": "Chassis range",
+     "value": "Specified down to \u221220 \u00b0C, though configured here for ambient"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/ambistore/"
   },
   {
    "id": "steristore_cold",
@@ -637,7 +1059,26 @@ window.BLUEPRINT = {
    "vendor": "HighRes Biosolutions",
    "kind": "store",
    "role": "cold hold \u2014 DNA, detection reagents, competent cells on the day, grown blocks, outgrowth",
-   "spec": "HighRes Biosolutions self-sterilising incubator. 4-100 C, humidity to 98% RH, CO2-ready as standard, and it sterilises itself with dry heat at about 180 C for three hours. 14 stackers of 24 standard or 10 deep-well. Configured here at 9 standard + 5 deep-well = 216 + 50.\n"
+   "spec": "HighRes Biosolutions self-sterilising incubator. 4-100 C, humidity to 98% RH, CO2-ready as standard, and it sterilises itself with dry heat at about 180 C for three hours. 14 stackers of 24 standard or 10 deep-well. Configured here at 9 standard + 5 deep-well = 216 + 50.\n",
+   "rows": [
+    {
+     "label": "Temperature",
+     "value": "4 \u00b0C"
+    },
+    {
+     "label": "Capacity",
+     "value": "216 standard + 50 deep-well positions"
+    },
+    {
+     "label": "Allocation",
+     "value": "9 standard stackers + 5 deep-well"
+    },
+    {
+     "label": "Holds",
+     "value": "DNA, detection reagents, competent cells on the day, grown deep-well blocks, transformation outgrowth"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/steristore_cold/"
   },
   {
    "id": "steristore_warm",
@@ -645,7 +1086,34 @@ window.BLUEPRINT = {
    "vendor": "HighRes Biosolutions",
    "kind": "store",
    "role": "where cell-free actually scales \u2014 bulk 37 C incubation, plus static recovery",
-   "spec": "The second SteriStore D, same unit, held at 37 C. Configured 12 standard + 2 deep-well = 288 + 20. 288 standard positions of static incubation is an order of magnitude more cell-free capacity than the four cycler blocks, which is why production cell-free lives here and the ATCs are kept for the temperature-arm DOE. Its 98% RH ceiling also covers the 85% RH a eukaryotic ALiCE reaction wants, for a static position.\n"
+   "spec": "The second SteriStore D, same unit, held at 37 C. Configured 12 standard + 2 deep-well = 288 + 20. 288 standard positions of static incubation is an order of magnitude more cell-free capacity than the four cycler blocks, which is why production cell-free lives here and the ATCs are kept for the temperature-arm DOE. Its 98% RH ceiling also covers the 85% RH a eukaryotic ALiCE reaction wants, for a static position.\n",
+   "rows": [
+    {
+     "label": "Temperature",
+     "value": "37 \u00b0C"
+    },
+    {
+     "label": "Capacity",
+     "value": "288 standard + 20 deep-well positions"
+    },
+    {
+     "label": "Allocation",
+     "value": "12 standard stackers + 2 deep-well"
+    },
+    {
+     "label": "Humidity",
+     "value": "Up to 98% RH"
+    },
+    {
+     "label": "Agitation",
+     "value": "None \u2014 static incubation only"
+    },
+    {
+     "label": "Holds",
+     "value": "Assay-plate incubation, cell-free reactions, static non-shaking culture, transformation recovery"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/steristore_warm/"
   },
   {
    "id": "microserve",
@@ -653,7 +1121,22 @@ window.BLUEPRINT = {
    "vendor": "HighRes Biosolutions",
    "kind": "consumable",
    "role": "every tip box on the system. The Bravo, the Lynx and the Magniflex all draw from here",
-   "spec": "HighRes Biosolutions consumable store. About 770 microplates, or 154 standard tip boxes, in under three feet of floor space. Per Ginkgo's Q&A all tip boxes live here, which is why no separate 8-position tip-box stacker is quoted. Tip inventory has to cover 250 uL+ for deep-well transfers, low-retention for cell-free, and the Lynx's 35 / 300 / 1200 uL types including filter tips.\n"
+   "spec": "HighRes Biosolutions consumable store. About 770 microplates, or 154 standard tip boxes, in under three feet of floor space. Per Ginkgo's Q&A all tip boxes live here, which is why no separate 8-position tip-box stacker is quoted. Tip inventory has to cover 250 uL+ for deep-well transfers, low-retention for cell-free, and the Lynx's 35 / 300 / 1200 uL types including filter tips.\n",
+   "rows": [
+    {
+     "label": "Function",
+     "value": "Tip and consumable store"
+    },
+    {
+     "label": "Scope",
+     "value": "All tip boxes on the system live here \u2014 there is no separate tip stacker"
+    },
+    {
+     "label": "Serves",
+     "value": "Bravo, Lynx and Magniflex tip formats"
+    }
+   ],
+   "url": "https://sofibali.github.io/protein-design-foundry/inventory/microserve/"
   },
   {
    "id": "offline",
@@ -1011,13 +1494,41 @@ window.BLUEPRINT = {
         protocols run through it, and a schematic elevation of how it is built.</p></div>`;
       return;
     }
-    const specs = r.instruments.map(i => INST[i]).filter(Boolean).map(i =>
-      `<div class="spec"><b>${esc(i.label)}</b>${i.vendor ? ' · ' + esc(i.vendor) : ''} — ${esc(i.spec)}</div>`
-    ).join('');
+    // One disclosure per instrument. The summary is the name, the vendor and
+    // what it is for; opening it gives the spec sheet's own rows as a table
+    // and the paragraph underneath, so the detail is there without being in
+    // the way. The first is open so a cart never opens onto nothing.
+    const insts = r.instruments.map(i => INST[i]).filter(Boolean);
+    const specs = insts.map((i, n) => {
+      const rows = (i.rows || []).map(s =>
+        `<tr><td class="k">${esc(s.label)}</td><td class="v">${esc(s.value)}</td></tr>`
+      ).join('');
+      return `<details class="dd"${n === 0 ? ' open' : ''}>
+        <summary><span>${esc(i.label)}</span>
+          <span class="sv">${i.vendor ? esc(i.vendor) : ''}</span>
+          <span class="cnt">${rows ? i.rows.length + ' specs' : 'no spec sheet'}</span></summary>
+        <div class="ddb">
+          ${i.role ? `<p class="prose" style="margin-top:0">${esc(i.role)}</p>` : ''}
+          ${rows ? `<table class="kv">${rows}</table>` : ''}
+          ${/* The paragraph and the table are the same facts twice over - the
+                Bravo's 8 min, 32 min and ~75 protocols are rows above and a
+                sentence below. Where there are rows, they are the better form
+                and the paragraph is dropped. Where there is no spec sheet the
+                paragraph is all there is, so it stays. */ ''}
+          ${!rows && i.spec ? `<p class="prose">${esc(i.spec)}</p>` : ''}
+          ${rows ? `<a class="more" href="${esc(i.url || '#')}">Full specification sheet &rarr;</a>` : ''}
+        </div></details>`;
+    }).join('');
+
+    // The protocol list was the longest thing on the sheet. As a table it is
+    // three narrow columns and reads at a glance; the phase is a named column
+    // rather than a colour you have to decode against the legend.
     const protos = (r.runs || []).map(w => {
-      const wf = WF[w], c = wf && PH[wf.phase] ? PH[wf.phase].c : 'var(--rule)';
-      return `<div class="pr" style="border-left-color:${c}">
-        <span class="pid">${esc(w)}</span><span>${esc(wf ? wf.name : w)}</span></div>`;
+      const wf = WF[w], ph = wf && PH[wf.phase];
+      return `<tr><td class="id">${esc(w)}</td>
+        <td>${esc(wf ? wf.name : w)}</td>
+        <td class="ph"><span class="dot" style="background:${ph ? ph.c : 'var(--rule)'}"></span>${
+          esc(ph ? ph.label : '—')}</td></tr>`;
     }).join('');
     detail.innerHTML = `
       <div class="ttl"><span>Fraser Lab &middot; UCSF</span>
@@ -1028,15 +1539,27 @@ window.BLUEPRINT = {
           ? '<span class="cls" style="color:var(--muted);border-color:var(--rule)">hand I/O</span>'
           : ''}</div>
         <p class="lead">${esc(r.note)}</p>
-        <div class="split">
-          <div><div class="lbl" style="margin-top:0">How it is built</div>
-            <div class="elev">${elevation(r)}</div></div>
-          <div>
-            <div class="lbl" style="margin-top:0">What it can do</div>${specs}
-            ${protos ? `<div class="lbl">Protocols that run through it &middot; ${r.runs.length}</div>
-              <div class="protos">${protos}</div>` : ''}
-          </div>
-        </div>
+        <table class="kv" style="margin-top:13px">
+          <tr><td class="k">Unit operation</td><td class="v">${esc(r.unitop)}</td></tr>
+          <tr><td class="k">Cart class</td><td class="v">${esc((r.class || []).join(', ') || '—')}</td></tr>
+          <tr><td class="k">On the cart</td><td class="v">${
+            insts.length ? insts.map(i => esc(i.label)).join(', ') : '—'}</td></tr>
+          <tr><td class="k">Protocols through it</td><td class="v">${
+            (r.runs || []).length}${(r.runs || []).length ? ' of ' + B.workflows.length : ''}</td></tr>
+          <tr><td class="k">Material by hand</td><td class="v">${
+            r.io ? 'Yes — this is where material enters or leaves' : '<em>No — the track feeds it</em>'}</td></tr>
+        </table>
+        <div class="lbl">What it can do</div>
+        ${specs}
+        ${protos ? `<details class="dd"><summary><span>Protocols that run through it</span>
+            <span class="cnt">${r.runs.length}</span></summary>
+          <div class="ddb"><table class="ptab">
+            <tr><th class="id">No.</th><th>Protocol</th><th class="ph">Phase</th></tr>
+            ${protos}</table></div></details>` : ''}
+        <details class="dd"><summary><span>How it is built</span>
+          <span class="cnt">elevation</span></summary>
+          <div class="ddb"><div class="elev" style="max-width:300px">${elevation(r)}</div></div>
+        </details>
       </div>`;
   }
   show(null);

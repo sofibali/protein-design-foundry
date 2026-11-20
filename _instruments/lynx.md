@@ -7,7 +7,7 @@ specs:
   - {label: Minimum volume, value: "1 µL"}
   - {label: Best accuracy, value: "2 µL at 2% CV"}
   - {label: Tip types, value: "35 µL, 300 µL, 1200 µL — filter tips available in all three"}
-  - {label: Verification, value: In-line flow sensor on every channel, measuring aspirate and dispense in real time}
+  - {label: Verification, value: "In-line flow sensor on every channel, measuring aspirate and dispense in real time"}
   - {label: Per-channel features, value: "Tip detection, contact dispense, mixing by pipetting"}
   - {label: Primary job, value: Concentration normalisation before assay}
 unknown:

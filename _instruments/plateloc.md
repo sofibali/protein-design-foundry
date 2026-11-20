@@ -7,7 +7,7 @@ specs:
   - {label: Settable temperature, value: 30–200 °C}
   - {label: Working range here, value: 130–180 °C}
   - {label: Seal time, value: 1–3 s}
-  - {label: Seal stock, value: Roll or sheet, changed by hand}
+  - {label: Seal stock, value: "Roll or sheet, changed by hand"}
   - {label: Seal types in use, value: "Gas-permeable for culture, foil for anaerobic deep-well, clear peelable for crystallography"}
 unknown:
   - Whether a crystallisation plate that already holds nanolitre drops survives a heat seal at all

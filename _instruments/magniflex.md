@@ -8,7 +8,7 @@ specs:
   - {label: Tip spacing, value: "Variable, 9 to 445 mm"}
   - {label: Pumps, value: Cavro Pulssar PBC piston pumps}
   - {label: Volume range, value: "5–1,000 µL"}
-  - {label: Displacement, value: Positive displacement, so viscosity does not defeat it}
+  - {label: Displacement, value: "Positive displacement, so viscosity does not defeat it"}
   - {label: Source format, value: "Tubes at variable spacing, as well as plates"}
 ---
 
