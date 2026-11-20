@@ -63,7 +63,19 @@ python3 scripts/check_data.py    # validate; runs the device-set checks too
 
 `check_data.py` fails if an instrument is on the capability map and on no cart,
 or on two, or if a workflow's cost disagrees with its deck, or if a YAML value
-was truncated by an unquoted comma in a flow mapping.
+was truncated by an unquoted comma in a flow mapping. It also fails if a
+protocol, a cart or a loop step has no drawing, or names one that does not
+exist: the figures are drawing code, so they live in the pages and in
+`pages/figkit.js`, and the build reads the registries back out of them.
+
+**Phase 2 is hidden.** `SHOW_PHASE2 = False` in `build_pages.py` keeps the four
+reserved crystallography carts, the phase 2 entries in `_data/future.yml` and
+the phase 2 programme out of every page and out of the generated inventory.
+Nothing is deleted from `_data/`, so the flag reverses it — with one manual
+step. The four phase 2 cart drawings were taken out of `pages/blueprint.html`,
+because these pages get mailed and hiding has to mean not shipped. Setting the
+flag back to `True` fails the build naming exactly those four; they are in
+commit `ed3d02f`.
 
 There is no build step for the site's tables. Jekyll reads `_data/` natively and
 the includes render them when the site builds.
