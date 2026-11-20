@@ -99,10 +99,17 @@ aside{position:sticky;top:14px}
 .bph .d0{margin-left:auto;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 .bps{font-size:12.5px;color:var(--muted);margin-bottom:11px}
 ol.steps{list-style:none;margin:0;padding:0}
-ol.steps li{display:grid;grid-template-columns:38px 1fr auto;gap:9px;align-items:baseline;
+ol.steps li{display:grid;grid-template-columns:46px 34px 1fr auto;gap:9px;align-items:center;
   padding:5px 0;border-top:1px solid var(--rule);font-size:13.5px}
 ol.steps li:first-child{border-top:0}
 ol.steps .id{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted)}
+  ol.steps .gl svg{display:block;width:46px;height:auto}
+  svg .ln{fill:none;stroke:var(--ink);stroke-width:1.1;stroke-linejoin:round;stroke-linecap:round}
+  svg .mu{fill:none;stroke:var(--muted);stroke-width:1}
+  svg .dash{stroke-dasharray:3 2.5}
+  svg .fl,svg .none{stroke:none}
+  svg text.lb{font-size:8.5px;fill:var(--ink)}
+  svg text.sm{font-size:7.5px;fill:var(--muted)}
 ol.steps .g{font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.03em}
 ol.steps li.off{opacity:.42}
 ol.steps li.off .g{color:var(--muted);text-decoration:line-through}
@@ -288,10 +295,15 @@ td.s2{font-variant-numeric:tabular-nums;white-space:nowrap}
 </main>
 </div>
 
+<script src="figkit.js"></script>
 <script src="pipeline.js"></script>
 <script>
 /* ---- the deck, generated into pipeline.js by build.py from protocols.yml -- */
 const P = window.PIPE || {workflows:{}, routes:{}, day:1200};
+// the step drawings (pages/figkit.js): a proposed pipeline is drawn the same
+// way the loops and the protocol library are.
+const STEP = (window.FIGKIT || {}).STEP || {};
+const figsvg = (window.FIGKIT || {}).svg || function () { return ''; };
 const W = P.workflows, R = P.routes, DAY = P.day;
 const GROUPS = ['shape','supply','expression','structure','hotspot','homolog','assay','limits'];
 const NEED = [['who','pi','email'],['goal'],['shape'],['supply'],['expression'],
@@ -400,7 +412,10 @@ function card(p, t) {
   const steps = ids.map(id => {
     const w = W[id];
     const off = (dead && w.g.includes('D6')) || (no('homolog') && id === '4.8');
-    return `<li class="${off?'off':''}"><span class="id">${id}</span><span>${esc(w.n)}</span>
+    const col = off ? 'var(--muted)' : (w.p || 'var(--ink)');
+    const gl = STEP[w.d] ? figsvg(STEP[w.d](30, 17, col), w.n, 34, 60) : '';
+    return `<li class="${off?'off':''}"><span class="gl">${gl}</span>
+      <span class="id">${id}</span><span>${esc(w.n)}</span>
       <span class="g">${w.g.join(' ')}</span></li>`;
   }).join('');
   const mins = ids.reduce((s,id)=>s+W[id].c,0);

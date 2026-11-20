@@ -549,6 +549,7 @@ workflows:
     short: Build a clonal array
     sub: no cloning at all
     phase: dna
+    draw: dna
     status: ready
     deck: [echo]
     holds: [ambistore]
@@ -575,6 +576,7 @@ workflows:
     short: Build a pooled library
     sub: oligo pool to liquid culture
     phase: dna
+    draw: dna
     status: offline
     deck: [echo, atc, bravo, magniflex, echo, atc, bravo, multiflo, cytomat, offline]
     holds: [ambistore, steristore_cold, microserve]
@@ -613,6 +615,7 @@ workflows:
     short: In-vitro assembly
     sub: a plasmid without ever touching a cell
     phase: dna
+    draw: dna
     status: ready
     deck: [echo, atc, bravo, magniflex, echo, atc, bravo, multiflo]
     holds: [ambistore, steristore_cold, microserve]
@@ -653,6 +656,7 @@ workflows:
     short: Cell-free expression
     sub: the bread and butter
     phase: express
+    draw: plate
     status: ready
     protocol: express.cfps.doe
     deck: [echo, multiflo, plateloc, atc, xpeel, multiflo, pherastar]
@@ -689,6 +693,7 @@ workflows:
     short: E. coli expression
     sub: for what cell-free will not make
     phase: express
+    draw: cells
     status: ready
     deck: [multiflo, a4s, cytomat, hig3, multiflo, hig3]
     holds: [steristore_cold, steristore_warm, ambistore]
@@ -726,6 +731,7 @@ workflows:
     short: Magnetic bead purification
     sub: His-tag on IMAC beads
     phase: purify
+    draw: beads
     status: ready
     deck: [bravo, bioshake]
     holds: [microserve, steristore_cold, ambistore]
@@ -759,6 +765,7 @@ workflows:
     short: Protein QC
     sub: three questions, one instrument
     phase: purify
+    draw: plot
     status: ready
     deck: [multiflo, pherastar, lynx]
     holds: [microserve, ambistore]
@@ -793,6 +800,7 @@ workflows:
     short: Binding ladder
     sub: four homogeneous formats
     phase: bind
+    draw: assay
     status: ready
     deck: [echo, multiflo, plateloc, pherastar]
     holds: [ambistore, steristore_cold]
@@ -832,6 +840,7 @@ workflows:
     short: Counter-screen
     sub: did it bind the right face?
     phase: bind
+    draw: counter
     status: ready
     deck: [echo, multiflo, plateloc, pherastar]
     holds: [ambistore, steristore_cold]
@@ -859,6 +868,7 @@ workflows:
     short: Dose-response
     sub: the thing the Echo is best at
     phase: bind
+    draw: curve
     status: ready
     deck: [echo, multiflo, plateloc, pherastar]
     holds: [ambistore, steristore_cold]
@@ -881,6 +891,7 @@ workflows:
     short: Thermal stability
     sub: a challenge, not a melt
     phase: purify
+    draw: heat
     status: limited
     deck: [plateloc, atc, xpeel, pherastar]
     holds: [ambistore]
@@ -905,6 +916,7 @@ workflows:
     short: Heat-shock transformation
     sub: the 45-second pulse, on the Bravo deck
     phase: dna
+    draw: cells
     status: ready
     deck: [echo, bravo, multiflo, bioshake, cytomat, a4s, offline]
     holds: [steristore_cold, microserve, ambistore]
@@ -940,6 +952,7 @@ workflows:
     short: Crystallisation screen
     sub: screens protein, does not make it
     phase: structure
+    draw: drop
     status: offline
     deck: [offline, echo, offline]
     holds: [ambistore]
@@ -979,6 +992,7 @@ workflows:
     short: Fragment screen
     sub: the same spine, compound plates instead
     phase: bind
+    draw: chem
     status: ready
     deck: [echo, multiflo, plateloc, pherastar]
     holds: [ambistore]
@@ -1004,6 +1018,7 @@ workflows:
     short: Two-hybrid, one well
     sub: expression and binding in one well
     phase: bind
+    draw: model
     status: build
     protocol: bind.cf2h.screen
     deck: [echo, multiflo, bravo, plateloc, pherastar]
@@ -1049,10 +1064,10 @@ loops:
     name: Expression loop
     closes: days
     steps:
-      - {label: factorial screen, where: rac}
-      - {label: effect sizes, where: compute}
-      - {label: optimise, where: compute}
-      - {label: fix condition, where: rac}
+      - {label: factorial screen, where: rac, draw: assay}
+      - {label: effect sizes, where: compute, draw: plot}
+      - {label: optimise, where: compute, draw: tune}
+      - {label: fix condition, where: rac, draw: plate}
     returns: >
       An expression route assigned to each new target. That model is Aim 1's
       real product — not the condition for any one protein.
@@ -1061,12 +1076,12 @@ loops:
     name: Binder loop
     closes: weeks
     steps:
-      - {label: design, where: compute}
-      - {label: express, where: rac}
-      - {label: screen, where: rac}
-      - {label: confirm, where: rac}
-      - {label: counter-screen, where: rac}
-      - {label: retrain, where: compute}
+      - {label: design, where: compute, draw: model}
+      - {label: express, where: rac, draw: plate}
+      - {label: screen, where: rac, draw: assay}
+      - {label: confirm, where: rac, draw: curve}
+      - {label: counter-screen, where: rac, draw: counter}
+      - {label: retrain, where: compute, draw: tune}
     returns: >
       Every measured design, failures included. A design that did not express
       is not a non-binder — keep three outcomes, True / False / Unknown, the
@@ -1076,10 +1091,10 @@ loops:
     name: Affinity-maturation loop
     closes: weeks
     steps:
-      - {label: NNK design, where: compute}
-      - {label: build library, where: rac}
-      - {label: screen, where: rac}
-      - {label: rank, where: compute}
+      - {label: NNK design, where: compute, draw: model}
+      - {label: build library, where: rac, draw: plate}
+      - {label: screen, where: rac, draw: assay}
+      - {label: rank, where: compute, draw: plot}
     returns: >
       Ranked variants around a confirmed hit. This is the loop that genuinely
       wants pooled handling, and the strongest argument for settling NGS.
@@ -1088,11 +1103,11 @@ loops:
     name: Structure loop
     closes: months
     steps:
-      - {label: pick hits, where: compute}
-      - {label: scale up, where: offrac}
-      - {label: crystallise, where: rac}
-      - {label: diffract, where: offrac}
-      - {label: compare to model, where: compute}
+      - {label: pick hits, where: compute, draw: pick}
+      - {label: scale up, where: offrac, draw: flask}
+      - {label: crystallise, where: rac, draw: drop}
+      - {label: diffract, where: offrac, draw: xray}
+      - {label: compare to model, where: compute, draw: overlay}
     returns: >
       Filters promoted or demoted on evidence. The only loop that tells you
       whether the models were right about where a binder sits, not only about how tightly.
@@ -1101,11 +1116,11 @@ loops:
     name: Compound loop
     closes: months
     steps:
-      - {label: fragment screen, where: rac}
-      - {label: hits, where: compute}
-      - {label: co-crystallise, where: rac}
-      - {label: diffract, where: offrac}
-      - {label: chemistry, where: offrac}
+      - {label: fragment screen, where: rac, draw: assay}
+      - {label: hits, where: compute, draw: plot}
+      - {label: co-crystallise, where: rac, draw: drop}
+      - {label: diffract, where: offrac, draw: xray}
+      - {label: chemistry, where: offrac, draw: chem}
     returns: >
       Not your programme. It is what makes this a service rather than a
       project, and it runs on the same Echo-plus-PHERAstar spine.

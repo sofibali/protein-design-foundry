@@ -96,7 +96,8 @@ def figures(page, marker, keys):
     if not m:
         sys.exit(f"pages/{page} has no {marker} block - it has nothing to draw with")
     block = m.group(1)
-    ids = set(re.findall(r"^  '([^']+)': \{", block, re.M))
+    # a registry key: quoted, at the top level of its object literal
+    ids = set(re.findall(r"^ {0,2}'([^']+)':", block, re.M))
     shapes = {k: len(re.findall(r"^    %s:" % k, block, re.M)) for k in keys}
     return ids, shapes
 
@@ -318,6 +319,33 @@ def check(gates, stages, protos, progs):
             if s not in seen:
                 errs.append(f"route {r['id']!r}: unknown workflow {s!r}")
 
+    # --- every loop step and every protocol is drawn, and says which drawing ---
+    glyphs, _ = figures("figkit.js", "STEP GLYPHS", ())
+    for w in protos["workflows"]:
+        d = w.get("draw")
+        if not d:
+            errs.append(f"workflow {w['id']!r} has no draw: - the proposal page draws the "
+                        f"pipeline it puts this protocol in")
+        elif d not in glyphs:
+            errs.append(f"workflow {w['id']!r} draws {d!r}, which is not in the STEP GLYPHS "
+                        f"block in pages/figkit.js ({', '.join(sorted(glyphs))})")
+    for lp in protos["loops"]:
+        for st in lp.get("steps", []):
+            d = st.get("draw")
+            if not d:
+                errs.append(f"loop {lp['id']!r}: step {st.get('label')!r} has no draw: - "
+                            f"every step on the loop is drawn, so it has to name its glyph")
+            elif d not in glyphs:
+                errs.append(f"loop {lp['id']!r}: step {st.get('label')!r} draws {d!r}, which is "
+                            f"not in the LOOP GLYPHS block in pages/workflows.html "
+                            f"({', '.join(sorted(glyphs))})")
+    # NOT `used`: that name already holds the gates the stages reference, and
+    # check() returns its length as the gate count.
+    drawn_with = {st.get("draw") for lp in protos["loops"] for st in lp.get("steps", [])}
+    drawn_with |= {w.get("draw") for w in protos["workflows"]}
+    for g in sorted(glyphs - drawn_with):
+        errs.append(f"pages/figkit.js draws a step glyph {g!r} that nothing uses")
+
     # --- loops ---
     seen = set()
     for lp in protos["loops"]:
@@ -464,11 +492,14 @@ def pipeline(protos):
     cost edit here from leaving the proposal page quoting last month's day.
     This is that table, derived, so the two cannot disagree.
     """
+    ph = {p["id"]: p["c"] for p in protos["phases"]}
     return {
         "day": protos["rates"]["day_min"],
         "workflows": {w["id"]: {"n": w["short"],
                                 "g": w.get("gates", []),
-                                "c": sum(w["cost"][k] for k in COST_KEYS)}
+                                "c": sum(w["cost"][k] for k in COST_KEYS),
+                                "d": w["draw"],
+                                "p": ph[w["phase"]]}
                       for w in protos["workflows"]},
         "routes": {r["id"]: r["steps"] for r in protos["routes"]},
     }

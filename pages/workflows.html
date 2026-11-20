@@ -1204,15 +1204,20 @@
     if (P.routes.some(r => r.id === h)) { setRoute(h); toPlan(); }
   });
 
+  // one small drawing per kind of step (pages/figkit.js)
+  const LOOPG = window.FIGKIT.STEP;
+
   function loopSvg(lp) {
     const n = lp.steps.length, VW = 840, PAD = 8;
-    const gap = 16, W = (VW - PAD * 2 - gap * (n - 1)) / n, H = 40, Y = 8;
+    const gap = 16, W = (VW - PAD * 2 - gap * (n - 1)) / n, H = 60, Y = 8;
     const mk = 'lpar-' + lp.id, parts = [];
     lp.steps.forEach((st, i) => {
       const x = PAD + i * (W + gap), c = WHERE[st.where].c;
       parts.push(`<rect x="${x}" y="${Y}" width="${W}" height="${H}" rx="8" fill="${c}"
         fill-opacity="var(--fillop)" stroke="${c}" stroke-width="1.2"/>`);
-      parts.push(`<text x="${x + W / 2}" y="${Y + H / 2 + 4.5}" text-anchor="middle"
+      // what happens at this stop, drawn
+      if (LOOPG[st.draw]) parts.push(LOOPG[st.draw](x + W / 2, Y + 20, c));
+      parts.push(`<text x="${x + W / 2}" y="${Y + H - 11}" text-anchor="middle"
         class="lp-lbl">${esc(st.label)}</text>`);
       if (i < n - 1) parts.push(`<line x1="${x + W + 3}" y1="${Y + H / 2}"
         x2="${x + W + gap - 3}" y2="${Y + H / 2}" stroke="var(--muted)" stroke-width="1.3"
