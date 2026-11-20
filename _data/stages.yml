@@ -132,10 +132,8 @@ stages:
 fit:
   question: What the foundry needs to know about your project
   note: >-
-    None of this is a test and nothing here is scored. It is the one page the
-    19 November session set out to produce, asked as questions. The five
-    project styles above are this same page already filled in, so if one of
-    them is close to your project you can answer by pointing at it.
+    Nothing here is scored. If one of the five styles above is close to your
+    project, you can answer by pointing at it.
   asks:
     - id: problem
       q: What is the problem?
@@ -182,20 +180,13 @@ fit:
   scale:
     title: The risk levels
     note: >-
-      These rate the target, not the campaign. A method that is hard for
-      everyone is not a risk tier - it is just the state of the field. What
-      moves a target up this scale is how much is unknown about the thing you
-      want bound: how well characterised it is, how large, how ordered, and
-      whether the site of interest exists on its own or only in context. The
-      levels are indicative. Each is meant to be agreed with the group that
-      owns the target rather than set centrally, and none has been agreed yet.
+      These rate the target, not the campaign, and none has been agreed yet -
+      a level is settled with the group that owns the target.
     levels:
       - id: low
         name: Low
         say: >-
-          A single, well-characterised domain. Several experimental
-          structures, a folded surface, and a hotspot you can point at. The
-          open question is whether a binder works, not what it is binding to.
+          The open question is whether a binder works, not what it binds to.
         eg:
           - A catalytic or binding domain with several deposited structures
           - A well-studied family member that has been expressed before
@@ -203,8 +194,7 @@ fit:
       - id: medium
         name: Medium
         say: >-
-          Most of that holds and one piece does not. Enough is known to design
-          against, and the gap is nameable rather than open-ended.
+          Enough is known to design against, and the gap has a name.
         eg:
           - A domain with a confident prediction but no experimental structure
           - A target whose relevant conformation is one of several
@@ -212,9 +202,7 @@ fit:
       - id: high
         name: High
         say: >-
-          A larger system, a disordered one, or one with little structural
-          precedent. What to bind is still a question alongside whether a
-          binder will.
+          What to bind is still a question, alongside whether a binder will.
         eg:
           - A multi-domain assembly whose interface only forms in context
           - A disordered region at the site of interest

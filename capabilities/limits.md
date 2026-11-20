@@ -43,6 +43,11 @@ expression, and no amount of scheduling moves it.
 
 Named but not specified. A gap is not a plan, it is an admission.
 
+{% comment %}
+  Gaps only. A gap is a hole in the machine as it stands; a phase 2 cart is a
+  plan, and the two do not belong in one table. Phase 2 is hidden from the
+  pages besides - scripts/build_pages.py, SHOW_PHASE2.
+{% endcomment %}
 {% assign gaps = site.data.instruments.instruments | where: "status", "gap" %}
 <table class="wide">
 <thead><tr><th>Status</th><th>Capability</th><th>Why it matters</th></tr></thead>

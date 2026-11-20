@@ -127,7 +127,9 @@
   .prog .ph{padding:13px 15px 0}
   .prog h3{font-size:16.5px;font-weight:500;margin:0;letter-spacing:-.008em}
   .prog .psub{color:var(--muted);font-size:12.5px;margin-top:2px}
-  .prog .pbody{padding:9px 15px 14px;font-size:13px;line-height:1.5;color:var(--muted);flex:1}
+  /* .areas takes the flex:1 the problem paragraph used to carry, so every
+     card's footer still lines up along the bottom of the row. */
+  .prog .areas{padding:11px 15px 12px;flex:1;align-content:flex-start}
   .prog .pfoot{padding:9px 15px 12px;border-top:1px solid var(--rule);display:flex;
                flex-wrap:wrap;gap:5px;align-items:center}
   .st{font-size:11px;border-radius:999px;padding:1px 9px;border:1px solid;white-space:nowrap}
@@ -471,7 +473,7 @@ window.FOUNDRY = {
  ],
  "fit": {
   "question": "What the foundry needs to know about your project",
-  "note": "None of this is a test and nothing here is scored. It is the one page the 19 November session set out to produce, asked as questions. The five project styles above are this same page already filled in, so if one of them is close to your project you can answer by pointing at it.",
+  "note": "Nothing here is scored. If one of the five styles above is close to your project, you can answer by pointing at it.",
   "asks": [
    {
     "id": "problem",
@@ -506,12 +508,12 @@ window.FOUNDRY = {
   ],
   "scale": {
    "title": "The risk levels",
-   "note": "These rate the target, not the campaign. A method that is hard for everyone is not a risk tier - it is just the state of the field. What moves a target up this scale is how much is unknown about the thing you want bound: how well characterised it is, how large, how ordered, and whether the site of interest exists on its own or only in context. The levels are indicative. Each is meant to be agreed with the group that owns the target rather than set centrally, and none has been agreed yet.",
+   "note": "These rate the target, not the campaign, and none has been agreed yet - a level is settled with the group that owns the target.",
    "levels": [
     {
      "id": "low",
      "name": "Low",
-     "say": "A single, well-characterised domain. Several experimental structures, a folded surface, and a hotspot you can point at. The open question is whether a binder works, not what it is binding to.",
+     "say": "The open question is whether a binder works, not what it binds to.",
      "eg": [
       "A catalytic or binding domain with several deposited structures",
       "A well-studied family member that has been expressed before",
@@ -521,7 +523,7 @@ window.FOUNDRY = {
     {
      "id": "medium",
      "name": "Medium",
-     "say": "Most of that holds and one piece does not. Enough is known to design against, and the gap is nameable rather than open-ended.",
+     "say": "Enough is known to design against, and the gap has a name.",
      "eg": [
       "A domain with a confident prediction but no experimental structure",
       "A target whose relevant conformation is one of several",
@@ -531,7 +533,7 @@ window.FOUNDRY = {
     {
      "id": "high",
      "name": "High",
-     "say": "A larger system, a disordered one, or one with little structural precedent. What to bind is still a question alongside whether a binder will.",
+     "say": "What to bind is still a question, alongside whether a binder will.",
      "eg": [
       "A multi-domain assembly whose interface only forms in context",
       "A disordered region at the site of interest",
@@ -727,7 +729,7 @@ window.FOUNDRY = {
   "lede": "The foundry runs campaigns, not samples. You bring a target and a question; what comes back is a verdict per design at every gate it passed through, with the failures kept. These are the shapes of project it takes.",
   "aside": {
    "title": "How a project is taken on",
-   "body": "A proposal is scored against D0's four preconditions, and the answer is one of three: onboarded and assigned an expression route, declined with the missing precondition named, or run as a feasibility arm first. Risk is rated per target, and rated with the group that owns it rather than assigned to them."
+   "body": "A conversation, then one of three answers: onboarded and assigned an expression route, run as a feasibility arm first, or declined with the reason named."
   },
   "programmes": [
    {
@@ -837,19 +839,23 @@ window.FOUNDRY = {
    "steps": [
     {
      "label": "factorial screen",
-     "where": "rac"
+     "where": "rac",
+     "draw": "assay"
     },
     {
      "label": "effect sizes",
-     "where": "compute"
+     "where": "compute",
+     "draw": "plot"
     },
     {
      "label": "optimise",
-     "where": "compute"
+     "where": "compute",
+     "draw": "tune"
     },
     {
      "label": "fix condition",
-     "where": "rac"
+     "where": "rac",
+     "draw": "plate"
     }
    ],
    "returns": "An expression route assigned to each new target. That model is Aim 1's real product \u2014 not the condition for any one protein.\n"
@@ -861,27 +867,33 @@ window.FOUNDRY = {
    "steps": [
     {
      "label": "design",
-     "where": "compute"
+     "where": "compute",
+     "draw": "model"
     },
     {
      "label": "express",
-     "where": "rac"
+     "where": "rac",
+     "draw": "plate"
     },
     {
      "label": "screen",
-     "where": "rac"
+     "where": "rac",
+     "draw": "assay"
     },
     {
      "label": "confirm",
-     "where": "rac"
+     "where": "rac",
+     "draw": "curve"
     },
     {
      "label": "counter-screen",
-     "where": "rac"
+     "where": "rac",
+     "draw": "counter"
     },
     {
      "label": "retrain",
-     "where": "compute"
+     "where": "compute",
+     "draw": "tune"
     }
    ],
    "returns": "Every measured design, failures included. A design that did not express is not a non-binder \u2014 keep three outcomes, True / False / Unknown, the way Adaptyv does.\n"
@@ -893,19 +905,23 @@ window.FOUNDRY = {
    "steps": [
     {
      "label": "NNK design",
-     "where": "compute"
+     "where": "compute",
+     "draw": "model"
     },
     {
      "label": "build library",
-     "where": "rac"
+     "where": "rac",
+     "draw": "plate"
     },
     {
      "label": "screen",
-     "where": "rac"
+     "where": "rac",
+     "draw": "assay"
     },
     {
      "label": "rank",
-     "where": "compute"
+     "where": "compute",
+     "draw": "plot"
     }
    ],
    "returns": "Ranked variants around a confirmed hit. This is the loop that genuinely wants pooled handling, and the strongest argument for settling NGS.\n"
@@ -917,23 +933,28 @@ window.FOUNDRY = {
    "steps": [
     {
      "label": "pick hits",
-     "where": "compute"
+     "where": "compute",
+     "draw": "pick"
     },
     {
      "label": "scale up",
-     "where": "offrac"
+     "where": "offrac",
+     "draw": "flask"
     },
     {
      "label": "crystallise",
-     "where": "rac"
+     "where": "rac",
+     "draw": "drop"
     },
     {
      "label": "diffract",
-     "where": "offrac"
+     "where": "offrac",
+     "draw": "xray"
     },
     {
      "label": "compare to model",
-     "where": "compute"
+     "where": "compute",
+     "draw": "overlay"
     }
    ],
    "returns": "Filters promoted or demoted on evidence. The only loop that tells you whether the models were right about where a binder sits, not only about how tightly.\n"
@@ -945,23 +966,28 @@ window.FOUNDRY = {
    "steps": [
     {
      "label": "fragment screen",
-     "where": "rac"
+     "where": "rac",
+     "draw": "assay"
     },
     {
      "label": "hits",
-     "where": "compute"
+     "where": "compute",
+     "draw": "plot"
     },
     {
      "label": "co-crystallise",
-     "where": "rac"
+     "where": "rac",
+     "draw": "drop"
     },
     {
      "label": "diffract",
-     "where": "offrac"
+     "where": "offrac",
+     "draw": "xray"
     },
     {
      "label": "chemistry",
-     "where": "offrac"
+     "where": "offrac",
+     "draw": "chem"
     }
    ],
    "returns": "Not your programme. It is what makes this a service rather than a project, and it runs on the same Echo-plus-PHERAstar spine.\n"
@@ -1280,14 +1306,13 @@ window.FOUNDRY = {
   };
   const COUNT = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'];
   document.getElementById('pr-lede').textContent =
-    (COUNT[PR.length - 1] || PR.length) + ' shapes of project, each running one of the loops. ' +
-    'Click one for the loop it runs, what it decides, and the exchange.';
+    (COUNT[PR.length - 1] || PR.length) + ' shapes of project. Click one for the problem it '
+    + 'solves, the loop it runs and what you get back.';
 
   document.getElementById('progs').innerHTML = PR.map(p => {
     const st = STYLE[p.status] || {c:'var(--muted)'};
     return `<button class="prog" type="button" aria-pressed="false" data-p="${esc(p.id)}">
       <div class="ph"><h3>${esc(p.name)}</h3><div class="psub">${esc(p.sub)}</div></div>
-      <div class="pbody">${esc(p.problem)}</div>
       <div class="areas">${p.areas.map(a => `<span class="area">${esc(a)}</span>`).join('')}</div>
       <div class="pfoot">
         <span class="st" style="color:${st.c};border-color:${st.c}">${esc(p.status)}</span>
@@ -1418,12 +1443,7 @@ window.FOUNDRY = {
   document.getElementById('foot').innerHTML =
     `Generated from <code>_data/programmes.yml</code>, <code>_data/stages.yml</code> and
      <code>_data/gates.yml</code>; the build fails if a programme claims a loop, a route or a
-     gate that does not exist. The risk levels rate a target rather than a style of work,
-     so no programme above carries one: the same campaign is low risk against a
-     well-characterised domain and high against a disordered assembly. They are indicative,
-     agreed with the group that owns the target rather than set centrally, and none has
-     been agreed yet.
-     <a href="workflows.html" style="color:var(--ink)">Sample protocols &rarr;</a>`;
+     gate that does not exist.`;
 })();
 </script>
 </body>

@@ -127,7 +127,9 @@
   .prog .ph{padding:13px 15px 0}
   .prog h3{font-size:16.5px;font-weight:500;margin:0;letter-spacing:-.008em}
   .prog .psub{color:var(--muted);font-size:12.5px;margin-top:2px}
-  .prog .pbody{padding:9px 15px 14px;font-size:13px;line-height:1.5;color:var(--muted);flex:1}
+  /* .areas takes the flex:1 the problem paragraph used to carry, so every
+     card's footer still lines up along the bottom of the row. */
+  .prog .areas{padding:11px 15px 12px;flex:1;align-content:flex-start}
   .prog .pfoot{padding:9px 15px 12px;border-top:1px solid var(--rule);display:flex;
                flex-wrap:wrap;gap:5px;align-items:center}
   .st{font-size:11px;border-radius:999px;padding:1px 9px;border:1px solid;white-space:nowrap}
@@ -385,14 +387,13 @@
   };
   const COUNT = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'];
   document.getElementById('pr-lede').textContent =
-    (COUNT[PR.length - 1] || PR.length) + ' shapes of project, each running one of the loops. ' +
-    'Click one for the loop it runs, what it decides, and the exchange.';
+    (COUNT[PR.length - 1] || PR.length) + ' shapes of project. Click one for the problem it '
+    + 'solves, the loop it runs and what you get back.';
 
   document.getElementById('progs').innerHTML = PR.map(p => {
     const st = STYLE[p.status] || {c:'var(--muted)'};
     return `<button class="prog" type="button" aria-pressed="false" data-p="${esc(p.id)}">
       <div class="ph"><h3>${esc(p.name)}</h3><div class="psub">${esc(p.sub)}</div></div>
-      <div class="pbody">${esc(p.problem)}</div>
       <div class="areas">${p.areas.map(a => `<span class="area">${esc(a)}</span>`).join('')}</div>
       <div class="pfoot">
         <span class="st" style="color:${st.c};border-color:${st.c}">${esc(p.status)}</span>
@@ -523,12 +524,7 @@
   document.getElementById('foot').innerHTML =
     `Generated from <code>_data/programmes.yml</code>, <code>_data/stages.yml</code> and
      <code>_data/gates.yml</code>; the build fails if a programme claims a loop, a route or a
-     gate that does not exist. The risk levels rate a target rather than a style of work,
-     so no programme above carries one: the same campaign is low risk against a
-     well-characterised domain and high against a disordered assembly. They are indicative,
-     agreed with the group that owns the target rather than set centrally, and none has
-     been agreed yet.
-     <a href="workflows.html" style="color:var(--ink)">Sample protocols &rarr;</a>`;
+     gate that does not exist.`;
 })();
 </script>
 </body>

@@ -235,6 +235,11 @@
   const G = window.FIGKIT.G, svg = window.FIGKIT.svg, rnd = window.FIGKIT.rnd;
 
   // CART FIGURES START
+  // One per installed cart. The four phase 2 carts are drawn too - in commit
+  // ed3d02f, where they were removed when phase 2 was hidden, because hiding
+  // has to mean not shipped on a page that gets mailed. Setting SHOW_PHASE2
+  // back to True fails the build naming exactly those four; lift them out of
+  // that commit and they are back.
   const CART = {
 
   'echo': {

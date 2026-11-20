@@ -22,11 +22,9 @@ lede: >-
 aside:
   title: How a project is taken on
   body: >-
-    A proposal is scored against D0's four preconditions, and the answer is one
-    of three: onboarded and assigned an expression route, declined with the
-    missing precondition named, or run as a feasibility arm first. Risk is
-    rated per target, and rated with the group that owns it rather than
-    assigned to them.
+    A conversation, then one of three answers: onboarded and assigned an
+    expression route, run as a feasibility arm first, or declined with the
+    reason named.
 
 programmes:
 
