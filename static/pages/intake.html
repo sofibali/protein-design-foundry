@@ -1,0 +1,575 @@
+<title>Propose a Campaign</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Questions on the left, one at a time. The pipeline on the right rebuilds
+   on every answer. Workflow ids, gates and minutes mirror data/protocols.yml. */
+:root{
+  --bg:#fff; --panel:#fafafa; --ink:#1d1d1f; --muted:#86868b; --rule:#d2d2d7;
+  --field:#fff; --accent:#0072B2; --ok:#009E73; --warn:#E69F00; --stop:#D55E00;
+  --font:"Helvetica Neue",Helvetica,Arial,sans-serif; color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141416; --panel:#1c1c1f; --ink:#f2f2f4; --muted:#8e8e93; --rule:#3a3a3d;
+  --field:#242427; --accent:#5aa9e6; --ok:#3fc39b; --warn:#e8b14a; --stop:#f0794b;
+  color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141416; --panel:#1c1c1f; --ink:#f2f2f4; --muted:#8e8e93;
+  --rule:#3a3a3d; --field:#242427; --accent:#5aa9e6; --ok:#3fc39b; --warn:#e8b14a;
+  --stop:#f0794b; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;
+  line-height:1.5;-webkit-font-smoothing:antialiased;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:26px}
+.wrap{max-width:1120px;margin:0 auto}
+h1{font-weight:400;font-size:clamp(23px,3vw,30px);margin:0 0 20px;letter-spacing:-.015em}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 352px;gap:26px;align-items:start}
+
+/* a step */
+.s{border-top:1px solid var(--rule);padding:16px 0 4px;opacity:0;transform:translateY(5px);
+   transition:opacity .22s,transform .22s}
+.s:first-of-type{border-top:0;padding-top:0}
+.s.on{opacity:1;transform:none}
+.s[hidden]{display:none}
+.k{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+   font-weight:600;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.c{font:inherit;font-size:14px;color:var(--ink);background:var(--field);cursor:pointer;
+   border:1px solid var(--rule);border-radius:999px;padding:6px 14px}
+.c:hover{border-color:var(--muted)}
+.c[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.c.bad[aria-pressed="true"]{background:var(--stop);border-color:var(--stop);color:#fff}
+.c.mid[aria-pressed="true"]{background:var(--warn);border-color:var(--warn);color:#1d1d1f}
+input,textarea{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--field);
+  border:1px solid var(--rule);border-radius:9px;padding:9px 11px}
+textarea{resize:vertical;min-height:72px;overflow:hidden}
+.three{display:grid;gap:9px;grid-template-columns:1fr 1fr 1fr}
+.c:focus-visible,input:focus-visible,textarea:focus-visible,button:focus-visible{
+  outline:2px solid var(--accent);outline-offset:1px}
+
+/* the pipeline */
+aside{position:sticky;top:14px}
+.bp{border:1px solid var(--rule);border-radius:13px;background:var(--panel);
+    padding:15px 16px 17px;margin-bottom:11px}
+.bp.alt{background:transparent}
+.bph{display:flex;align-items:baseline;gap:8px;margin-bottom:3px}
+.bph b{font-weight:600;font-size:15.5px}
+.bph .d0{margin-left:auto;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bps{font-size:12.5px;color:var(--muted);margin-bottom:11px}
+ol.steps{list-style:none;margin:0;padding:0}
+ol.steps li{display:grid;grid-template-columns:38px 1fr auto;gap:9px;align-items:baseline;
+  padding:5px 0;border-top:1px solid var(--rule);font-size:13.5px}
+ol.steps li:first-child{border-top:0}
+ol.steps .id{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted)}
+ol.steps .g{font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.03em}
+ol.steps li.off{opacity:.42}
+ol.steps li.off .g{color:var(--muted);text-decoration:line-through}
+.cost{margin-top:10px;padding-top:9px;border-top:1px solid var(--rule);font-size:12.5px;
+  color:var(--muted);font-variant-numeric:tabular-nums}
+.flag{font-size:12.5px;margin-top:8px;display:grid;grid-template-columns:13px 1fr;gap:7px}
+.flag.stop{color:var(--stop)} .flag.warn{color:var(--warn)} .flag.ok{color:var(--muted)}
+.empty{border:1px dashed var(--rule);border-radius:13px;padding:22px 16px;text-align:center;
+  color:var(--muted);font-size:13.5px}
+button.send{width:100%;margin-top:4px;border:0;border-radius:10px;background:var(--ink);
+  color:var(--bg);font:inherit;font-weight:500;font-size:15px;padding:11px;cursor:pointer}
+button.send:disabled{opacity:.3;cursor:not-allowed}
+.note{font-size:12px;color:var(--muted);margin-top:8px}
+.sent{border:1px solid var(--ok);border-radius:11px;padding:13px 15px;margin-bottom:18px;font-size:14px}
+.sent b{font-family:ui-monospace,Menlo,monospace}
+.err{color:var(--stop);font-size:12.5px;margin-top:8px}
+.inbox{margin-top:34px;border-top:1px solid var(--rule);padding-top:16px}
+.inbox h2{font-size:16px;font-weight:500;margin:0 0 10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:7px 9px;border-top:1px solid var(--rule);vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+   font-weight:600;border-top:0}
+td.s2{font-variant-numeric:tabular-nums;white-space:nowrap}
+@media (max-width:900px){.cols{grid-template-columns:1fr}aside{position:static}}
+@media (max-width:560px){.three{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+<h1>Propose a campaign</h1>
+<div id="sent-box"></div>
+
+<div class="cols">
+  <form id="f" novalidate>
+
+    <div class="s" data-s="0">
+      <div class="k">You</div>
+      <div class="three">
+        <input id="who" placeholder="Name" autocomplete="name">
+        <input id="pi" placeholder="PI or lab">
+        <input id="email" type="email" placeholder="Email" autocomplete="email">
+      </div>
+    </div>
+
+    <div class="s" data-s="1" hidden>
+      <div class="k">What do you want to be able to do?</div>
+      <textarea id="goal" placeholder="The problem, not the reagent."></textarea>
+    </div>
+
+    <div class="s" data-s="2" hidden>
+      <div class="k">What should it be?</div>
+      <div class="chips" data-g="shape">
+        <button type="button" class="c" data-v="inhibitor">Inhibitor</button>
+        <button type="button" class="c" data-v="chaperone">Crystallisation chaperone</button>
+        <button type="button" class="c" data-v="sensor">Biosensor</button>
+        <button type="button" class="c" data-v="degrader">Degrader handle</button>
+        <button type="button" class="c" data-v="reagent">Detection reagent</button>
+        <button type="button" class="c" data-v="unsure">Not sure</button>
+      </div>
+    </div>
+
+    <div class="s" data-s="3" hidden>
+      <div class="k">Who makes the protein?</div>
+      <div class="chips" data-g="supply">
+        <button type="button" class="c" data-v="us">We make it</button>
+        <button type="button" class="c" data-v="you">You send it purified</button>
+      </div>
+    </div>
+
+    <div class="s" data-s="4" hidden>
+      <div class="k">Has it been expressed?</div>
+      <div class="chips" data-g="expression">
+        <button type="button" class="c" data-v="met">We have a protocol</button>
+        <button type="button" class="c" data-v="met2">Published</button>
+        <button type="button" class="c mid" data-v="part">Only a homolog</button>
+        <button type="button" class="c bad" data-v="no">Never</button>
+      </div>
+    </div>
+
+    <div class="s" data-s="5" hidden>
+      <div class="k">Structure</div>
+      <div class="chips" data-g="structure">
+        <button type="button" class="c" data-v="met">Experimental</button>
+        <button type="button" class="c" data-v="met2">Predicted, pLDDT 85+</button>
+        <button type="button" class="c mid" data-v="part">Predicted, 80&ndash;85</button>
+        <button type="button" class="c bad" data-v="no">None</button>
+      </div>
+    </div>
+
+    <div class="s" data-s="6" hidden>
+      <div class="k">A residue you can mutate to alanine</div>
+      <div class="chips" data-g="hotspot">
+        <button type="button" class="c" data-v="met">Named, tolerant</button>
+        <button type="button" class="c mid" data-v="part">Named, untested</button>
+        <button type="button" class="c bad" data-v="no">None</button>
+      </div>
+    </div>
+
+    <div class="s" data-s="7" hidden>
+      <div class="k">A close homolog</div>
+      <div class="chips" data-g="homolog">
+        <button type="button" class="c" data-v="met">Yes, expressed</button>
+        <button type="button" class="c mid" data-v="part">Yes, untested</button>
+        <button type="button" class="c bad" data-v="no">None</button>
+      </div>
+    </div>
+
+    <div class="s" data-s="8" hidden>
+      <div class="k">An assay that already reads it out</div>
+      <div class="chips" data-g="assay">
+        <button type="button" class="c" data-v="ours">Ours</button>
+        <button type="button" class="c" data-v="pub">Published</button>
+        <button type="button" class="c" data-v="none">None</button>
+      </div>
+    </div>
+
+    <div class="s" data-s="9" hidden>
+      <div class="k">Anything that rules out a route</div>
+      <div class="chips" data-g="limits" data-multi="1">
+        <button type="button" class="c bad" data-v="toxic">Toxic in E. coli</button>
+        <button type="button" class="c bad" data-v="ss">Needs a disulfide</button>
+        <button type="button" class="c mid" data-v="fusion">Only folds as a fusion</button>
+        <button type="button" class="c bad" data-v="membrane">Membrane protein</button>
+        <button type="button" class="c" data-v="none">None</button>
+      </div>
+    </div>
+
+    <div class="s" data-s="10" hidden>
+      <div class="k">Anything else</div>
+      <textarea id="notes" placeholder="Optional."></textarea>
+    </div>
+  </form>
+
+  <aside>
+    <div id="bp"></div>
+    <button class="send" id="send" disabled>Send</button>
+    <div class="note" id="note"></div>
+    <div class="note">Anyone with this link can read what is submitted.</div>
+    <div class="err" id="err"></div>
+  </aside>
+</div>
+
+<section class="inbox" id="inbox" hidden>
+  <h2 id="inbox-h">Proposals</h2>
+  <table><thead><tr><th>When</th><th>From</th><th>D0</th><th>Route</th><th>Goal</th></tr></thead>
+    <tbody id="inbox-rows"></tbody></table>
+</section>
+</div>
+
+<script>
+window.PIPE = {
+ "day": 1200,
+ "workflows": {
+  "4.1": {
+   "n": "Build a clonal array",
+   "g": [],
+   "c": 3
+  },
+  "4.2": {
+   "n": "Build a pooled library",
+   "g": [],
+   "c": 30
+  },
+  "4.13": {
+   "n": "In-vitro assembly",
+   "g": [],
+   "c": 22
+  },
+  "4.3": {
+   "n": "Cell-free expression",
+   "g": [
+    "D1",
+    "D2"
+   ],
+   "c": 44
+  },
+  "4.4": {
+   "n": "E. coli expression",
+   "g": [
+    "D1"
+   ],
+   "c": 0
+  },
+  "4.5": {
+   "n": "Magnetic bead purification",
+   "g": [
+    "D2"
+   ],
+   "c": 60
+  },
+  "4.6": {
+   "n": "Protein QC",
+   "g": [
+    "D2"
+   ],
+   "c": 24
+  },
+  "4.7": {
+   "n": "Binding ladder",
+   "g": [
+    "D3",
+    "D4"
+   ],
+   "c": 11
+  },
+  "4.8": {
+   "n": "Counter-screen",
+   "g": [
+    "D6"
+   ],
+   "c": 11
+  },
+  "4.9": {
+   "n": "Dose-response",
+   "g": [
+    "D5"
+   ],
+   "c": 11
+  },
+  "4.10": {
+   "n": "Thermal stability",
+   "g": [],
+   "c": 32
+  },
+  "4.14": {
+   "n": "Heat-shock transformation",
+   "g": [],
+   "c": 27
+  },
+  "4.11": {
+   "n": "Crystallisation screen",
+   "g": [
+    "D7"
+   ],
+   "c": 9
+  },
+  "4.12": {
+   "n": "Fragment screen",
+   "g": [],
+   "c": 11
+  },
+  "CF2H": {
+   "n": "Two-hybrid, one well",
+   "g": [
+    "D1",
+    "D4",
+    "D6"
+   ],
+   "c": 43
+  }
+ },
+ "routes": {
+  "cellfree": [
+   "4.1",
+   "4.3",
+   "4.5",
+   "4.6",
+   "4.7",
+   "4.9"
+  ],
+  "ecoli": [
+   "4.1",
+   "4.4",
+   "4.5",
+   "4.6",
+   "4.7",
+   "4.9"
+  ],
+  "invitro": [
+   "4.13",
+   "4.3",
+   "4.5",
+   "4.6",
+   "4.7"
+  ],
+  "cf2h": [
+   "4.1",
+   "CF2H"
+  ],
+  "selectivity": [
+   "4.7",
+   "4.8",
+   "4.9"
+  ]
+ }
+};
+</script>
+<script>
+/* ---- the deck, generated into pipeline.js by build.py from protocols.yml -- */
+const P = window.PIPE || {workflows:{}, routes:{}, day:1200};
+const W = P.workflows, R = P.routes, DAY = P.day;
+const GROUPS = ['shape','supply','expression','structure','hotspot','homolog','assay','limits'];
+const NEED = [['who','pi','email'],['goal'],['shape'],['supply'],['expression'],
+              ['structure'],['hotspot'],['homolog'],['assay'],['limits'],[]];
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const val = id => ($(id)?.value || '').trim();
+const A = {limits:[]};
+let db=null, user=null, canWrite=false;
+
+/* ---- blueprints ---------------------------------------------------------- */
+const met = k => A[k] === 'met' || A[k] === 'met2';
+const part = k => A[k] === 'part';
+const no = k => A[k] === 'no';
+const lim = v => A.limits.includes(v);
+
+function d0() {
+  const keys = ['structure','hotspot','homolog','expression'];
+  const m = keys.filter(met).length, p = keys.filter(part).length,
+        x = keys.filter(no).length, open = keys.filter(k => !A[k]).length;
+  return {m, p, x, open, verdict: x ? 0 : open ? null : m === 4 ? 4 : 3};
+}
+
+function plans() {
+  if (!A.supply) return [];
+  const out = [];
+  const noEcoli = lim('toxic') || lim('membrane');
+  const needSS  = lim('ss');
+
+  // every purified line ends with the same two gates, in gate order
+  const tail = ids => {
+    ids = ids.slice();
+    ['4.9','4.8'].forEach(id => { if (W[id] && !ids.includes(id)) ids.push(id); });
+    return ids;
+  };
+
+  let route, name, why;
+  if (A.supply === 'you') {
+    route = 'cellfree'; name = 'You send protein';
+    why = 'QC on arrival, then straight to the assay ladder.';
+  } else if (noEcoli || needSS) {
+    route = 'cellfree'; name = 'Cell-free, arrayed';
+    why = needSS && !noEcoli ? 'Disulfide, so cell-free with an oxidising lysate.'
+                             : 'E. coli is ruled out, so cell-free.';
+  } else if (met('expression')) {
+    route = 'ecoli'; name = 'E. coli, arrayed';
+    why = 'There is a protocol, so use it.';
+  } else if (lim('fusion')) {
+    route = 'invitro'; name = 'In-vitro assembly';
+    why = 'A fusion construct, built without ever touching a cell.';
+  } else {
+    route = 'cellfree'; name = 'Cell-free, arrayed';
+    why = no('expression') ? 'Nothing has expressed this, so start where failure is cheapest.'
+                           : 'The default line.';
+  }
+  let ids = tail(R[route] || []);
+  if (A.supply === 'you') { const i = ids.indexOf('4.6'); if (i > 0) ids = ids.slice(i); }
+  if (A.shape === 'chaperone' && W['4.11']) ids = ids.concat('4.11');
+  out.push({name, why, ids});
+
+  // a second line worth offering
+  if (A.supply === 'us' && (no('expression') || part('expression'))) {
+    out.push({name:'Two-hybrid first', alt:true, ids:(R.cf2h || []).slice(),
+      why:'Expression and binding in one well, nothing purified. Not yet built.'});
+  } else if (A.supply === 'us' && !noEcoli && met('expression')) {
+    out.push({name:'Cell-free in parallel', alt:true, ids:(R.cellfree || []).slice(),
+      why:'Same designs down a second route, so one failure does not stop the round.'});
+  }
+  return out;
+}
+
+function flags() {
+  const f = [];
+  if (no('structure')) f.push(['stop','No structure, so design cannot start.']);
+  else if (part('structure')) f.push(['warn','Structure is predicted at 80–85, so the epitope is soft.']);
+  if (no('hotspot')) f.push(['stop','No mutable hotspot, so D6 cannot run and the line stops at D5.']);
+  if (no('homolog')) f.push(['stop','No homolog, so there is no counter-target on the plate.']);
+  else if (part('homolog')) f.push(['warn','Homolog has never expressed, so the counter-screen may not run.']);
+  if (no('expression')) f.push(['warn','Nothing has expressed, so expect a condition screen before D1.']);
+  if (A.assay === 'none') f.push(['ok','No assay exists, so we build NanoBiT then HTRF.']);
+  if (A.assay === 'ours') f.push(['ok','Your assay is the first thing we try to port at D3.']);
+  if (lim('membrane')) f.push(['stop','Membrane protein, which this deck cannot do.']);
+  return f;
+}
+
+function card(p, t) {
+  const dead = no('hotspot');
+  const ids = p.ids.filter(id => W[id]);
+  const steps = ids.map(id => {
+    const w = W[id];
+    const off = (dead && w.g.includes('D6')) || (no('homolog') && id === '4.8');
+    return `<li class="${off?'off':''}"><span class="id">${id}</span><span>${esc(w.n)}</span>
+      <span class="g">${w.g.join(' ')}</span></li>`;
+  }).join('');
+  const mins = ids.reduce((s,id)=>s+W[id].c,0);
+  const pct = Math.round(mins / DAY * 1000) / 10;
+  const d = t.verdict;
+  const tag = d === 4 ? '4/4' : d === 0 ? t.m + '/4 ×' + t.x
+            : d === 3 ? t.m + '/4 ~' + t.p : t.m + '/4';
+  return `<div class="bp ${p.alt?'alt':''}">
+    <div class="bph"><b>${esc(p.name)}</b><span class="d0">D0 ${tag}</span></div>
+    <div class="bps">${esc(p.why)}</div>
+    <ol class="steps">${steps}</ol>
+    <div class="cost">${mins} min a round · ${pct}% of a 20 h day</div>
+    ${p.alt ? '' : flags().map(([c,s])=>`<div class="flag ${c}"><span>${
+      c==='stop'?'×':c==='warn'?'~':'·'}</span><span>${esc(s)}</span></div>`).join('')}
+  </div>`;
+}
+
+function paint() {
+  // reveal one step at a time
+  let open = true;
+  document.querySelectorAll('.s').forEach((el,i) => {
+    el.hidden = !open;
+    if (open) requestAnimationFrame(()=>el.classList.add('on'));
+    const done = (NEED[i]||[]).every(k => GROUPS.includes(k)
+      ? (k==='limits' ? A.limits.length : A[k]) : val(k));
+    if (!done) open = false;
+  });
+
+  const t = d0(), ps = plans();
+  $('bp').innerHTML = ps.length ? ps.map(p=>card(p,t)).join('')
+    : '<div class="empty">Answer a few and a pipeline appears here.</div>';
+
+  const missing = ['who','pi','email','goal'].filter(k=>!val(k));
+  $('send').disabled = missing.length > 0 || !ps.length || !db || !canWrite;
+  $('note').textContent = !db ? 'Open the published page to send.'
+    : !canWrite ? 'You can read this but not submit.'
+    : missing.length ? 'Needs: ' + missing.join(', ') + '.'
+    : !ps.length ? 'Keep going.' : 'Ready.';
+  try { localStorage.setItem('foundry-proposal', JSON.stringify({A, who:val('who'),
+    pi:val('pi'), email:val('email'), goal:val('goal'), notes:val('notes')})); } catch(e){}
+}
+
+/* ---- wiring -------------------------------------------------------------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('.c'); if (!b) return;
+  const box = b.closest('.chips'), g = box.dataset.g;
+  if (box.dataset.multi) {
+    const v = b.dataset.v;
+    if (v === 'none') A.limits = A.limits.includes('none') ? [] : ['none'];
+    else {
+      A.limits = A.limits.filter(x => x !== 'none');
+      A.limits = A.limits.includes(v) ? A.limits.filter(x=>x!==v) : A.limits.concat(v);
+    }
+    box.querySelectorAll('.c').forEach(c =>
+      c.setAttribute('aria-pressed', A.limits.includes(c.dataset.v) ? 'true' : 'false'));
+  } else {
+    A[g] = A[g] === b.dataset.v ? undefined : b.dataset.v;
+    box.querySelectorAll('.c').forEach(c =>
+      c.setAttribute('aria-pressed', A[g] === c.dataset.v ? 'true' : 'false'));
+  }
+  paint();
+});
+document.addEventListener('input', e => {
+  if (e.target.tagName === 'TEXTAREA') {
+    e.target.style.height = 'auto';
+    e.target.style.height = Math.max(e.target.scrollHeight + 2, 72) + 'px';
+  }
+  paint();
+});
+
+try {
+  const d = JSON.parse(localStorage.getItem('foundry-proposal') || '{}');
+  if (d.A) { Object.assign(A, d.A); A.limits = d.A.limits || []; }
+  ['who','pi','email','goal','notes'].forEach(k => { if (d[k] && $(k)) $(k).value = d[k]; });
+  document.querySelectorAll('.chips').forEach(box => box.querySelectorAll('.c').forEach(c =>
+    c.setAttribute('aria-pressed', (box.dataset.multi ? A.limits.includes(c.dataset.v)
+      : A[box.dataset.g] === c.dataset.v) ? 'true' : 'false')));
+} catch(e){}
+paint();
+
+$('send').addEventListener('click', async () => {
+  $('send').disabled = true; $('err').textContent = '';
+  const t = d0(), ps = plans();
+  const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+  const doc = {...A, limits: A.limits.join(' '), who:val('who'), pi:val('pi'),
+    email:val('email'), goal:val('goal'), notes:val('notes'),
+    d0_met:t.m, d0_part:t.p, d0_no:t.x, d0_verdict:t.verdict,
+    route: ps[0] ? ps[0].name : '', steps: ps[0] ? ps[0].ids.join(' ') : '',
+    submitted: new Date().toISOString()};
+  try {
+    if (user) { try { doc.by = await user.id(); } catch(e){} }
+    await db.collection('proposals').doc(id).set(doc);
+    $('sent-box').innerHTML = `<div class="sent">Sent as <b>${esc(id)}</b>. Proposed route:
+      ${esc(doc.route)} — ${esc(doc.steps)}.</div>`;
+    try { localStorage.removeItem('foundry-proposal'); } catch(e){}
+    $('f').reset(); Object.keys(A).forEach(k=>delete A[k]); A.limits=[];
+    document.querySelectorAll('.c').forEach(c=>c.setAttribute('aria-pressed','false'));
+    paint(); window.scrollTo({top:0,behavior:'smooth'});
+  } catch(e) {
+    $('err').textContent = 'Did not send: ' + (e && e.message ? e.message : 'unknown') + '.';
+    $('send').disabled = false;
+  }
+});
+
+async function loadInbox() {
+  if (!user || !db) return;
+  let owner = false;
+  try { owner = user.isOwner() || user.canEdit(); } catch(e){}
+  if (!owner) return;
+  $('inbox').hidden = false;
+  db.collection('proposals').onSnapshot(snap => {
+    const rows = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .sort((a,b)=>String(b.submitted).localeCompare(String(a.submitted)));
+    $('inbox-h').textContent = 'Proposals — ' + rows.length;
+    $('inbox-rows').innerHTML = rows.map(r=>`<tr>
+      <td class="s2">${esc(String(r.submitted||'').slice(0,10))}</td>
+      <td>${esc(r.who||'—')}<br><span style="color:var(--muted);font-size:12px">${esc(r.pi||'')}</span></td>
+      <td class="s2">${r.d0_met ?? 0}/4${r.d0_no ? ' ×'+r.d0_no : ''}</td>
+      <td>${esc(r.route||'—')}<br><span style="color:var(--muted);font-size:12px;
+        font-family:ui-monospace,Menlo,monospace">${esc(r.steps||'')}</span></td>
+      <td>${esc(String(r.goal||'—').slice(0,120))}</td></tr>`).join('');
+  });
+}
+
+(async () => {
+  if (typeof claude === 'undefined' || !claude.use) { paint(); return; }
+  user = await claude.use('user').catch(()=>null);
+  db = await claude.use('db').catch(()=>null);
+  if (user) { try { canWrite = (await user.can('data.write')) !== false; } catch(e){ canWrite = true; } }
+  paint(); loadInbox();
+})();
+</script>

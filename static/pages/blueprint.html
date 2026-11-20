@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foundry Blueprint</title>
+<style>
+  :root {
+    --bg:#fff; --ink:#1d1d1f; --muted:#8e8e93; --rule:#d2d2d7; --tab-bg:#f2f2f4;
+    --font:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    /* the drawing is a technical drawing: blueprint paper in either theme */
+    --paper:#0f1b2a; --grid:#24415e; --line:#e8eef5; --dim:#8fa6bd; --accent:#56B4E9;
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme=light]){
+    --bg:#141416; --ink:#f2f2f4; --muted:#8e8e93; --rule:#3a3a3d; --tab-bg:#242427;
+  }}
+  :root[data-theme=dark]{ --bg:#141416; --ink:#f2f2f4; --rule:#3a3a3d; --tab-bg:#242427; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px 16px 56px}
+  header{text-align:center;margin-bottom:18px}
+  h1{font-weight:400;font-size:clamp(22px,3vw,34px);margin:0;letter-spacing:-.01em}
+  .sub{font-size:clamp(15px,2vw,19px);margin-top:3px}
+  .note{color:var(--muted);font-size:13px;margin-top:6px;line-height:1.5}
+  .nav{text-align:center;font-size:13px;margin-top:10px}
+  .nav a{color:var(--muted)}
+  .nav a:hover{color:var(--ink)}
+
+  /* the sheet */
+  .sheet{background:var(--paper);border-radius:14px;padding:6px;overflow:hidden;
+         box-shadow:0 1px 3px rgba(0,0,0,.18)}
+  .sheet svg{display:block;width:100%;height:auto;font-family:var(--font)}
+  .cart-l{font-size:12.5px;fill:var(--line)}
+  .cart-n{font-size:10px;fill:var(--dim);font-variant-numeric:tabular-nums}
+  .io-l{font-size:8.5px;fill:var(--dim);letter-spacing:.04em}
+  .tile{cursor:pointer}
+  .tile rect.box{fill:#16263a;stroke:var(--line);stroke-width:1.3}
+  rect.box.p2{fill:none;stroke:var(--dim);stroke-dasharray:5 4}
+  .tile:hover rect.box{fill:#21384f}
+  .tile[aria-pressed=true] rect.box{fill:#27405a;stroke:var(--accent);stroke-width:2}
+  .tile.dim{opacity:.3}
+  .glyph{fill:none;stroke:var(--line);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .glyph.p2{stroke:var(--dim)}
+  .cart-l.p2{fill:var(--dim)}
+
+  /* legend + detail */
+  .bar{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:12.5px;color:var(--muted);
+       margin:14px 2px 0;align-items:center}
+  .bar span{display:inline-flex;align-items:center;gap:7px}
+  .key{width:17px;height:12px;border-radius:3px;flex:none;border:1.3px solid var(--ink)}
+  .key.p2{border-style:dashed;background:transparent;opacity:.6}
+  .key.inst{background:var(--tab-bg)}
+  .key.io{width:12px;height:12px;border-radius:999px}
+
+  .detail{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;margin-top:16px;
+          min-height:118px}
+  .detail .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .detail h3{font-size:16px;font-weight:400;margin:0}
+  .detail .n{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+  .detail .st{font-size:11px;border-radius:999px;padding:1px 8px;border:1px solid}
+  .detail p{font-size:13px;line-height:1.5;margin:8px 0 0;color:var(--ink)}
+  .detail .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;
+               color:var(--muted);margin-top:11px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+  .chip{font-size:12px;background:var(--tab-bg);border:1px solid transparent;
+        border-radius:7px;padding:3px 9px}
+  .chip.wf{background:transparent;border-color:var(--rule);
+           font-variant-numeric:tabular-nums}
+  .spec{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:5px}
+  .empty{color:var(--muted);font-size:13px;line-height:1.5;margin:0}
+
+  .foot{font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:22px;
+        border-top:1px solid var(--rule);padding-top:12px}
+  .foot b{color:var(--ink);font-weight:500}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="t"></h1>
+    <div class="sub" id="s"></div>
+    <div class="note" id="n"></div>
+    <div class="nav"><a href="foundry.html">the loop and the gates</a>
+      &nbsp;&middot;&nbsp; <a href="workflows.html">every workflow as a deck sequence</a></div>
+  </header>
+
+  <div class="sheet"><div id="sheet"></div></div>
+  <div class="bar" id="legend"></div>
+  <div class="detail" id="detail"></div>
+  <div class="foot" id="foot"></div>
+</div>
+
+<script>
+window.BLUEPRINT = {
+ "title": "UCSF Protein Design Foundry",
+ "subtitle": "RAC system blueprint",
+ "racs": [
+  {
+   "n": 9,
+   "id": "echo",
+   "unitop": "Non-contact acoustic cherry picking",
+   "class": [
+    "liquid handling"
+   ],
+   "instruments": [
+    "echo"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "The only tipless transfer on the system, and the way every 384 and 1536 plate gets built without paying the Bravo's quadrant tax.\n",
+   "runs": [
+    "4.1",
+    "4.2",
+    "4.13",
+    "4.3",
+    "4.7",
+    "4.8",
+    "4.9",
+    "4.14",
+    "4.11",
+    "4.12",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 10,
+   "id": "multiflo",
+   "unitop": "Bulk dispensing",
+   "class": [
+    "liquid handling"
+   ],
+   "instruments": [
+    "multiflo"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "Anything added to every well. Three peristaltic cassettes cover 1 uL to 3 mL, and a whole 1536 plate at 1 uL a well takes 21 s.\n",
+   "runs": [
+    "4.2",
+    "4.13",
+    "4.3",
+    "4.4",
+    "4.6",
+    "4.7",
+    "4.8",
+    "4.9",
+    "4.14",
+    "4.12",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 3,
+   "id": "bravo",
+   "unitop": "Contact stamping pipetting",
+   "class": [
+    "liquid handling",
+    "incubating"
+   ],
+   "instruments": [
+    "bravo",
+    "bioshake"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "96-channel head, magnet plate, on-deck orbital shaking, and the two temperature-controlled nests at 4 C and 42 C that make heat shock a plate move. The system throughput ceiling.\n",
+   "runs": [
+    "4.2",
+    "4.13",
+    "4.5",
+    "4.14",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 11,
+   "id": "magniflex",
+   "unitop": "Positive-displacement channel pipetting",
+   "class": [
+    "liquid handling"
+   ],
+   "instruments": [
+    "magniflex"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "2/4/8 independent channels, tip spacing 9-445 mm, piston pumps over 5-1000 uL. The only way to move a glycerol-based enzyme master mix out of a tube.\n",
+   "runs": [
+    "4.2",
+    "4.13"
+   ]
+  },
+  {
+   "n": 4,
+   "id": "lynx",
+   "unitop": "Volume-verified contact pipetting",
+   "class": [
+    "liquid handling"
+   ],
+   "instruments": [
+    "lynx"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "An in-line flow sensor on every channel, so a normalised plate is measured rather than nominal. Concentration normalisation before assay.\n",
+   "runs": [
+    "4.6"
+   ]
+  },
+  {
+   "n": 2,
+   "id": "thermal",
+   "unitop": "Thermal cycling",
+   "class": [
+    "incubating"
+   ],
+   "instruments": [
+    "atc"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "Four blocks running independent programs - three 96-well at 10-100 uL, one 384-well at 5-20 uL. PCR, Golden Gate, heat lysis, and the four temperature arms of the cell-free DOE.\n",
+   "runs": [
+    "4.2",
+    "4.13",
+    "4.3",
+    "4.10"
+   ]
+  },
+  {
+   "n": 1,
+   "id": "sealpeel",
+   "unitop": "Microplate sealing & seal peeling",
+   "class": [
+    "sealing"
+   ],
+   "instruments": [
+    "plateloc",
+    "xpeel"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "Ginkgo gives sealing and peeling a cart each; ours shares one. PlateLoc applies foil at 30-200 C, XPeel removes up to 200 seals an hour.\n",
+   "runs": [
+    "4.3",
+    "4.7",
+    "4.8",
+    "4.9",
+    "4.10",
+    "4.12",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 15,
+   "id": "breathable",
+   "unitop": "Microplate breathable sealing",
+   "class": [
+    "sealing"
+   ],
+   "instruments": [
+    "a4s"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "The second sealer, so a gas-permeable culture roll and a foil PCR roll are both resident. Without it a 20 h deep-well culture goes anaerobic under foil.\n",
+   "runs": [
+    "4.4",
+    "4.14"
+   ]
+  },
+  {
+   "n": 12,
+   "id": "spin",
+   "unitop": "Centrifugation",
+   "class": [
+    "centrifugation"
+   ],
+   "instruments": [
+    "hig3"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "Two plates a run, 5000 g, about 20 s to speed. Cell harvest before lysis, and that is all it needs to do.\n",
+   "runs": [
+    "4.4"
+   ]
+  },
+  {
+   "n": 8,
+   "id": "shaking",
+   "unitop": "Temp-control shaking incubation",
+   "class": [
+    "incubating",
+    "storage"
+   ],
+   "instruments": [
+    "cytomat"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "The only shaking position on the system, so 14 deep-well slots and 7 concurrent culture protocols is the hard cap on everything that grows.\n",
+   "runs": [
+    "4.2",
+    "4.4",
+    "4.14"
+   ]
+  },
+  {
+   "n": 7,
+   "id": "static37",
+   "unitop": "37 C static incubation",
+   "class": [
+    "incubating",
+    "storage"
+   ],
+   "instruments": [
+    "steristore_warm"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "288 standard positions. This, not the four cycler blocks, is where cell-free actually scales.\n",
+   "runs": [
+    "4.3",
+    "4.4"
+   ]
+  },
+  {
+   "n": 6,
+   "id": "cold",
+   "unitop": "Refrigerated random access storage",
+   "class": [
+    "storage"
+   ],
+   "instruments": [
+    "steristore_cold"
+   ],
+   "status": "installed",
+   "io": true,
+   "note": "4 C, 216 standard + 50 deep-well. DNA, detection reagents, grown blocks, and competent cells on the day. The coldest position on the system.\n",
+   "runs": [
+    "4.2",
+    "4.13",
+    "4.4",
+    "4.5",
+    "4.7",
+    "4.8",
+    "4.9",
+    "4.14",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 5,
+   "id": "ambient",
+   "unitop": "Ambient random access storage",
+   "class": [
+    "storage"
+   ],
+   "instruments": [
+    "ambistore"
+   ],
+   "status": "installed",
+   "io": true,
+   "note": "216 standard + 50 deep-well, delivered in as little as 12 s. Crystallography trays, Echo source plates, assay plates in flight.\n",
+   "runs": [
+    "4.1",
+    "4.2",
+    "4.13",
+    "4.3",
+    "4.4",
+    "4.5",
+    "4.6",
+    "4.7",
+    "4.8",
+    "4.9",
+    "4.10",
+    "4.14",
+    "4.11",
+    "4.12",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 14,
+   "id": "consumable",
+   "unitop": "Tip & consumable storage",
+   "class": [
+    "storage"
+   ],
+   "instruments": [
+    "microserve"
+   ],
+   "status": "installed",
+   "io": true,
+   "note": "About 770 plates or 154 tip boxes. Every tip box on the system lives here, which is why no separate tip-box stacker is quoted.\n",
+   "runs": [
+    "4.2",
+    "4.13",
+    "4.5",
+    "4.6",
+    "4.14",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 13,
+   "id": "reader",
+   "unitop": "Plate reading",
+   "class": [
+    "assaying"
+   ],
+   "instruments": [
+    "pherastar"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "Every readout in the spec, 6 to 3456 wells. Tied with the Bravo as the system bottleneck at 150 384-well TR-FRET plates a day.\n",
+   "runs": [
+    "4.3",
+    "4.6",
+    "4.7",
+    "4.8",
+    "4.9",
+    "4.10",
+    "4.12",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 16,
+   "id": "imaging",
+   "unitop": "Crystal imaging",
+   "class": [
+    "assaying"
+   ],
+   "instruments": [],
+   "status": "phase2",
+   "io": false,
+   "note": "Not quoted. The crystallography protocol puts 560 imaging events in a campaign - 37 h by hand against 9 h on an imager cart - and it is what makes Aim 3 unattended.\n",
+   "runs": []
+  },
+  {
+   "n": 17,
+   "id": "ambient2",
+   "unitop": "Ambient random access storage",
+   "class": [
+    "storage"
+   ],
+   "instruments": [],
+   "status": "phase2",
+   "io": true,
+   "note": "A second AmbiStore. Crystallography raises the tray count, and 216 standard positions is 2x headroom only until trays start rotating.\n",
+   "runs": []
+  },
+  {
+   "n": 18,
+   "id": "sealer2",
+   "unitop": "Microplate sealing",
+   "class": [
+    "sealing"
+   ],
+   "instruments": [],
+   "status": "phase2",
+   "io": false,
+   "note": "A third seal type resident. Flagged in the notes as needing a fit check - there is no space in the sealer/peeler cart.\n",
+   "runs": []
+  },
+  {
+   "n": 19,
+   "id": "handler2",
+   "unitop": "Contact stamping pipetting",
+   "class": [
+    "liquid handling"
+   ],
+   "instruments": [],
+   "status": "phase2",
+   "io": false,
+   "note": "A second liquid handler is the only thing that moves the ~75 two-plate protocols a day ceiling without changing the Bravo's head.\n",
+   "runs": []
+  }
+ ],
+ "instruments": [
+  {
+   "id": "echo",
+   "label": "Echo 655",
+   "vendor": "Beckman Coulter",
+   "kind": "deck",
+   "role": "acoustic nL transfer \u2014 and the only way around the Bravo's 4x cost at 384",
+   "spec": "Beckman Coulter, 600 Series. 2.5 nL drop, 2.5-5,000 nL transfer range, 96/384/1536, DMSO to 100% from 384PP 2.0 and LDV plates, glycerol to 50%, proteins and nucleic acids. Tipless, so no carryover and no consumable per sample. 74.6 cm deep, 130 kg. ~400 384-well plates per 20 h day.\n"
+  },
+  {
+   "id": "multiflo",
+   "label": "MultiFlo FX",
+   "vendor": "Agilent",
+   "kind": "deck",
+   "role": "bulk dispense \u2014 anything added to every well",
+   "spec": "Agilent (BioTek). Peristaltic cassettes at 1, 5 and 10 uL, giving recommended per-well ranges of 1-50 uL, 5-2,500 uL and 10-3,000 uL. 6- through 1536-well plates, standard, deep-well and PCR. A whole 1536 plate at 1 uL a well takes 21 s, accuracy +/-5% at 1 uL \u2014 so the 2.5 uL cell-free dispense into 1536 sits comfortably inside the 1 uL cassette.\n"
+  },
+  {
+   "id": "bravo",
+   "label": "Bravo 96 + magnet",
+   "vendor": "Agilent",
+   "kind": "deck",
+   "role": "96-channel pipetting, bead handling, and the two temperature-controlled deck nests. The system throughput ceiling",
+   "spec": "Agilent, 96-channel head, nine deck positions. Carries the magnet plate for bead work and TWO temperature-controlled nests held at 4 C and 42 C \u2014 QInstruments Peltier blocks, -20 to 99.9 C, 12 K/min. Those two fixed positions with a plate move between them are what gives a 45-second heat shock. ~75 two-plate protocols per 20 h day; one 96-well transfer step is ~8 min and a 384-well plate is four offset quadrant transfers, so ~32 min.\n"
+  },
+  {
+   "id": "bioshake",
+   "label": "BioShake",
+   "vendor": "QInstruments",
+   "kind": "deck",
+   "role": "on-deck orbital shaking \u2014 mixing and bead resuspension without the plate leaving the Bravo",
+   "spec": "QInstruments, elm series, mounted as a Bravo deck position. 200-3,000 rpm on microplates with a 2.0 mm orbit (D30 variant 3.0 mm for deep-well, 5000 variant 1.2 mm and up to 5,000 rpm for 384/1536). T variants are heater-shakers, ambient to 99 C. 142 x 170 x 80 mm, 2.7 kg.\n"
+  },
+  {
+   "id": "lynx",
+   "label": "Lynx LM900 VVP",
+   "vendor": "Dynamic Devices",
+   "kind": "deck",
+   "role": "variable-volume pipetting with per-channel volume verification \u2014 concentration normalisation before assay",
+   "spec": "Dynamic Devices. 900 mm X travel, 30 microplate deck positions, ~40 x 36 x 40 in. VVP tools come as 96-channel and 8-channel heads. Volume Verified Pipetting puts an in-line flow sensor on every channel and measures what was actually aspirated and dispensed, in real time, per channel \u2014 which is what makes normalising a plate to a target mass trustworthy rather than nominal. 1 uL minimum, 2 uL at 2% CV. Three tip types, 35 / 300 / 1200 uL, filter tips included. Tip detection per channel, contact dispense and mixing by pipetting are standard. VVP 2.0 ships at SLAS at no price difference \u2014 take the upgrade path in writing.\n"
+  },
+  {
+   "id": "magniflex",
+   "label": "Magniflex",
+   "vendor": "Tecan",
+   "kind": "deck",
+   "role": "the system's positive-displacement, variable-spacing channel \u2014 viscous and tube-based reagents the Echo cannot transfer",
+   "spec": "Tecan Cavro Magni Flex, an OEM liquid-handling framework. Two, four or eight independent Y and Z channels with variable tip spacing from 9 to 445 mm, so it reformats between tubes, troughs and plates. Cavro Pulssar PBC piston pumps \u2014 positive displacement \u2014 over 5-1,000 uL; the optional Air Restriction Pipettor covers 1 uL to 5 mL by air displacement. Fixed or disposable tips. 100-240 V, 480 VA. Note the name: Magni Flex is a pipetting framework, NOT a magnet. Bead separation is the Bravo's job.\n"
+  },
+  {
+   "id": "atc",
+   "label": "ATC x4",
+   "vendor": "Thermo Fisher",
+   "kind": "deck",
+   "role": "four thermal cyclers running independent programs \u2014 PCR, Golden Gate, heat lysis, melts, and held temperatures",
+   "spec": "Thermo Fisher Applied Biosystems Automated Thermal Cycler, four units on one cart: three 96-well and one 384-well. The 96-well blocks take 10-100 uL full-skirted; the 384-well block is a 0.02 mL block and takes 5-20 uL, which is the number that decides what can run in it. Both formats 0-105 C, ramp 2.8 C/s block and 1.6 C/s sample, accuracy +/-0.25 C from 35 to 99.9 C, uniformity under 0.5 C twenty seconds after reaching 95 C. All four run independent programs at once.\n"
+  },
+  {
+   "id": "plateloc",
+   "label": "PlateLoc",
+   "vendor": "Agilent",
+   "kind": "deck",
+   "role": "heat seal \u2014 foil and PCR seals",
+   "spec": "Agilent thermal microplate sealer. 30-200 C, temperature held to +/-2 C, seal time set per seal type, about 8 s a plate end to end and 2.5 min to warm up. One seal roll resident, which is why the a4s carries the second seal type.\n"
+  },
+  {
+   "id": "xpeel",
+   "label": "XPeel",
+   "vendor": "Azenta",
+   "kind": "deck",
+   "role": "peel \u2014 the only de-sealer on the system",
+   "spec": "Azenta Automated Plate Seal Remover. Up to 200 seals an hour. Removes both heat-applied and pressure-applied full-plate seals using a proprietary tape good for about 400 removals a roll. Takes full-skirted PCR plates, low-base microplates and deep-well plates to 2 mL. 35 kg.\n"
+  },
+  {
+   "id": "a4s",
+   "label": "a4s sealer",
+   "vendor": "Azenta",
+   "kind": "deck",
+   "role": "the second sealer \u2014 the seal type the PlateLoc is not holding, plus agar plates and over-tall stacks",
+   "spec": "Azenta a4S, now sold as the Automated Roll Heat Sealer (4ti-0665). 100-195 C, seal time 0.1-10 s, SBS footprint from 96 through 1536, 230 x 507 x 276 mm, 27 kg, RS-232 and USB. Having two sealers is what lets a gas-permeable culture seal and a foil PCR seal both be resident without a manual roll change mid-run. It also covers the agar plates and the filter-plus-carrier stacks that are too tall for the PlateLoc.\n"
+  },
+  {
+   "id": "pherastar",
+   "label": "PHERAstar FSX",
+   "vendor": "BMG LABTECH",
+   "kind": "deck",
+   "role": "every readout on this page. Tied with the Bravo as the system bottleneck",
+   "spec": "BMG LABTECH. Every detection method in well formats from 6 through 3456. FI, FP, luminescence, BRET; absorbance spectrometer 220-1000 nm; High-End TRF/HTRF with two red-sensitive photon-counting PMTs; HTS AlphaScreen laser; simultaneous dual emission; two reagent injectors. Optic modules for DAPI, FITC, TAMRA, Cy5, AlphaScreen, AlphaLISA, NanoBRET, FP, LanthaScreen and HTRF, filling five of six slots. Incubation caps at 45 C, so melts run in an ATC and are read after. ~8 min a 384-well TR-FRET plate, ~3 min luminescence; 150 plates per 20 h day.\n"
+  },
+  {
+   "id": "hig3",
+   "label": "HiG 3",
+   "vendor": "BioNex",
+   "kind": "deck",
+   "role": "plate centrifuge \u2014 cell harvest",
+   "spec": "BioNex. Two plates a run, direct robotic access, about 20 s to speed. 5,000 g maximum, 100 g imbalance tolerance, fan cooling. Chosen over the HiG 4 deliberately: the HiG 4 trades down to 4,000 g and halves imbalance tolerance to 50 g for a Peltier that only holds ambient, and odd plate counts fault twice as often at 50 g.\n"
+  },
+  {
+   "id": "cytomat",
+   "label": "Cytomat 2",
+   "vendor": "Thermo Fisher",
+   "kind": "deck",
+   "role": "the deck's only shaking incubator, and so the cap on everything that cultures",
+   "spec": "Thermo Fisher Cytomat 2 C-LiN. Two stackers, 11 standard or 7 deep-well positions each, so 14 deep-well culture positions and 7 concurrent culture protocols. Series range is ambient +4 C to 50 C on the C450-LiN and to 70 C on the C470 \u2014 30 C for yeast and 37 C for E. coli are both well inside it. The floor is the catch: ambient +4 C means a 25 C setpoint needs a room at 21 C or below. Tower Shaker gives 100-1200 rpm at 850 g a position on a 1-3 mm amplitude; the Selector variant offers 25 mm at 100-350 rpm with active clamping, which is the orbit published deep-well microbial protocols actually use.\n"
+  },
+  {
+   "id": "ambistore",
+   "label": "AmbiStore D",
+   "vendor": "HighRes Biosolutions",
+   "kind": "store",
+   "role": "controlled ambient storage \u2014 crystallography trays, Echo source plates, assay plates in flight",
+   "spec": "HighRes Biosolutions random-access carousel. 14 stackers, each holding 24 standard or 10 deep-well plates, so 336 standard or 140 deep-well at the extremes. Configured here as 9 standard + 5 deep-well = 216 + 50. Up to six transfer nests and a plate delivered in as few as 12 seconds. The same chassis is also specified down to -20 C, which is the route to frozen storage on the system if it is ever wanted.\n"
+  },
+  {
+   "id": "steristore_cold",
+   "label": "SteriStore D 4 C",
+   "vendor": "HighRes Biosolutions",
+   "kind": "store",
+   "role": "cold hold \u2014 DNA, detection reagents, competent cells on the day, grown blocks, outgrowth",
+   "spec": "HighRes Biosolutions self-sterilising incubator. 4-100 C, humidity to 98% RH, CO2-ready as standard, and it sterilises itself with dry heat at about 180 C for three hours. 14 stackers of 24 standard or 10 deep-well. Configured here at 9 standard + 5 deep-well = 216 + 50.\n"
+  },
+  {
+   "id": "steristore_warm",
+   "label": "SteriStore D 37 C",
+   "vendor": "HighRes Biosolutions",
+   "kind": "store",
+   "role": "where cell-free actually scales \u2014 bulk 37 C incubation, plus static recovery",
+   "spec": "The second SteriStore D, same unit, held at 37 C. Configured 12 standard + 2 deep-well = 288 + 20. 288 standard positions of static incubation is an order of magnitude more cell-free capacity than the four cycler blocks, which is why production cell-free lives here and the ATCs are kept for the temperature-arm DOE. Its 98% RH ceiling also covers the 85% RH a eukaryotic ALiCE reaction wants, for a static position.\n"
+  },
+  {
+   "id": "microserve",
+   "label": "MicroServe",
+   "vendor": "HighRes Biosolutions",
+   "kind": "consumable",
+   "role": "every tip box on the system. The Bravo, the Lynx and the Magniflex all draw from here",
+   "spec": "HighRes Biosolutions consumable store. About 770 microplates, or 154 standard tip boxes, in under three feet of floor space. Per Ginkgo's Q&A all tip boxes live here, which is why no separate 8-position tip-box stacker is quoted. Tip inventory has to cover 250 uL+ for deep-well transfers, low-retention for cell-free, and the Lynx's 35 / 300 / 1200 uL types including filter tips.\n"
+  },
+  {
+   "id": "offline",
+   "label": "Offline",
+   "kind": "virtual",
+   "role": "not on the rack",
+   "spec": "Not an instrument. The chain leaves the system here \u2014 bench work, sequencing, diffraction, or an imager that is not yet on the floor.\n"
+  }
+ ],
+ "workflows": [
+  {
+   "id": "4.1",
+   "name": "Build a clonal array",
+   "phase": "dna"
+  },
+  {
+   "id": "4.2",
+   "name": "Build a pooled library",
+   "phase": "dna"
+  },
+  {
+   "id": "4.13",
+   "name": "In-vitro assembly to expression",
+   "phase": "dna"
+  },
+  {
+   "id": "4.3",
+   "name": "Cell-free expression, arrayed",
+   "phase": "express"
+  },
+  {
+   "id": "4.4",
+   "name": "E. coli expression, arrayed",
+   "phase": "express"
+  },
+  {
+   "id": "4.5",
+   "name": "Magnetic bead purification",
+   "phase": "purify"
+  },
+  {
+   "id": "4.6",
+   "name": "Protein QC without a gel",
+   "phase": "purify"
+  },
+  {
+   "id": "4.7",
+   "name": "Binding \u2014 the assay ladder",
+   "phase": "bind"
+  },
+  {
+   "id": "4.8",
+   "name": "Counter-screen and competition",
+   "phase": "bind"
+  },
+  {
+   "id": "4.9",
+   "name": "Dose-response",
+   "phase": "bind"
+  },
+  {
+   "id": "4.10",
+   "name": "Thermal stability",
+   "phase": "purify"
+  },
+  {
+   "id": "4.14",
+   "name": "Heat-shock transformation",
+   "phase": "dna"
+  },
+  {
+   "id": "4.11",
+   "name": "Crystallisation screening",
+   "phase": "structure"
+  },
+  {
+   "id": "4.12",
+   "name": "Compound and fragment screening",
+   "phase": "bind"
+  },
+  {
+   "id": "CF2H",
+   "name": "Cell-free two-hybrid screen",
+   "phase": "bind"
+  }
+ ],
+ "phases": [
+  {
+   "id": "dna",
+   "label": "DNA",
+   "c": "#0072B2"
+  },
+  {
+   "id": "express",
+   "label": "Express",
+   "c": "#009E73"
+  },
+  {
+   "id": "purify",
+   "label": "Purify and QC",
+   "c": "#56B4E9"
+  },
+  {
+   "id": "bind",
+   "label": "Bind",
+   "c": "#D55E00"
+  },
+  {
+   "id": "structure",
+   "label": "Structure",
+   "c": "#CC79A7"
+  }
+ ]
+};
+</script>
+<script>
+(() => {
+  const B = window.BLUEPRINT, RACS = B.racs;
+  const INST = Object.fromEntries(B.instruments.map(i => [i.id, i]));
+  const WF = Object.fromEntries(B.workflows.map(w => [w.id, w]));
+  const PH = Object.fromEntries(B.phases.map(p => [p.id, p]));
+  const esc = t => String(t).replace(/[&<>"]/g, m =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+
+  document.getElementById('t').textContent = B.title;
+  document.getElementById('s').textContent = B.subtitle;
+  const inst = RACS.filter(r => r.status === 'installed').length;
+  const p2 = RACS.filter(r => r.status === 'phase2').length;
+  document.getElementById('n').textContent =
+    `${inst} carts at install, ${p2} more the floor plan leaves room for. ` +
+    `Each cart is named for what it does, not what is in it — click one.`;
+
+  // ---- line glyphs, one per kind of unit operation ----
+  const G = {
+    acoustic: 'M4 16h16M6 16V9M10 16V9M14 16V9M18 16V9M5 7h14',
+    bulk:     'M4 17h16M7 17V9a3 3 0 0 1 6 0v8M16 9c0-2 2-2 2-4M13 12h5',
+    stamp:    'M5 6h14M7 6v5M10 6v5M14 6v5M17 6v5M5 15h14v3H5z',
+    channel:  'M8 5v6M16 5v6M8 11l-1 7h2zM16 11l-1 7h2zM5 5h6M13 5h6',
+    verified: 'M7 5v7M17 5v7M7 12l-1 6h2zM17 12l-1 6h2zM11 16l2 2 4-5',
+    thermal:  'M4 12h3l2-5 2 10 2-8 2 5h5M4 18h16M4 6h16',
+    seal:     'M4 15h16v4H4zM7 11c3-3 7-3 10 0M9 7c2-2 4-2 6 0',
+    breathe:  'M4 16h16v3H4zM7 12V6M11 12V6M15 12V6M17 12V6M5 9h14',
+    spin:     'M12 4a8 8 0 1 1-8 8M12 8a4 4 0 1 0 4 4M12 4v4M4 12h4',
+    shake:    'M4 7h16v11H4zM4 11h16M4 15h16M7 4l2 2-2 2M17 4l-2 2 2 2',
+    static:   'M4 6h16v13H4zM4 11h16M4 15.5h16M9 3h6',
+    cold:     'M12 4v16M5 8l14 8M5 16l14-8M12 7l-2-2M12 7l2-2M12 17l-2 2M12 17l2 2',
+    ambient:  'M4 5h16v14H4zM4 10h16M4 14.5h16M8 7.5h3M8 12h3M8 16.5h3',
+    tips:     'M6 5h4l-1 13H7zM14 5h4l-1 13h-2zM4 20h16',
+    reader:   'M3 6h18v12H3zM6 9h7M6 12h5M6 15h7M16 9.5h2.5v2.5H16zM16 13h2.5v2.5H16z',
+    imaging:  'M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10M12 11.5a1.5 1.5 0 1 0 0 3M4 5v3M4 5h3M20 19v-3M20 19h-3',
+  };
+  const GLYPH = {
+    'Non-contact acoustic cherry picking': 'acoustic',
+    'Bulk dispensing': 'bulk',
+    'Contact stamping pipetting': 'stamp',
+    'Positive-displacement channel pipetting': 'channel',
+    'Volume-verified contact pipetting': 'verified',
+    'Thermal cycling': 'thermal',
+    'Microplate sealing & seal peeling': 'seal',
+    'Microplate sealing': 'seal',
+    'Microplate breathable sealing': 'breathe',
+    'Centrifugation': 'spin',
+    'Temp-control shaking incubation': 'shake',
+    '37 C static incubation': 'static',
+    'Refrigerated random access storage': 'cold',
+    'Ambient random access storage': 'ambient',
+    'Tip & consumable storage': 'tips',
+    'Plate reading': 'reader',
+    'Crystal imaging': 'imaging',
+  };
+
+  // ---- lay the carts out around a rounded-rectangle track ----
+  // Ginkgo's own sheets run the track as a closed loop with the carts sitting
+  // on it and the labels outside, and the I/O badges just inside. Same here,
+  // sized to the cart count rather than hand-placed.
+  const VW = 1200, TILE = 74, LBL = 170, GAPV = 26;
+  const n = RACS.length;
+  const topN = Math.min(4, Math.ceil(n / 5));
+  const botN = Math.min(4, Math.max(1, Math.floor((n - topN) / 5)));
+  let side = Math.floor((n - topN - botN) / 2);
+  const extra = n - topN - botN - 2 * side;          // 0 or 1, goes to the bottom
+  const botTotal = botN + extra;
+
+  const trackL = LBL, trackR = VW - LBL - TILE;
+  const trackT = 120, trackH = Math.max(1, side) * (TILE + GAPV) - GAPV;
+  const trackB = trackT + trackH;
+  const yTop = trackT - 58, yBot = trackB + 58;
+
+  const pos = [];
+  const spreadX = (count, y, at) => {
+    const span = trackR - trackL;
+    for (let i = 0; i < count; i++)
+      pos.push({x: trackL + span * (i + 1) / (count + 1), y, at});
+  };
+  spreadX(topN, yTop, 'top');
+  for (let i = 0; i < side; i++) pos.push({x: trackR, y: trackT + i * (TILE + GAPV), at: 'right'});
+  {
+    const span = trackR - trackL;
+    for (let i = 0; i < botTotal; i++)
+      pos.push({x: trackR - span * (i + 1) / (botTotal + 1), y: yBot, at: 'bottom'});
+  }
+  for (let i = side - 1; i >= 0; i--) pos.push({x: trackL, y: trackT + i * (TILE + GAPV), at: 'left'});
+
+  const H = yBot + TILE + 62;
+
+  const glyph = (u, p2) => `<path class="glyph${p2 ? ' p2' : ''}" d="${G[GLYPH[u]] || G.ambient}"
+      transform="translate(${(TILE - 24) / 2} ${(TILE - 24) / 2 - 3})"/>`;
+
+  function wrap(text, max) {
+    const words = String(text).split(' '), lines = [];
+    let cur = '';
+    for (const w of words) {
+      if ((cur + ' ' + w).trim().length > max && cur) { lines.push(cur); cur = w; }
+      else cur = (cur + ' ' + w).trim();
+    }
+    if (cur) lines.push(cur);
+    return lines;
+  }
+
+  function sheet() {
+    const parts = [];
+    parts.push(`<defs><pattern id="gr" width="26" height="26" patternUnits="userSpaceOnUse">
+      <path d="M26 0H0V26" fill="none" stroke="var(--grid)" stroke-width="0.6"
+        opacity="0.55"/></pattern></defs>`);
+    parts.push(`<rect width="${VW}" height="${H}" fill="var(--paper)"/>`);
+    parts.push(`<rect width="${VW}" height="${H}" fill="url(#gr)"/>`);
+
+    // the track, drawn through the cart centres
+    const c = TILE / 2;
+    const x0 = trackL + c, x1 = trackR + c, y0 = yTop + c, y1 = yBot + c;
+    parts.push(`<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}"
+      rx="56" fill="none" stroke="var(--line)" stroke-width="3" opacity="0.9"/>`);
+
+    RACS.forEach((r, i) => {
+      const p = pos[i]; if (!p) return;
+      const p2 = r.status === 'phase2' ? ' p2' : '';
+      const cxp = p.x + TILE / 2, cyp = p.y + TILE / 2;
+
+      // label outside the ring
+      let lx, ly, anchor, lines;
+      if (p.at === 'left' || p.at === 'right') {
+        lines = wrap(r.unitop, 18);
+        lx = p.at === 'right' ? p.x + TILE + 16 : p.x - 16;
+        anchor = p.at === 'right' ? 'start' : 'end';
+        ly = cyp + 4.5 - (lines.length - 1) * 7.5;
+      } else {
+        lines = wrap(r.unitop, 17);
+        lx = cxp; anchor = 'middle';
+        ly = p.at === 'top' ? p.y - 12 - (lines.length - 1) * 15 : p.y + TILE + 24;
+      }
+      const label = lines.map((t, k) =>
+        `<text x="${lx}" y="${ly + k * 15}" text-anchor="${anchor}"
+           class="cart-l${p2}">${esc(t)}</text>`).join('');
+
+      // I/O badge, placed inside the ring so it never collides with a label
+      let ix = cxp, iy = cyp;
+      if (p.at === 'top') iy = p.y + TILE + 22;
+      else if (p.at === 'bottom') iy = p.y - 22;
+      else if (p.at === 'left') ix = p.x + TILE + 22;
+      else ix = p.x - 22;
+      const io = r.io ? `<g><circle cx="${ix}" cy="${iy}" r="13" fill="var(--paper)"
+          stroke="var(--line)" stroke-width="1.2"/>
+        <text x="${ix}" y="${iy + 3.3}" text-anchor="middle" class="io-l">I/O</text></g>` : '';
+
+      parts.push(`<g class="tile" data-r="${esc(r.id)}" data-status="${esc(r.status)}"
+          aria-pressed="false" role="button" tabindex="0"
+          aria-label="${esc(r.unitop)}, cart ${r.n}">
+        <g transform="translate(${p.x} ${p.y})">
+          <rect class="box${p2}" width="${TILE}" height="${TILE}" rx="13"${
+            p2 ? ' fill="none" stroke-dasharray="5 4"' : ''}/>
+          ${glyph(r.unitop, p2)}
+          <text x="${TILE - 7}" y="${TILE - 6}" text-anchor="end" class="cart-n">${r.n}</text>
+        </g>${label}${io}</g>`);
+    });
+
+    return `<svg viewBox="0 0 ${VW} ${H}" role="img"
+      aria-label="${esc(B.title)} RAC system blueprint, ${n} carts">${parts.join('')}</svg>`;
+  }
+
+  document.getElementById('sheet').innerHTML = sheet();
+
+  document.getElementById('legend').innerHTML =
+    `<span><i class="key inst"></i>at install</span>` +
+    `<span><i class="key p2"></i>phase 2 — space reserved, not quoted</span>` +
+    `<span><i class="key io"></i>material enters or leaves here by hand</span>` +
+    `<span>cart number is Ginkgo's, confirmed 2026-11-04</span>`;
+
+  const STATUS = {installed: {c:'#009E73', t:'at install'},
+                  phase2:    {c:'#8e8e93', t:'phase 2'}};
+
+  function show(id) {
+    const r = RACS.find(x => x.id === id);
+    const el = document.getElementById('detail');
+    if (!r) {
+      el.innerHTML = `<p class="empty">Nineteen carts, each named for its unit
+        operation rather than its instrument — that is how Ginkgo draws its own
+        published blueprints, and it is the altitude that lets someone plan
+        against the machine without knowing the model numbers.
+        Click a cart for what is in it and what runs through it.</p>`;
+      return;
+    }
+    const st = STATUS[r.status];
+    const instr = r.instruments.map(i =>
+      `<span class="chip">${esc(INST[i] ? INST[i].label : i)}</span>`).join('') ||
+      `<span class="chip" style="opacity:.6">not quoted</span>`;
+    const runs = (r.runs || []).map(w => {
+      const c = WF[w] && PH[WF[w].phase] ? PH[WF[w].phase].c : 'var(--rule)';
+      return `<span class="chip wf" style="border-color:${c}"
+        title="${esc(WF[w] ? WF[w].name : w)}">${esc(w)}</span>`;
+    }).join('');
+    const specs = r.instruments.map(i => INST[i])
+      .filter(Boolean).map(i => `<div class="spec"><b>${esc(i.label)}</b> — ${esc(i.spec)}</div>`)
+      .join('');
+    el.innerHTML = `
+      <div class="hd"><h3>${esc(r.unitop)}</h3>
+        <span class="n">cart ${r.n}</span>
+        <span class="st" style="color:${st.c};border-color:${st.c}">${st.t}</span></div>
+      <p>${esc(r.note)}</p>
+      <div class="lbl">what is on it</div><div class="chips">${instr}</div>
+      ${specs ? `<div style="margin-top:7px">${specs}</div>` : ''}
+      ${runs ? `<div class="lbl">what runs through it &middot; ${r.runs.length}</div>
+                <div class="chips">${runs}</div>` : ''}`;
+  }
+  show(null);
+
+  let sel = null;
+  function pick(id) {
+    sel = (sel === id) ? null : id;
+    document.querySelectorAll('.tile').forEach(t => {
+      t.setAttribute('aria-pressed', String(t.dataset.r === sel));
+      t.classList.toggle('dim', !!sel && t.dataset.r !== sel);
+    });
+    show(sel);
+  }
+  document.getElementById('sheet').addEventListener('click', e => {
+    const t = e.target.closest('.tile'); if (t) pick(t.dataset.r);
+  });
+  document.getElementById('sheet').addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const t = e.target.closest('.tile'); if (t) { e.preventDefault(); pick(t.dataset.r); }
+  });
+
+  // ---- the footnote: what this sheet is, and what it is not ----
+  const placed = RACS.reduce((a, r) => a + r.instruments.length, 0);
+  document.getElementById('foot').innerHTML =
+    `<b>${placed} instruments across ${inst} carts</b>, generated from the same
+     <code>data/protocols.yml</code> that drives the workflow page — the build fails if an
+     instrument is on the capability map and on no cart, or on two. The shape is
+     borrowed from Ginkgo's published Application Blueprints, which label a cart by
+     its unit operation rather than its instrument; where they have a term for
+     something we have, the term here is theirs.
+     <br><br>
+     <b>What this is not:</b> a floor plan. Cart order here reads as a workflow loop,
+     not as the physical layout — the real block is 8,338&nbsp;mm long at 15 carts and
+     10,338&nbsp;mm at 19, and the orientation in the room is forced.
+     <b>Colony picking</b> has no cart: it stays out of scope, though Ginkgo's own
+     transformation note says it can be onboarded with a further cart.`;
+})();
+</script>
+</body>
+</html>

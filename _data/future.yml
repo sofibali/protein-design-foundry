@@ -1,0 +1,49 @@
+# What is not on the floor: carts the layout reserves (phase2) and
+# capabilities the system does not have at all (gap).
+#
+# Hand-maintained, unlike _data/instruments.yml, which is generated from
+# _data/protocols.yml. The split is deliberate: protocols.yml describes the
+# machine as quoted, and nothing in it should have to carry an absence.
+# scripts/build_pages.py merges these two into the inventory the site renders.
+
+future:
+- key: imager
+  name: Crystallisation plate imager
+  vendor: TBC
+  rac: 16
+  status: phase2
+  role: Scheduled imaging of crystallisation trays.
+  note: The largest single automation win available. A campaign of 80 trays at 7 timepoints is 560 imaging
+    events, which is roughly 37 h of human time against 9 h of robot time.
+- key: second_ambistore
+  name: Second ambient store
+  vendor: LiCONiC
+  rac: 17
+  status: phase2
+  role: Crystallography tray capacity beyond 150 positions.
+- key: prep_purification
+  name: Purification at milligram scale
+  vendor: null
+  rac: null
+  status: gap
+  role: Protein for crystallography.
+  note: Magnetic-bead purification gives micrograms. There is no size-exclusion step and no concentrator
+    on the system, so crystallography-grade protein is made off-system for now.
+- key: drop_setter
+  name: Dedicated crystallisation drop setter
+  vendor: null
+  rac: null
+  status: gap
+  role: Sitting-drop setting independent of acoustic fluid classes.
+  note: Acoustic drop setting is published but needs a validated fluid class per condition, and viscous
+    precipitants fall outside them. The obvious alternative has no drop-setting API, so it would be a
+    custom integration.
+- key: lidder
+  name: Lidding and de-lidding
+  vendor: null
+  rac: null
+  status: gap
+  role: Handling lids on agar plates and over-tall plate stacks.
+  note: Opened 2026-11-17, when the cart we had recorded as a lidder turned out to be a second sealer.
+    Plating is in scope and agar plates carry lids, so something has to lift them. Filter plus carrier
+    combinations are also too tall for either sealer.

@@ -9,3 +9,6 @@ vendor/
 *quote*.pdf
 *proposal*.pdf
 private/
+
+# generated beside the page templates by scripts/build_pages.py
+pages/*.js

@@ -1,0 +1,199 @@
+# The four loop stages. One entry per box in the schematic.
+# where: compute = yours | rac = on the Ginkgo | offrac = not on the machine yet
+
+title: UCSF Protein Design Foundry
+subtitle: Lab-in-the-loop automated protein targeting
+note: Install April 2027 · year 1 · 4 labs · PARP14 binder campaign
+
+stages:
+
+  - id: design
+    label: Design
+    sub: models propose
+    where: compute
+    body: >
+      More than 1,000 candidates per target from RFdiffusion, ProteinMPNN and
+      BindCraft, rescored with Boltz and filtered by the expression model.
+      Runs on UCSF compute, not on the machine.
+    gates: [D0]
+    protocols:
+      - {id: intake.target.rank, status: draft}
+      - {id: campaign.design.bindcraft, status: draft}
+    instruments: [UCSF GPU server]
+    open:
+      - Which filters actually predicted measured outcomes?
+
+  - id: express
+    label: Express
+    sub: make protein
+    where: rac
+    body: >
+      Cell-free and E. coli in parallel, optimised by fractional-factorial
+      screen then Bayesian optimisation. Magnetic-bead purification, then a
+      quality gate before anything reaches an assay.
+      Two things settled since this was written. The four ATCs are
+      3 x 96-well + 1 x 384-well, all in one RAC, running four independent
+      programs at once; the 96 blocks take 10-100 uL and the 384 block takes
+      5-20 uL. And heat shock works: the Bravo carries two
+      temperature-controlled deck positions at 4 C and 42 C, so the
+      45-second pulse is a plate move between them. Transformation, plating
+      and E. coli expression are all in scope on the RAC — colony picking is
+      not — and the backbones stand. The ceiling on all of it is the Bravo at
+      ~75 two-plate protocols per 20-hour day, tied with the PHERAstar at 150
+      384-well TR-FRET plates; a 384 plate costs the Bravo 4x a 96 plate, so
+      data/protocols.yml now carries what every workflow costs the day.
+    gates: [D1, D2]
+    protocols:
+      - {id: express.cfps.doe, status: draft}
+      - {id: express.ecoli.autoinduction96, status: planned}
+      - {id: express.cfps.production96, status: planned}
+      - {id: purify.imac.magbead96, status: planned}
+      - {id: qc.protein.plate96, status: planned}
+    instruments: [Echo 655, MultiFlo, ATC 3x96 + 1x384, Bravo 96 + magnet, BioShake,
+                  Cytomat 2, HiG 3, Magniflex, Lynx LM900 VVP, PHERAstar FSX,
+                  SteriStore D 37 C, SteriStore D 4 C, MicroServe]
+    open:
+      - >-
+        A second 384-well ATC, in or out - Sofia's call, not an open question
+        for Ginkgo. The recommendation on record is to swap a second 96 block
+        for a 384, keeping four units, and push retrieval PCR to 384 via the
+        Echo: 3 plates instead of 12 for a 1,152-design set, cycler time 10 h
+        to 6 h. It is a swap, not a fifth unit, so it should be close to
+        price-neutral against the quoted ATC line. Keep two 96 blocks either
+        way: they take 10-100 uL and the 384 block takes 5-20 uL.
+      - >-
+        Yeast at 30 C is inside the Cytomat's range - the C-LiN series runs to
+        50 C and the unit has to reach 37 C for E. coli anyway - so a third
+        expression route costs no hardware. What is worth a growth curve is
+        the 1-3 mm shaking orbit, a mammalian-suspension spec; published
+        deep-well microbial protocols use 25 mm and the Selector offers it.
+      - >-
+        Eukaryotic cell-free (ALiCE) wants 25 C, shaking, 36 h, 85% RH.
+        Humidity is covered - the SteriStore D runs to 98% RH - but it is
+        static. The Cytomat shakes, and its floor is ambient +4 C, so a 25 C
+        setpoint needs the room held at 21 C or below. That is a room
+        specification rather than an instrument one.
+      - No optics on any ATC, so DSF melt curves need separate hardware.
+
+  - id: test
+    label: Test
+    sub: does it bind?
+    where: rac
+    body: >
+      Assay window proven before any design batch is committed. Primary screen
+      against an on-plate counter-target, dose-response on the primaries, then
+      a selectivity screen that tests whether the binder hit the face it was
+      designed for.
+    gates: [D3, D4, D5, D6]
+    protocols:
+      - {id: assay.htrf.window384, status: draft}
+      - {id: bind.cf2h.screen, status: draft}
+      - {id: build.library.assemble, status: planned}
+      - {id: test.binding.htrf384, status: planned}
+      - {id: test.binding.dose384, status: planned}
+      - {id: test.selectivity.counter384, status: planned}
+    instruments: [PHERAstar FSX, Echo 655, Bravo 96 + magnet, MultiFlo, PlateLoc,
+                  AmbiStore D, SteriStore D 4 C, MicroServe]
+    open:
+      - The PHERAstar UV TR-FRET laser is a priced option. It buys HTRF dynamic range.
+      - CF2H would answer D1 and D4 in one well with no purified protein,
+        but the reporter plasmid, CI cassette and dRecBCD extract are an
+        offline build that does not exist yet.
+
+  - id: structure
+    label: Structure
+    sub: right face?
+    where: offrac
+    body: >
+      Crystallisation screening, co-crystallisation against soaking, and
+      comparison of the solved interface to the design model. Runs on Fraser
+      lab instruments until the imagers arrive.
+    gates: [D7, D8]
+    protocols:
+      - {id: struct.crystal.screen, status: planned}
+    instruments: [Fraser lab, imagers pending, Echo 655 required, a4s lidder, AmbiStore D]
+    open:
+      - Aim 3 cannot run on an Echo 525. The 6XX is a scope decision.
+      - Imagers and automated crystal scoring are not yet quoted.
+
+# ---------------------------------------------------------------------------
+# The user-facing half. A foundry user is a PI or postdoc from one of the
+# labs bringing a target; they need to know whether it can be taken, what
+# they hand over, and what comes back. Everything below answers one of those.
+
+intake:
+  question: Can the foundry take your target?
+  note: >-
+    Four things have to hold. Each is the precondition of a decision the
+    machine makes later, so a target missing one does not fail at intake for
+    bureaucratic reasons - it fails months in, after the protein has been
+    made. This is gate D0.
+  checks:
+    - id: structure
+      ask: Is there a structure of the domain you want targeted?
+      need: An experimental structure, or a prediction at pLDDT 85 or better across the intended epitope.
+      why: Design works from it, and so does the gate that checks where a binder actually landed.
+    - id: hotspot
+      ask: Can you name a hotspot residue that tolerates an alanine substitution?
+      need: At least one, and the domain still has to fold without it.
+      why: >-
+        D6 asks whether a binder engages the face it was designed for, by
+        mutating that residue and watching the signal drop. With no mutable
+        hotspot that gate cannot run, and a binder that found a different
+        face reaches the structure queue undetected.
+    - id: homolog
+      ask: Is there a close homolog that can be expressed?
+      need: One is enough. It goes on the plate beside the target.
+      why: Selectivity is measured against it, on the same plate, at no extra cost.
+    - id: expression
+      ask: Has this protein, or a close homolog, been expressed before?
+      need: Any system, any scale. A reference will do; a working protocol is better.
+      why: >-
+        It stands in for the expression model, which is an output of year one
+        rather than an input to it.
+  verdicts:
+    - n: 4
+      label: "All four"
+      say: "Ranked against the other targets in the queue and assigned an expression route."
+    - n: 3
+      label: "Three, or one met weakly"
+      say: "A feasibility run rather than a decline - usually the expression arm first."
+    - n: 0
+      label: "Any missing outright"
+      say: "Declined, with the reason named. Bring it back when that one is answered."
+
+provide:
+  title: What you hand over
+  items:
+    - k: "The target"
+      v: "Sequence and structure. We express it, or you send purified protein."
+    - k: "One hotspot mutant"
+      v: "We make it. You confirm the residue is the one you care about."
+    - k: "A close homolog"
+      v: "It goes on every plate as the counter-target."
+    - k: "Nothing else"
+      v: "Designs, constructs, assays, analysis and the data back are ours."
+
+returns:
+  title: What comes back
+  items:
+    - k: "A verdict per design, per gate"
+      v: "Pass, fail or unclear. Not a data dump."
+    - k: "Measured negatives"
+      v: "Failures are kept and returned. They are the training data, and most designs fail."
+    - k: "An affinity, where it is determined"
+      v: "K_D over 0.5 to 100 nM. Weaker binders come back as a bound and go to maturation."
+    - k: "An epitope verdict"
+      v: "Whether the binder engaged the face it was designed for, or a different one."
+    - k: "A per-design quality record"
+      v: "Yield, aggregation state, and a specificity index that means the same thing in every campaign."
+
+limits:
+  title: What it cannot do
+  note: Worth knowing before you plan around it.
+  items:
+    - "No FACS, so no yeast-display selection and no libraries at 10^6 and above."
+    - "No kinetics. Endpoint and equilibrium only; k_on and k_off need an instrument the deck does not have."
+    - "No milligrams. Plate assays yes, crystallography protein no - that comes from offline expression."
+    - "No colony picking, so no clonal isolation from a transformation."
+    - "No mammalian or CHO expression."

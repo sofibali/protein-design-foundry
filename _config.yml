@@ -38,6 +38,9 @@ nav:
 exclude:
   - README.md
   - scripts/
+  - pages/          # page templates; the built versions are in static/pages/
+  - protocols/      # protocol source, no front matter yet
+  - reference/      # research notes, no front matter yet
   - .github/
   - Gemfile
   - Gemfile.lock

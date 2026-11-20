@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foundry Protocols</title>
+<style>
+  :root {
+    --bg:#fff; --ink:#1d1d1f; --muted:#8e8e93; --rule:#d2d2d7; --tab-bg:#f2f2f4;
+    --fillop:0.14; --chipop:0.10; --warn:#E69F00;
+    --font:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme=light]){
+    --bg:#141416; --ink:#f2f2f4; --muted:#8e8e93; --rule:#3a3a3d; --tab-bg:#242427;
+    --fillop:0.24; --chipop:0.20;
+  }}
+  :root[data-theme=dark]{ --bg:#141416; --ink:#f2f2f4; --rule:#3a3a3d; --tab-bg:#242427;
+                          --fillop:0.24; --chipop:0.20; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px 16px 56px}
+  header{text-align:center;margin-bottom:22px}
+  h1{font-weight:400;font-size:clamp(22px,3vw,34px);margin:0;letter-spacing:-.01em}
+  .sub{font-size:clamp(15px,2vw,19px);margin-top:3px}
+  .note{color:var(--muted);font-size:13px;margin-top:6px}
+  .nav{text-align:center;font-size:13px;margin-top:10px}
+  .nav a{color:var(--muted)}
+  .nav a:hover{color:var(--ink)}
+
+  /* instrument bar */
+  .bar{border:1px solid var(--rule);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+  .bar h3{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+          font-weight:500;margin:0 0 9px}
+  .insts{display:flex;flex-wrap:wrap;gap:7px}
+  .ichip{font:inherit;font-size:12.5px;color:var(--ink);background:var(--tab-bg);
+         border:1px solid transparent;border-radius:999px;padding:4px 10px;cursor:pointer;
+         display:inline-flex;align-items:center;gap:7px;transition:background .12s,border-color .12s}
+  .ichip:hover{border-color:var(--rule)}
+  .ichip .n{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+  .ichip[aria-pressed=true]{background:var(--bg);border-color:var(--ink)}
+  .ichip[aria-pressed=true] .n{color:var(--ink)}
+  .ichip.store{background:transparent;border:1px dashed var(--rule)}
+  .ichip.store[aria-pressed=true]{border-style:solid;border-color:var(--ink)}
+  .role{color:var(--muted);font-size:12.5px;margin-top:10px;min-height:1.3em}
+  .role b{color:var(--ink);font-weight:500}
+  .role .sp{display:block;margin-top:4px;line-height:1.5}
+  /* --- plan a day --- */
+  .plan{border:1px solid var(--rule);border-radius:12px;padding:14px 16px 16px;margin:18px 0 4px}
+  .plan h2{font-size:16px;font-weight:500;margin:0 0 3px}
+  .plan .lede{color:var(--muted);font-size:12.5px;margin-bottom:11px;max-width:74ch}
+  .routes{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .rt{border:1px solid var(--rule);background:none;color:inherit;border-radius:999px;
+      padding:4px 12px;font:inherit;font-size:12.5px;cursor:pointer}
+  .rt:hover{border-color:var(--ink)}
+  .rt.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .rt.clr{color:var(--muted)}
+  .chain-edit{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:13px;min-height:26px}
+  .pill2{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--rule);
+         border-radius:7px;padding:3px 5px 3px 9px;font-size:12.5px}
+  .pill2 .x{cursor:pointer;color:var(--muted);border:0;background:none;font:inherit;padding:0 3px}
+  .pill2 .x:hover{color:#D55E00}
+  .pill2 .n{font-variant-numeric:tabular-nums;color:var(--muted);min-width:18px;text-align:center}
+  .pill2 button.s{border:1px solid var(--rule);background:none;color:inherit;border-radius:4px;
+       width:19px;height:19px;line-height:1;cursor:pointer;font:inherit;padding:0}
+  .bars{display:grid;gap:8px}
+  .barrow{display:grid;grid-template-columns:78px minmax(0,1fr) 98px;gap:11px;align-items:center;font-size:12.5px}
+  .barrow .nm2{color:var(--muted)}
+  .track{height:9px;background:var(--tab-bg);border-radius:5px;overflow:hidden}
+  .track i{display:block;height:100%;border-radius:5px;transition:width .25s}
+  .barrow .v2{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+  .verdict{margin-top:12px;padding-top:11px;border-top:1px solid var(--rule);font-size:13px}
+  .verdict b{font-weight:500}
+  .verdict .cult{color:#D55E00;font-weight:500}
+  .plan .empty2{color:var(--muted);font-size:12.5px;font-style:italic}
+  @media (max-width:560px){ .barrow{grid-template-columns:62px minmax(0,1fr) 80px;gap:8px} }
+  .ceil{border-top:1px solid var(--rule);margin-top:11px;padding-top:9px;
+        font-size:12px;color:var(--muted);line-height:1.5}
+  .ceil b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+  .ceil .sep{opacity:.5;padding:0 6px}
+
+  /* status legend */
+  .legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--muted);
+          margin:0 0 26px;padding-left:2px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:9px;height:9px;border-radius:999px;flex:none}
+
+  /* phases */
+  .phase{margin-top:30px}
+  .phase > h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:500;
+              margin:0 0 10px;padding-bottom:6px;border-bottom:2px solid currentColor}
+  .cards{display:flex;flex-direction:column;gap:9px}
+
+  /* a workflow */
+  .wf{border:1px solid var(--rule);border-left-width:3px;border-radius:10px;
+      padding:12px 14px;display:grid;grid-template-columns:238px 1fr;gap:4px 20px;
+      transition:opacity .15s}
+  .wf.dim{opacity:.26}
+  .wf .id{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+  .wf .nm{font-size:15px;margin-top:1px}
+  .wf .sb{color:var(--muted);font-size:12.5px;margin-top:1px}
+  .wf .tags{margin-top:7px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+  .pill{font-size:11px;border-radius:999px;padding:1px 8px;border:1px solid}
+  .gate{font-size:11px;border-radius:4px;padding:1px 5px;background:var(--tab-bg);color:var(--muted);
+        font-variant-numeric:tabular-nums}
+  .right{min-width:0}
+
+  .chain{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:1px 0 9px}
+  .step{font-size:12.5px;border:1px solid var(--rule);border-radius:7px;padding:3px 9px;
+         white-space:nowrap;transition:background .12s,border-color .12s,color .12s}
+  .step.on{border-color:var(--ink);background:var(--tab-bg);font-weight:500}
+  .step.off{border-style:dashed;color:var(--muted)}
+  .arr{color:var(--muted);font-size:12px;flex:none}
+
+  .meta{font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:2px 14px}
+  .meta b{font-weight:400;color:var(--ink)}
+  .holds{font-size:12px;color:var(--muted);margin:-4px 0 9px;display:flex;
+         flex-wrap:wrap;align-items:center;gap:5px}
+  .holds .lbl{text-transform:uppercase;letter-spacing:.06em;font-size:10.5px}
+  .hchip{font-size:12px;border:1px dashed var(--rule);border-radius:7px;padding:2px 8px;
+         white-space:nowrap;transition:border-color .12s,color .12s,background .12s}
+  .hchip.on{border-style:solid;border-color:var(--ink);background:var(--tab-bg);color:var(--ink)}
+  .hchip.off{color:var(--muted);opacity:.5}
+  .cost{font-size:12px;margin-top:8px;padding:6px 10px;border-radius:7px;
+        background:var(--tab-bg);line-height:1.5;color:var(--muted)}
+  .cost b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+  .cost .bar{display:inline-block;vertical-align:middle;width:84px;height:5px;border-radius:999px;
+             background:var(--rule);overflow:hidden;margin:0 7px;border:0;padding:0}
+  .cost .bar i{display:block;height:100%;background:var(--ink)}
+  .cost .lim{display:block;margin-top:2px}
+  .ends{font-size:12.5px;color:var(--muted);margin-top:5px}
+  .ins{margin-top:9px;border-top:1px solid var(--rule);padding-top:7px}
+  .ins > summary{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+                 cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px}
+  .ins > summary::-webkit-details-marker{display:none}
+  .ins > summary::before{content:"+";font-size:13px;line-height:1;width:11px;text-align:center}
+  .ins[open] > summary::before{content:"\2212"}
+  .ins > summary:hover{color:var(--ink)}
+  .ins dl{margin:8px 0 2px;display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:12.5px;
+          line-height:1.45}
+  .ins dt{font-weight:500;white-space:nowrap}
+  .ins dd{margin:0;color:var(--muted)}
+  @media (max-width:620px){ .ins dl{grid-template-columns:1fr;gap:1px} .ins dd{margin-bottom:6px} }
+  .body{font-size:13px;line-height:1.46;margin:8px 0 0}
+  .warn{font-size:12.5px;line-height:1.45;margin:8px 0 0;padding:7px 10px;border-radius:7px;
+        border:1px solid var(--warn);background:var(--tab-bg)}
+  .fmts{margin:9px 0 0;padding:0;list-style:none;font-size:12.5px;line-height:1.5}
+  .fmts li{padding:2px 0 2px 13px;position:relative;color:var(--muted)}
+  .fmts li::before{content:"";position:absolute;left:2px;top:.72em;width:4px;height:4px;
+                   border-radius:999px;background:var(--muted)}
+  .fmts b{color:var(--ink);font-weight:500}
+
+  /* loops */
+  .loops{margin-top:42px;padding-top:4px}
+  .loops > h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:500;
+              margin:0 0 4px;padding-bottom:6px;border-bottom:2px solid var(--rule)}
+  .loops .intro{color:var(--muted);font-size:12.5px;margin:10px 0 18px}
+  .loop{border:1px solid var(--rule);border-radius:10px;padding:13px 14px 10px;margin-bottom:9px}
+  .loop .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .loop .hd h3{font-size:15px;font-weight:400;margin:0}
+  .loop .closes{font-size:11.5px;color:var(--muted)}
+  .loop .scroll{overflow-x:auto;margin-top:4px}
+  .loop svg{display:block;width:100%;min-width:560px;height:auto;font-family:var(--font)}
+  .loop .rt{font-size:13px;line-height:1.46;margin:4px 0 0}
+  .lp-lbl{font-size:12.5px;fill:var(--ink)}
+  .lp-arc{font-size:11.5px;fill:var(--muted)}
+
+  @media (max-width:780px){
+    .wf{grid-template-columns:1fr;gap:2px}
+    .wf .tags{margin-bottom:8px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="t"></h1>
+    <div class="sub" id="s"></div>
+    <div class="note" id="n"></div>
+    <div class="nav"><a href="foundry.html">&larr; the loop and the gates</a>
+      &nbsp;&middot;&nbsp; <a href="blueprint.html">the system blueprint &rarr;</a>
+      &nbsp;&middot;&nbsp; <a href="maps.html">one-page maps &rarr;</a>
+      &nbsp;&middot;&nbsp; full input spec in <code>reference/constructs.md</code></div>
+  </header>
+
+  <div class="bar">
+    <h3>Instruments</h3>
+    <div class="insts" id="insts"></div>
+    <div class="role" id="role"></div>
+    <div class="ceil" id="ceil"></div>
+  </div>
+  <div class="legend" id="legend"></div>
+
+  <section class="plan">
+    <h2>Plan a day</h2>
+    <div class="lede" id="plan-lede"></div>
+    <div class="routes" id="routes"></div>
+    <div class="chain-edit" id="chain-edit"></div>
+    <div class="bars" id="bars"></div>
+    <div class="verdict" id="verdict"></div>
+  </section>
+
+  <div id="phases"></div>
+
+  <section class="loops">
+    <h2>The loops</h2>
+    <div class="intro" id="lintro"></div>
+    <div id="loops"></div>
+    <div class="legend" id="wlegend" style="margin-top:16px"></div>
+  </section>
+</div>
+
+<script src="protocols.js"></script>
+<script>
+(() => {
+  const P = window.PROTOCOLS, WF = P.workflows;
+  const INST = Object.fromEntries(P.instruments.map(i => [i.id, i]));
+  const STATUS = {
+    ready:   {c:'#009E73', label:'runs on the deck as quoted'},
+    limited: {c:'#E69F00', label:'runs, but not the thing you wanted'},
+    build:   {c:'#0072B2', label:'needs an offline build first'},
+    offline: {c:'#8e8e93', label:'ends in a sample prepared off the rack'}
+  };
+  const esc = t => String(t).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+
+  document.getElementById('t').textContent = P.title;
+  document.getElementById('s').textContent = P.subtitle;
+  document.getElementById('n').textContent = P.note;
+
+  // how many workflows need each instrument — on the deck, or holding a plate
+  const uses = (w, id) => w.deck.includes(id) || (w.holds || []).includes(id);
+  const count = id => WF.filter(w => uses(w, id)).length;
+  const isStore = i => i.kind === 'store' || i.kind === 'consumable';
+
+  document.getElementById('insts').innerHTML = P.instruments.map(i =>
+    `<button class="ichip${isStore(i) ? ' store' : ''}" type="button" aria-pressed="false"
+       data-i="${esc(i.id)}">${esc(i.label)}<span class="n">${count(i.id)}</span></button>`).join('');
+
+  // the ceiling. Solid chips act on a plate; dashed ones hold it.
+  const R = P.rates;
+  document.getElementById('ceil').innerHTML =
+    'Solid acts on the plate &middot; dashed holds it. The day is ' +
+    `<b>${R.day_min / 60} h</b>, and these are its ceilings:<br>` +
+    R.ceilings.map(c => `<b>${esc(c.what)} ${c.limit}</b> ${esc(c.per)}`)
+      .join('<span class="sep">&middot;</span>') +
+    `<br>One Bravo step costs <b>${R.bravo_96} min</b> on a 96-well plate and ` +
+    `<b>${R.bravo_384} min</b> on a 384 — four offset quadrant transfers with a 96-channel ` +
+    'head. That 4&times; is why so much of this page runs through the Echo.';
+
+  document.getElementById('legend').innerHTML = Object.entries(STATUS).map(([k, v]) =>
+    `<span><i class="dot" style="background:${v.c}"></i>${esc(k)} &mdash; ${esc(v.label)}</span>`).join('');
+
+  const chain = w => w.deck.map((d, i) => {
+    const label = INST[d] ? INST[d].label : d;
+    return (i ? '<span class="arr">&rarr;</span>' : '') +
+      `<span class="step" data-i="${esc(d)}">${esc(label)}</span>`;
+  }).join('');
+
+  const holds = w => {
+    const h = w.holds || [];
+    if (!h.length) return '';
+    return `<div class="holds"><span class="lbl">waits in</span>` + h.map(d =>
+      `<span class="hchip" data-i="${esc(d)}">${esc(INST[d] ? INST[d].label : d)}</span>`
+    ).join('') + `</div>`;
+  };
+
+  // what the workflow costs the day. build.py derives worst/runs/share from
+  // the three minute figures, so this never disagrees with the YAML.
+  const cost = w => {
+    const c = w.cost, parts = [];
+    if (c.bravo)  parts.push(`Bravo <b>${c.bravo} min</b>`);
+    if (c.echo)   parts.push(`Echo <b>${c.echo} min</b>`);
+    if (c.reader) parts.push(`reader <b>${c.reader} min</b>`);
+    const spend = parts.length ? parts.join(' &middot; ')
+                               : 'no time on the Bravo, the Echo or the reader';
+    // the share is of the three instruments priced above. Where something
+    // else binds first - shaking, a cycler - c.binds says so, and the
+    // runs-a-day figure is then an upper bound rather than the answer.
+    const run = c.runs
+      ? `<span class="bar"><i style="width:${Math.min(100, c.share)}%"></i></span>` +
+        `<b>${c.share}%</b> of a 20 h day, so those three allow <b>${c.runs}</b> a day`
+      : '';
+    return `<p class="cost">${spend}${run}` +
+           `<span class="lim">What actually limits it: ${esc(c.binds)}</span></p>`;
+  };
+
+  const card = w => {
+    const st = STATUS[w.status], ph = P.phases.find(p => p.id === w.phase);
+    const gates = (w.gates || []).map(g => `<span class="gate">${esc(g)}</span>`).join('');
+    const fmts = (w.formats || []).map(f =>
+      `<li><b>${esc(f.name)}</b> &mdash; ${esc(f.note)}</li>`).join('');
+    return `<article class="wf" style="border-left-color:${ph.c}" data-id="${esc(w.id)}">
+      <div>
+        <div class="id">${esc(w.id)}</div>
+        <div class="nm">${esc(w.name)}</div>
+        <div class="sb">${esc(w.sub)}</div>
+        <div class="tags">
+          <span class="pill" style="color:${st.c};border-color:${st.c}">${esc(w.status)}</span>
+          ${gates}
+        </div>
+      </div>
+      <div class="right">
+        <div class="chain">${chain(w)}</div>
+        ${holds(w)}
+        <div class="meta">
+          <span><b>${esc(w.gives)}</b></span>
+          <span>${esc(w.scale)}</span>
+          <span>${esc(w.time)}</span>
+          ${w.protocol ? `<span>${esc(w.protocol)}</span>` : ''}
+        </div>
+        ${cost(w)}
+        ${w.ends ? `<div class="ends">hands off to &rarr; ${esc(w.ends)}</div>` : ''}
+        <button class="rt" data-add="${esc(w.id)}" style="margin-top:9px">+ add to the day</button>
+        ${fmts ? `<ul class="fmts">${fmts}</ul>` : ''}
+        ${w.note ? `<p class="body">${esc(w.note)}</p>` : ''}
+        <details class="ins"><summary>what goes in &middot; ${w.inputs.length}</summary>
+          <dl>${w.inputs.map(x =>
+            `<dt>${esc(x.item)}</dt><dd>${esc(x.spec)}</dd>`).join('')}</dl></details>
+        ${w.blocked ? `<p class="warn">${esc(w.blocked)}</p>` : ''}
+      </div>
+    </article>`;
+  };
+
+  document.getElementById('phases').innerHTML = P.phases.map(ph => {
+    const mine = WF.filter(w => w.phase === ph.id);
+    if (!mine.length) return '';
+    return `<section class="phase" style="color:${ph.c}">
+      <h2>${esc(ph.label)}</h2>
+      <div class="cards" style="color:var(--ink)">${mine.map(card).join('')}</div>
+    </section>`;
+  }).join('');
+
+  // ---- the loops, drawn as loops ----
+  const WHERE = {
+    compute: {c:'#0072B2', label:'yours to build'},
+    rac:     {c:'#009E73', label:'on the Ginkgo'},
+    offrac:  {c:'#999999', label:'not there yet'}
+  };
+  const NS = 'http://www.w3.org/2000/svg';
+
+  // ---- plan a day: one workflow's cost is not a day, a chain is ----
+  const PH = Object.fromEntries(P.phases.map(x => [x.id, x]));
+  const BY = Object.fromEntries(WF.map(w => [w.id, w]));
+  const COST = [['bravo', 'Bravo'], ['echo', 'Echo'], ['reader', 'PHERAstar']];
+  let plan = [];   // [{id, n}]
+
+  document.getElementById('plan-lede').textContent =
+    'Pick a route, or build a chain. Minutes are modelled off Ginkgo’s own throughput figures '
+    + 'against a ' + (R.day_min / 60) + '-hour day — trust the ratio between two chains more than '
+    + 'either absolute number.';
+
+  document.getElementById('routes').innerHTML =
+    P.routes.map(r => `<button class="rt" data-r="${esc(r.id)}" title="${esc(r.sub)}">${esc(r.name)}</button>`).join('')
+    + `<button class="rt clr" data-r="">clear</button>`;
+
+  function setRoute(id) {
+    const r = P.routes.find(x => x.id === id);
+    plan = r ? r.steps.map(s => ({ id: s, n: 1 })) : [];
+    document.querySelectorAll('.rt').forEach(b => b.classList.toggle('on', b.dataset.r === id && !!id));
+    draw();
+  }
+
+  function draw() {
+    const ce = document.getElementById('chain-edit');
+    ce.innerHTML = plan.length ? plan.map((s, i) => {
+      const w = BY[s.id], ph = PH[w.phase];
+      return `<span class="pill2" style="border-left:3px solid ${ph.c}">
+        <span>${esc(w.id)} ${esc(w.name)}</span>
+        <button class="s" data-d="${i}" aria-label="one fewer">&minus;</button>
+        <span class="n">&times;${s.n}</span>
+        <button class="s" data-u="${i}" aria-label="one more">+</button>
+        <button class="x" data-rm="${i}" aria-label="remove">&times;</button></span>`;
+    }).join('') : `<span class="empty2">Nothing chained yet — pick a route above, or add from any card below.</span>`;
+
+    const tot = { bravo: 0, echo: 0, reader: 0 };
+    plan.forEach(s => COST.forEach(([k]) => { tot[k] += (BY[s.id].cost?.[k] || 0) * s.n; }));
+    const worst = Math.max(...COST.map(([k]) => tot[k]), 0);
+
+    document.getElementById('bars').innerHTML = COST.map(([k, label]) => {
+      const pct = Math.min(100, tot[k] / R.day_min * 100);
+      const col = tot[k] === worst && worst > 0 ? '#D55E00' : '#0072B2';
+      return `<div class="barrow"><span class="nm2">${esc(label)}</span>
+        <span class="track"><i style="width:${pct.toFixed(1)}%;background:${col}"></i></span>
+        <span class="v2">${tot[k]} min &middot; ${pct.toFixed(0)}%</span></div>`;
+    }).join('');
+
+    const v = document.getElementById('verdict');
+    if (!plan.length) { v.innerHTML = ''; return; }
+    const binder = COST.find(([k]) => tot[k] === worst);
+    const rounds = worst > 0 ? Math.floor(R.day_min / worst) : Infinity;
+    const culture = plan.map(s => BY[s.id]).filter(w => /Cytomat/i.test(w.cost?.binds || ''));
+    v.innerHTML =
+      `<b>${esc(binder[1])}</b> is the binding instrument at <b>${worst} min</b>, so this chain runs `
+      + `<b>${rounds === Infinity ? '—' : rounds}×</b> in a ${R.day_min / 60}-hour day.`
+      + (culture.length ? `<br><span class="cult">But ${esc(culture[0].id)} cultures.</span> `
+          + esc(culture[0].cost.binds) + ' — a concurrency cap, not a minutes one, so the day'
+          + ' arithmetic above does not describe it.' : '');
+  }
+
+  document.getElementById('routes').addEventListener('click', e => {
+    const b = e.target.closest('[data-r]'); if (b) setRoute(b.dataset.r);
+  });
+  document.getElementById('chain-edit').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.rm !== undefined) plan.splice(+b.dataset.rm, 1);
+    else if (b.dataset.u !== undefined) plan[+b.dataset.u].n++;
+    else if (b.dataset.d !== undefined && plan[+b.dataset.d].n > 1) plan[+b.dataset.d].n--;
+    document.querySelectorAll('.rt').forEach(x => x.classList.remove('on'));
+    draw();
+  });
+  document.addEventListener('click', e => {
+    const a = e.target.closest('[data-add]'); if (!a) return;
+    const hit = plan.find(s => s.id === a.dataset.add);
+    hit ? hit.n++ : plan.push({ id: a.dataset.add, n: 1 });
+    document.querySelectorAll('.rt').forEach(x => x.classList.remove('on'));
+    draw();
+    document.querySelector('.plan').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+  setRoute(P.routes[0].id);
+
+  function loopSvg(lp) {
+    const n = lp.steps.length, VW = 840, PAD = 8;
+    const gap = 16, W = (VW - PAD * 2 - gap * (n - 1)) / n, H = 40, Y = 8;
+    const mk = 'lpar-' + lp.id, parts = [];
+    lp.steps.forEach((st, i) => {
+      const x = PAD + i * (W + gap), c = WHERE[st.where].c;
+      parts.push(`<rect x="${x}" y="${Y}" width="${W}" height="${H}" rx="8" fill="${c}"
+        fill-opacity="var(--fillop)" stroke="${c}" stroke-width="1.2"/>`);
+      parts.push(`<text x="${x + W / 2}" y="${Y + H / 2 + 4.5}" text-anchor="middle"
+        class="lp-lbl">${esc(st.label)}</text>`);
+      if (i < n - 1) parts.push(`<line x1="${x + W + 3}" y1="${Y + H / 2}"
+        x2="${x + W + gap - 3}" y2="${Y + H / 2}" stroke="var(--muted)" stroke-width="1.3"
+        marker-end="url(#${mk})"/>`);
+    });
+    // the return path: last box down, back along the bottom, up into the first
+    const x0 = PAD + W / 2, xN = PAD + (n - 1) * (W + gap) + W / 2, by = Y + H + 22;
+    parts.push(`<path d="M${xN} ${Y + H + 2} L${xN} ${by} L${x0} ${by} L${x0} ${Y + H + 4}"
+      fill="none" stroke="var(--muted)" stroke-width="1.3" marker-end="url(#${mk})"/>`);
+    parts.push(`<text x="${VW / 2}" y="${by + 15}" text-anchor="middle" class="lp-arc"
+      >closes in ${esc(lp.closes)}</text>`);
+    return `<svg viewBox="0 0 ${VW} ${by + 22}" role="img"
+      aria-label="${esc(lp.name)}, closes in ${esc(lp.closes)}">
+      <defs><marker id="${mk}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7"
+        markerHeight="7" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none"
+        stroke="var(--muted)" stroke-width="1.6" stroke-linecap="round"
+        stroke-linejoin="round"/></marker></defs>${parts.join('')}</svg>`;
+  }
+
+  document.getElementById('lintro').textContent =
+    'Five, nested, each returning something different. Colour is where each step happens.';
+  document.getElementById('loops').innerHTML = (P.loops || []).map(lp =>
+    `<article class="loop">
+       <div class="hd"><h3>${esc(lp.name)}</h3><span class="closes">${esc(lp.steps.length)} steps</span></div>
+       <div class="scroll">${loopSvg(lp)}</div>
+       <p class="rt">${esc(lp.returns)}</p>
+     </article>`).join('');
+
+  document.getElementById('wlegend').innerHTML = Object.values(WHERE).map(w =>
+    `<span><i class="dot" style="background:${w.c}"></i>${esc(w.label)}</span>`).join('');
+
+  // click an instrument: dim every workflow that does not use it
+  let sel = null;
+  const role = document.getElementById('role');
+  document.getElementById('insts').addEventListener('click', e => {
+    const b = e.target.closest('.ichip'); if (!b) return;
+    sel = (sel === b.dataset.i) ? null : b.dataset.i;
+    document.querySelectorAll('.ichip').forEach(c =>
+      c.setAttribute('aria-pressed', String(c.dataset.i === sel)));
+    role.innerHTML = sel
+      ? `<b>${esc(INST[sel].label)}</b> &mdash; ${esc(INST[sel].role)}` +
+        `<span class="sp">${esc(INST[sel].spec)}</span>`
+      : '';
+    document.querySelectorAll('.wf').forEach(c => {
+      const w = WF.find(x => x.id === c.dataset.id);
+      c.classList.toggle('dim', !!sel && !uses(w, sel));
+    });
+    document.querySelectorAll('.step, .hchip').forEach(s => {
+      s.classList.toggle('on', !!sel && s.dataset.i === sel);
+      s.classList.toggle('off', !!sel && s.dataset.i !== sel);
+    });
+  });
+})();
+</script>
+</body>
+</html>

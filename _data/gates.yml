@@ -1,0 +1,301 @@
+# The nine gates.
+# A run ends in a verdict, not data.
+# Every gate has three outcomes. Ambiguous is where campaigns die quietly.
+# Criteria are fixed BEFORE the run.
+# All nine were set with Sofia on 2026-11-17 and every one carries a note
+# saying where its number came from. None is a convention borrowed unexamined.
+# Two are capacity statements rather than quality ones (D7's n, and D5's
+# determined window, which follows from D2's mass floor). One rank is
+# explicitly unvalidated and says so (D0).
+
+gates:
+
+  - id: D0
+    name: Onboard this target?
+    measure: >-
+      four hard preconditions first, each one the precondition of a later gate;
+      then a rank among the targets that clear all four
+    pass: >-
+      all four preconditions met - (1) a structure of the target domain, either
+      experimental or predicted at pLDDT >= 85 across the intended epitope;
+      (2) a definable hotspot set with at least one residue that can be
+      alanine-substituted without unfolding the domain; (3) at least one close
+      homolog that can be expressed, to counter-screen against; (4) expression
+      evidence for the target or a close homolog in any system
+    fail: any one precondition missing
+    ambiguous: >-
+      a precondition met only weakly - predicted structure at pLDDT 80-85, a
+      homolog that exists but has never been expressed, or a hotspot set whose
+      mutability is untested
+    then: {pass: assign expression route, fail: decline, ambiguous: feasibility run}
+    by: human
+    note: >-
+      Set 2026-11-17. NOT A COMPOSITE SCORE WITH A CUTOFF, and that is
+      deliberate. The project already has one measured instance of a composite
+      score that filtered acceptably and ranked below a coin flip - Boltz-2
+      ipSAE at ROC AUC 0.43 on 30 measured binders. Onboarding is a scarcer,
+      slower decision than ordering a design, so an unvalidated weighted score
+      is a worse idea here, not a better one.
+      THE PRECONDITIONS ARE NOT A WISHLIST. Each is the precondition of a gate
+      that would otherwise fail late and expensively: (1) and (2) are what D6
+      needs - without a mutable hotspot the wrong-face gate cannot run at all,
+      and md1_baseline is what that costs; (3) is what D4's counter-target and
+      D7's selectivity term need; (4) stands in for the Aim 1 expression model,
+      which is an OUTPUT of year 1 and so cannot gate year 1's intake.
+      THE RANK IS EXPLICITLY UNVALIDATED. Order the survivors however seems
+      sensible, but RECORD THE RANK AND THE OUTCOME for every onboarded target,
+      so that at the end of year 1 the ranking can be tested against what
+      actually expressed and bound. That test is the one Boltz-2 ipSAE failed,
+      and running it is the only thing that turns this rank into a metric.
+      WHERE AMBIGUOUS STOPS AND FAIL STARTS, settled 2026-11-19. The line is
+      drawn at MISSING, not at a count of weak answers. Any precondition
+      answered "no" declines the proposal however strong the other three are -
+      three met plus one missing is a decline, not a feasibility run. With
+      nothing missing it is ambiguous no matter how many are weak, including
+      one met and three weak, because a weak answer is evidence that can be
+      strengthened and a missing one is not. All four unanswered is
+      undetermined rather than a fail. intake.html scores exactly this.
+
+  - id: D1
+    name: Does it express?
+    measure: >-
+      ug/mL per condition, converted from RFU against the GFP11 standard
+      curve; reject the plate if the curve fits at R2 < 0.98
+    pass: at least one condition >= 5 ug/mL in >=3 of 4 replicates
+    fail: no condition reaches 5 ug/mL at any temperature, on any route
+    ambiguous: clears 5 ug/mL in exactly 2 of 4 replicates, or only at an edge temperature
+    then: {pass: "fix condition, proceed", fail: "stop, log route failure", ambiguous: "repeat that arm"}
+    by: agent
+    note: >-
+      5 ug/mL is the NanoBiT entry floor, set 2026-11-17. The screen is
+      tiered - NanoBiT reads crude cell-free with no purification, so D1 only
+      has to put the design above the assay's working range. At ~14 kDa
+      (75 aa design plus the GGGS/GFP11/GGGS/Twin-Strep cassette), 5 ug/mL is
+      ~360 nM in the reaction, which still gives >=10 nM in the assay well at
+      a 20x dilution with margin. It is deliberately low: D1 is the cheap,
+      inclusive gate and its failures are training data. The expensive
+      resource is purified protein, and that floor lives on D2.
+      This number does NOT depend on the production reaction volume, which is
+      what makes it settleable before express.cfps.production96 is written.
+
+  - id: D2
+    name: Is the protein usable?
+    measure: >-
+      concentration by GFP11 complementation against the same standard curve
+      as D1, plus fluorescence polarisation on the complemented species -
+      both on the PHERAstar, one plate, two reads
+    pass: ">= 2.25 ug purified per design AND FP within 10 mP of the on-plate monomer control, either side"
+    fail: >-
+      below 2.25 ug, or FP more than 25 mP ABOVE the monomer control
+      (aggregated), or more than 20 mP BELOW it - the design has been cleaved
+      off its tag and what was purified is the GFP11-Strep peptide
+    ambiguous: FP 10-25 mP from the monomer control in either direction, or 2.25 ug reached in only one replicate
+    then: {pass: release to assay, fail: repurify once, ambiguous: subset SDS-PAGE}
+    by: agent
+    note: >-
+      Set 2026-11-17. Three things changed here and the reasons matter.
+      CONCENTRATION is read by GFP11 complementation, not A280. At the 2 ug
+      floor in a 50 ug/mL eluate a typical design (1 Trp, 2 Tyr, eps280 ~8730)
+      gives A280 = 0.012 against ~0.005 AU of reader noise - unmeasurable, and
+      it varies several-fold design to design with aromatic content, which
+      would make designs incomparable. GFP11 reads the same way for every
+      design and on the same curve as D1. A280 is still recorded alongside,
+      as a cross-check, where the design's own computed eps280 puts it above
+      about 0.05 AU.
+      The A260/A280 CHECK IS DROPPED from this gate: it is a ratio of two
+      near-noise numbers here, and residual nucleic acid does not interfere
+      with NanoBiT or HTRF. It belongs on the structure path, where it does.
+      The FP WINDOW IS NARROW and that is physics, not a tuning problem. With
+      GFP's ~3 ns lifetime on a ~41 kDa complemented species, Perrin gives
+      427 mP for the monomer against a 490 mP ceiling: dimer +29, trimer +40,
+      gross aggregate +63. So 25 mP is most of the way to a dimer and the
+      gate detects aggregation, not oligomer-level change. Confirm the
+      monomer control's actual mP on the first real plate at D3.
+      THE WINDOW IS TWO-SIDED, added 2026-11-17. Both the reporter and the
+      purification tag sit C-terminal to the design in the standing cassette,
+      so a design proteolysed off its tag leaves a GFP11-Strep peptide that
+      still complements GFP1-10 and still binds the beads: the concentration
+      read passes and the well is labelled as 2 ug of a design it does not
+      contain. DTU excluded 2 of 30 designs for exactly this, by gel. The
+      cleaved species is ~27 kDa against the intact 41 kDa, which puts it
+      27 mP BELOW the monomer - about 6 sigma, the same size as the dimer
+      shift above it. The read was already being taken; it just has to look
+      down as well as up. See reference/design-quality-invariants.md.
+
+  - id: D3
+    name: Does the assay have a window?
+    measure: Z' and signal/background on a known binder plus no-binder control
+    pass: Z' >= 0.5 and S/B >= 3        # Z' >= 0.5 is the standard convention
+    fail: Z' < 0.3
+    ambiguous: 0.3 <= Z' < 0.5
+    then: {pass: "release designs", fail: "reformat assay, commit nothing", ambiguous: "repeat on fresh target prep"}
+    by: agent_proposes_human_confirms
+    note: no design batch is committed before this gate passes
+
+  - id: D4
+    name: Which designs bind?
+    measure: >-
+      fold-activation per design - its own +target well over its own -target
+      well, which cancels expression - then a robust z of those folds across
+      the plate, z = (fold - median) / (1.4826 * MAD). Counter-target and
+      non-binder controls are on the same plate and are recorded, not gated
+      on here
+    pass: "z >= 3.0 AND fold >= 2.0, in >=2 of 3 replicates, with all decoys silent"
+    fail: below both, with the -target well at floor
+    ambiguous: >-
+      clears one condition but not the other (z >= 3.0 with fold 1.5-2.0, or
+      fold >= 2.0 with z 2.0-3.0), or -target elevated, or any decoy fired,
+      or the design was below the D1 floor
+    then: {pass: to dose-response, fail: record as measured negative, ambiguous: to dose-response}
+    by: agent
+    note: >-
+      Set 2026-11-17. The AND is strict and the routing is permissive, on
+      purpose: the strict pass keeps the TRAINING LABEL clean, while the
+      ambiguous band still goes to D5, so recall is not lost. That matters
+      because the two error types are not symmetric here. A false positive
+      costs one dose-response on a plate that holds 24 of them - about 11
+      minutes. A false negative enters the Aim 2 training set as a measured
+      negative and teaches the model that a real binder is not one. Across
+      1,000 designs at an 8% hit rate the whole z=2 to z=4 range differs by
+      ~21 dose-responses and ~10 minutes of reader time, so strictness buys
+      very little and the ambiguous route is what protects recall.
+      The comparator is PER DESIGN, not a plate-level non-binder control,
+      because expression varies design to design - the DTU cell-free study
+      names unnormalised expression as the reason an earlier method missed a
+      low-micromolar binder.
+      Fold >= 2.0 is the CF2H precedent and it is still arbitrary; the robust
+      z is what makes it noise-aware. Counter-target fold is recorded per
+      design and carried to D6; a design that fires as hard on the
+      counter-target is flagged promiscuous and still goes to D5, because
+      cross-reactivity against MD2/MD3 is a result worth measuring rather
+      than discarding.
+      THE STANDING PROMISCUITY PANEL, added 2026-11-17. Every design is also
+      read against three unrelated proteins that never change between
+      campaigns or labs - lysozyme, ubiquitin and MBP, chosen to span charge
+      and size - in triplicate, at the same concentration as the target.
+      Record the fold on each, the PANEL-FIRE FRACTION, and the SPECIFICITY
+      INDEX = target fold / max panel fold. This RECORDS, it does not gate: a
+      promiscuous design still goes to D5. The counter-target above is a
+      campaign-specific homolog and its number means nothing to another lab;
+      the panel is the same measurement on every design the foundry ever
+      makes, which is what makes it the experimental analogue of ipAE.
+      DECOYS ARE NOT THIS - a decoy here is a control DESIGN, and designs are
+      never read against decoys. Costs 0.25 ug per design, which is why D2's
+      floor is 2.25 ug and not 2. See reference/design-quality-invariants.md.
+      Failures are training data, never discarded.
+
+  - id: D5
+    name: Are the hits real?
+    measure: >-
+      four-parameter logistic on a 12-point, 3-fold titration topping at
+      1 uM, in triplicate. Report K_D with its 95% CI, the Hill slope and R2
+    pass: >-
+      fit converges, R2 >= 0.95, Hill slope 0.7-1.5, and dose dependence
+      established. K_D is reported as a VALUE when it falls inside the
+      determined window of 0.5-100 nM, and as a LOWER BOUND above it
+    fail: no dose dependence - the fit is no better than a flat line
+    ambiguous: >-
+      R2 0.90-0.95, or Hill slope outside 0.7-1.5, or bi-phasic, or K_D below
+      0.5 nM, which is the tight-binding limit rather than a real number
+    then: {pass: "to selectivity if K_D determined, else to affinity maturation with the bound", fail: "drop, record as measured negative", ambiguous: "expand concentration series"}
+    by: agent
+    note: >-
+      Set 2026-11-17. THE DETERMINED WINDOW IS 0.5-100 nM and it is set by
+      the D2 mass floor, not by the assay chemistry. The lower limit is half
+      the fixed component (1 nM target); the upper is the top of the titration
+      over ten, because you need the plateau. Raising the top to 10 uM would
+      put the window at 0.5-1000 nM but costs 12.6 ug of protein per design
+      against D2's 2 ug floor, so it is a per-design exception, not the
+      default.
+      A WEAK BINDER IS STILL A BINDER. Real dose dependence with K_D above
+      100 nM passes with a lower bound and goes to affinity maturation, which
+      is what the maturation loop is for. Failing it would put a true binder
+      into the Aim 2 training set as a negative - the same error D4 is built
+      to avoid.
+      ON R2, HONESTLY: Sofia chose R2 >= 0.95 as the fit gate on 2026-11-17.
+      It should be read as a gross-misfit catch and not as evidence that a
+      K_D is determined. Simulated 12-point titrations at 5% noise return
+      R2 = 0.997 for K_D = 1 nM and R2 = 0.997 for K_D = 2 uM, where only the
+      foot of the curve is visible - R2 >= 0.95 passes both. What separates
+      them is the 95% CI on K_D: 1.2x against 12.2x. The CI is therefore
+      REPORTED on every fit even though it does not gate, and the explicit
+      0.5-100 nM window above is what actually catches the undetermined case.
+      One case neither statistic catches: at K_D = 500 nM the fit returned
+      334 nM with a 1.3x CI and R2 = 0.9985 - tight-looking and a third low,
+      because the plateau was never reached. That is the window's whole job.
+
+  - id: D6
+    name: Does it bind where it was designed to?
+    measure: >-
+      single-point signal against a HOTSPOT ALANINE POINT-MUTANT of the target
+      itself, beside wild-type target on the same plate, with each design read
+      at ITS OWN K_D from D5. Homolog panel recorded alongside for selectivity
+    pass: ">= 70% signal loss against the mutant, with the mutant-target control still active"
+    fail: < 25% loss - indistinguishable from no contact, so it binds a different face
+    ambiguous: 25-70% loss, or the mutant-target control is dead or weakened
+    then: {pass: "to structure queue", fail: "drop, feed back to design filters", ambiguous: "second mutant"}
+    by: agent_proposes_human_confirms
+    note: >-
+      Set 2026-11-17. A generic counter-target cannot catch a wrong-face
+      binder. This gate is why, and md1_baseline is the reason it exists -
+      both of its ranked designs had Hotspot_Contact_Fraction = 0.00 against
+      an off-epitope median of 0.71.
+      READ EACH DESIGN AT ITS OWN K_D. This matters as much as the threshold:
+      the same 10x affinity shift shows 82% signal loss at K_D but only 22% at
+      30x K_D, so a fixed plate-wide concentration would fail tight binders
+      for being tight. D5 has just measured every K_D and the Echo sets the
+      concentration per well, so this costs nothing.
+      THE NUMBERS. At [design] = K_D the wild-type occupancy is 0.5, so signal
+      loss maps onto energy: 0.5 kcal/mol gives 40%, 1.0 gives 69%, 1.5 gives
+      85%, and the Clackson-Wells 2 kcal/mol hotspot definition gives 93%.
+      70% is therefore about 1 kcal/mol and a 5.4x K_D shift - a real contact,
+      and 5 sigma clear of zero at the ~10% noise of the assay. The 25% floor
+      is ~2.5 sigma, which is as close to "no drop" as the plate can resolve.
+      THE CONTROL IS NOT OPTIONAL. With a single mutant, a target that the
+      mutation has unfolded or inactivated gives total signal loss for every
+      design, and every design passes. The mutant plate must therefore carry a
+      reference ligand or a known binder and show it is still engaged; if that
+      control is dead or weakened, the gate is ambiguous, not pass.
+      One mutant is the default by decision; a partial drop escalates to a
+      second mutant rather than being resolved by guessing which residue of a
+      patch the design actually used.
+      Weak binders do not normally arrive here - D5 routes a K_D known only as
+      a lower bound to affinity maturation, and without a real K_D the
+      read-at-K_D rule above cannot be applied.
+
+  - id: D7
+    name: Which hits earn a structure?
+    measure: >-
+      rank on K_D determined at D5, selectivity from D6's mutant drop and the
+      homolog panel, and whether the design can be made offline at milligram
+      scale and 10 mg/mL
+    pass: "top 4 per campaign round, by the capacity rule in the note"
+    fail: below the top 4 - hold, do not drop
+    ambiguous: high affinity but no evidence it can be made at scale
+    then: {pass: crystallisation screen, fail: hold, ambiguous: re-express at scale}
+    by: human
+    note: >-
+      Set 2026-11-17. N IS CAPACITY, NOT QUALITY. Everything that follows
+      this gate is offline: the RAC does not make crystallography protein, it
+      screens it, so each design needs 1-2 bench days of expression to
+      milligram scale at 10 mg/mL, and about 3 trays.
+      The binding constraint today is HAND IMAGING at 48.9 h per 80 trays,
+      about 0.61 h a tray. At a sustainable 12 trays a week that is 4 designs
+      a round. Tray residency is not the limit - the AmbiStore holds 100-150
+      standard positions, which is 33-50 designs resident - and Echo drop
+      setting is not the limit either, at 9 min a tray, 11.5 h for 80 trays
+      against 48.9 h of hand scoring.
+      So n = 4 is a statement about hands, not about designs. RECOMPUTE IT
+      when the imagers and automated scoring arrive, which are still unquoted;
+      the rule is trays-imaged-per-week divided by 3.
+      Below the top 4 is HOLD, not drop. These are confirmed, epitope-verified
+      binders and the constraint is this round's capacity.
+
+  - id: D8
+    name: Does the solved interface match the model?
+    measure: contact overlap and interface RMSD, solved vs designed
+    pass: designed hotspots present in the solved interface
+    fail: different interface
+    ambiguous: partial overlap
+    then: {pass: "retrain, promote filters", fail: "retrain, demote filters", ambiguous: "flag for review"}
+    by: human

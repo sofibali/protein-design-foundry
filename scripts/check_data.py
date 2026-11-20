@@ -65,10 +65,21 @@ def main():
             if not i.get("role"):
                 fail(key, "quoted instrument with no role")
 
+    # A cart that is installed must carry something. A phase2 cart is a
+    # position the layout reserves, so it is allowed to be empty - that is
+    # what reserving it means.
     placed = [i["rac"] for i in instruments["instruments"] if i["status"] == "quoted"]
-    for rid in sorted(rac_ids):
-        if rid not in placed:
-            fail("instruments.yml", f"cart {rid} has no instrument on it")
+    reserved = {r["id"] for r in instruments["racs"] if r.get("status") == "phase2"}
+    for r in instruments["racs"]:
+        if r["id"] not in placed and r["id"] not in reserved:
+            fail("instruments.yml", f"cart {r['id']} is installed but has no instrument on it")
+
+    # instruments.yml is generated. If someone edits it by hand the next build
+    # silently reverts them, so say so rather than let them find out later.
+    head = (ROOT / "_data/instruments.yml").read_text(errors="replace")[:200]
+    if "GENERATED" not in head:
+        fail("instruments.yml", "missing its GENERATED header - it is written by "
+                                "scripts/build_pages.py from _data/protocols.yml")
 
     seen = set()
     for d in decisions["decisions"]:
@@ -131,6 +142,19 @@ def main():
     for i in instruments["instruments"]:
         if i["status"] == "quoted" and i["key"] not in documented:
             note(i["key"], "quoted instrument with no spec sheet")
+
+    # the device set, the gates and the workflows, checked against each other
+    # by the same code that builds the pages
+    try:
+        sys.path.insert(0, str(ROOT / "scripts"))
+        import build_pages
+        g, st, pr = build_pages.load()
+        build_pages.check(g, st, pr)
+    except SystemExit:
+        fail("build_pages.check", "the device set, gates and workflows disagree - "
+                                  "run python3 scripts/build_pages.py for the detail")
+    except Exception as exc:                      # a missing file, a YAML error
+        fail("build_pages.check", f"could not run: {exc}")
 
     print(f"{len(keys)} instruments on {len(rac_ids)} carts, "
           f"{len(decisions['decisions'])} decisions, {len(projects)} projects, "

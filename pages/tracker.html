@@ -1,0 +1,284 @@
+<title>Foundry Readiness</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: date rail across the top, then a two-column register — list left, inspector right. */
+:root{
+  --bg:#f2f4f6; --panel:#ffffff; --sunk:#e8ecf0; --ink:#13202b; --muted:#5a6b7a; --line:#d2dae1;
+  --accent:#0072B2;            /* Okabe-Ito blue, as used in the foundry pages */
+  --ok:#009E73; --warn:#E69F00; --stop:#D55E00; --idle:#8e8e93; --person:#CC79A7;
+  --font-ui:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --font-data:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e151b; --panel:#17212a; --sunk:#111a21; --ink:#e4ecf2; --muted:#93a5b3; --line:#2a3845;
+  --accent:#58a6e8; --ok:#3fc39b; --warn:#e8b14a; --stop:#f0794b; --idle:#78848e; --person:#e08cc0;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e151b; --panel:#17212a; --sunk:#111a21; --ink:#e4ecf2; --muted:#93a5b3; --line:#2a3845;
+  --accent:#58a6e8; --ok:#3fc39b; --warn:#e8b14a; --stop:#f0794b; --idle:#78848e; --person:#e08cc0;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-ui);font-size:14.5px;line-height:1.5;
+     padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1{font-size:25px;font-weight:700;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.lede{color:var(--muted);margin:3px 0 0;max-width:68ch}
+header .meta{font-family:var(--font-data);font-size:11.5px;color:var(--muted);margin-top:8px;display:flex;flex-wrap:wrap;gap:4px 14px}
+.num{font-variant-numeric:tabular-nums}
+
+/* date rail */
+.rail{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 4px 4px;overflow-x:auto}
+.rail h2,.reg h2,.ready h2{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600;margin:0 0 10px;padding:0 12px}
+.rail-track{display:flex;gap:0;min-width:620px;padding:0 12px 14px;position:relative}
+.rail-track::before{content:"";position:absolute;left:12px;right:12px;top:7px;height:2px;background:var(--line)}
+.mile{flex:1;position:relative;padding-top:22px;padding-right:12px;min-width:0}
+.mile .dot{position:absolute;top:1px;left:0;width:14px;height:14px;border-radius:50%;background:var(--panel);border:3px solid var(--idle)}
+.mile.hot .dot{border-color:var(--stop)}
+.mile.soon .dot{border-color:var(--warn)}
+.mile .d{font-family:var(--font-data);font-size:11.5px;font-weight:600;letter-spacing:-.01em}
+.mile .w{font-size:12.5px;color:var(--muted);margin-top:1px}
+.mile .away{font-family:var(--font-data);font-size:10.5px;color:var(--muted);opacity:.8}
+
+/* filters */
+.bar{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.grp{display:flex;flex-wrap:wrap;gap:5px;align-items:center;min-width:0}
+.grp b{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--panel);color:inherit;
+      border-radius:999px;padding:3px 11px;font-size:12.5px;cursor:pointer;font-family:inherit}
+.chip .sw{width:9px;height:9px;border-radius:50%;flex:none}
+.chip.off{opacity:.42}
+.chip:hover{border-color:var(--accent)}
+.chip:focus-visible,.row:focus-visible,.sbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* register */
+.main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+.reg,.ready,aside .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 0}
+.grouphead{display:flex;align-items:baseline;gap:9px;padding:14px 14px 6px;border-top:1px solid var(--line);margin-top:8px}
+.grouphead:first-of-type{border-top:0;margin-top:0;padding-top:2px}
+.grouphead h3{font-size:14.5px;margin:0;font-weight:600}
+.grouphead .who{font-size:12px;color:var(--muted)}
+.grouphead .n{margin-left:auto;font-family:var(--font-data);font-size:11.5px;color:var(--muted)}
+.row{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:3px 10px;padding:8px 14px;cursor:pointer;
+     border:0;background:none;width:100%;text-align:left;font:inherit;color:inherit;border-top:1px solid var(--sunk)}
+.row:hover{background:var(--sunk)}
+.row.sel{background:var(--sunk);box-shadow:inset 3px 0 0 var(--accent)}
+.row .code{font-family:var(--font-data);font-size:11.5px;color:var(--muted);padding-top:2px}
+.row .t{font-weight:500;min-width:0}
+.row .b{grid-column:2;font-size:12.5px;color:var(--muted);min-width:0}
+.pill{font-family:var(--font-data);font-size:10px;text-transform:uppercase;letter-spacing:.05em;border:1px solid currentColor;
+      border-radius:4px;padding:1px 6px;white-space:nowrap;align-self:start;margin-top:2px}
+.s-open{color:var(--stop)} .s-sent{color:var(--warn)} .s-running{color:var(--accent)}
+.s-answered{color:var(--ok)} .s-decided{color:var(--ok)} .s-done{color:var(--idle)}
+.due{font-family:var(--font-data);font-size:10.5px;color:var(--muted);margin-top:3px;text-align:right}
+.due.hot{color:var(--stop);font-weight:600}
+
+/* inspector */
+aside{display:flex;flex-direction:column;gap:12px;position:sticky;top:12px}
+aside .card{padding:14px}
+aside h3{margin:0;font-size:17px;letter-spacing:-.01em;text-wrap:balance}
+aside .code{font-family:var(--font-data);font-size:11.5px;color:var(--accent);font-weight:600}
+aside p{margin:9px 0 0;font-size:13.5px}
+aside .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin-top:14px}
+.sbtns{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.sbtn{border:1px solid var(--line);background:var(--panel);color:inherit;border-radius:7px;padding:4px 10px;
+      font-size:12.5px;cursor:pointer;font-family:inherit}
+.sbtn:hover{border-color:var(--accent)}
+.sbtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ro{font-size:12.5px;color:var(--muted);margin-top:10px}
+
+/* readiness */
+.ready{padding:14px}
+.rchk{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;padding:8px 0;border-top:1px solid var(--sunk)}
+.rchk:first-of-type{border-top:0}
+.rchk .mark{width:17px;height:17px;border-radius:5px;border:2px solid var(--line);margin-top:2px}
+.rchk.pass .mark{background:var(--ok);border-color:var(--ok)}
+.rchk .n2{font-weight:500;font-size:13.5px}
+.rchk .t2{grid-column:2;font-size:12.5px;color:var(--muted)}
+.prog{height:5px;background:var(--sunk);border-radius:3px;overflow:hidden;margin:4px 0 12px}
+.prog i{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+.empty{padding:34px 16px;text-align:center;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:5px}
+footer{color:var(--muted);font-size:12px;font-family:var(--font-data);padding-bottom:6px}
+@media (max-width:900px){.main{grid-template-columns:1fr}aside{position:static}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <h1>Foundry Readiness</h1>
+  <p class="lede">Every open decision, question and piece of work between here and the April 2027 install, sorted by who can actually answer it. Settled decisions are not listed: heat shock, transformation and plating on the RAC, and <em>E. coli</em> expression are all confirmed and closed.</p>
+  <div class="meta"><span id="m-count">loading the register…</span><span id="m-owner"></span></div>
+</header>
+
+<section class="rail">
+  <h2>Timeline</h2>
+  <div class="rail-track" id="rail"></div>
+</section>
+
+<div class="bar">
+  <div class="grp"><b>Owner</b><span id="f-owner"></span></div>
+  <div class="grp"><b>State</b><span id="f-status"></span></div>
+</div>
+
+<div class="main">
+  <section class="reg" id="reg">
+    <div class="empty"><b>Nothing loaded yet</b>The register lives in this page's shared database, so everyone you share the link with sees the same state. If this message stays, you may be signed out.</div>
+  </section>
+
+  <aside>
+    <div class="card" id="insp">
+      <div class="code">SELECT AN ITEM</div>
+      <h3>The register, item by item</h3>
+      <p>Pick any row to see what it blocks and move it along. Changes save for everyone with the link.</p>
+    </div>
+    <div class="ready">
+      <h2 style="padding:0">Readiness</h2>
+      <div class="prog"><i id="rbar"></i></div>
+      <div id="rlist"></div>
+    </div>
+  </aside>
+</div>
+
+<footer id="foot">UCSF protein design foundry · audit of 2026-11-17 · install April 2027</footer>
+</div>
+
+<script>
+const OWNERS={
+  sofia:{label:"Sofia decides",who:"nobody else can",color:"var(--person)"},
+  ginkgo:{label:"Ginkgo answers",who:"sent, then waited on",color:"var(--accent)"},
+  vendor:{label:"Vendors answer",who:"BMG, Fida, Agilent, Twist, IDT, IBA",color:"var(--warn)"},
+  us:{label:"Work we can just do",who:"no permission needed",color:"var(--ok)"},
+  agent:{label:"Agents",who:"running or ready to start",color:"var(--idle)"}
+};
+const STATUS={
+  open:{label:"open",cls:"s-open"}, sent:{label:"sent",cls:"s-sent"},
+  running:{label:"running",cls:"s-running"}, answered:{label:"answered",cls:"s-answered"},
+  decided:{label:"decided",cls:"s-decided"}, done:{label:"done",cls:"s-done"}
+};
+const CLOSED=new Set(["answered","decided","done"]);
+const DATES=[
+  {d:"2026-12-15",w:"Echo model settled",why:"device swap is about two months"},
+  {d:"2027-01-28",w:"PHERAstar quote expires",why:"worth deciding the laser before this"},
+  {d:"2027-01-31",w:"Second 384 ATC, NGS path",why:"integration lead time before install"},
+  {d:"2027-02-28",w:"Twelve protocols exist in draft",why:"Ginkgo writes against them under Apex"},
+  {d:"2027-04-01",w:"Install",why:"year one starts here"}
+];
+const READY=[
+  {n:"R1 Every gate executable",t:"zero TODO thresholds in gates.yml",key:i=>i.code==="S1"},
+  {n:"R2 Every workflow has a protocol",t:"12 of 14 are missing today",key:i=>i.code==="W1"},
+  {n:"R3 Every device on the map",t:"19 instruments, not 10",key:i=>i.code==="W2"},
+  {n:"R4 Every number has a source",t:"verified / likely / to check",key:i=>i.code==="W6"},
+  {n:"R5 Every question has an owner",t:"and a date it is needed by",key:i=>i.code==="W7"},
+  {n:"R6 Someone else can read it",t:"a correct verdict in ten seconds",key:i=>i.code==="W8"}
+];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const TODAY=new Date("2026-11-17T00:00:00Z");
+const daysTo=d=>Math.round((new Date(d+"T00:00:00Z")-TODAY)/864e5);
+
+let ITEMS=[], sel=null, db=null, canWrite=false;
+const show={owner:new Set(), status:new Set()};
+
+function rail(){
+  $("rail").innerHTML=DATES.map(m=>{
+    const n=daysTo(m.d), cls="";
+    return `<div class="mile ${cls}"><span class="dot"></span><div class="d">${esc(m.d)}</div>
+      <div class="w">${esc(m.w)}</div><div class="away">${n} days · ${esc(m.why)}</div></div>`;
+  }).join("");
+}
+function chips(){
+  $("f-owner").innerHTML=Object.entries(OWNERS).map(([k,o])=>
+    `<button class="chip${show.owner.size&&!show.owner.has(k)?" off":""}" data-ow="${k}">
+      <span class="sw" style="background:${o.color}"></span>${esc(o.label)}</button>`).join("");
+  $("f-status").innerHTML=Object.entries(STATUS).map(([k,s])=>
+    `<button class="chip${show.status.size&&!show.status.has(k)?" off":""}" data-st="${k}">${esc(s.label)}</button>`).join("");
+  $("f-owner").querySelectorAll("[data-ow]").forEach(b=>b.onclick=()=>tog(show.owner,b.dataset.ow));
+  $("f-status").querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>tog(show.status,b.dataset.st));
+}
+function tog(set,k){set.has(k)?set.delete(k):set.add(k);chips();render()}
+
+function visible(){
+  return ITEMS.filter(i=>(!show.owner.size||show.owner.has(i.owner))&&(!show.status.size||show.status.has(i.status)));
+}
+function render(){
+  const vis=visible();
+  if(!ITEMS.length){return}
+  let html="";
+  for(const [k,o] of Object.entries(OWNERS)){
+    const rows=vis.filter(i=>i.owner===k).sort((a,b)=>(a.code>b.code?1:-1));
+    if(!rows.length)continue;
+    const openN=rows.filter(i=>!CLOSED.has(i.status)).length;
+    html+=`<div class="grouphead"><h3>${esc(o.label)}</h3><span class="who">${esc(o.who)}</span>
+      <span class="n">${openN} open of ${rows.length}</span></div>`;
+    html+=rows.map(i=>{
+      const st=STATUS[i.status]||STATUS.open, n=i.due?daysTo(i.due):null;
+      return `<button class="row${sel===i.code?" sel":""}" data-c="${esc(i.code)}">
+        <span class="code">${esc(i.code)}</span>
+        <span class="t">${esc(i.title)}</span>
+        <span class="pill ${st.cls}">${esc(st.label)}</span>
+        <span class="b">blocks ${esc(i.blocks)}</span>
+        ${i.due?`<span class="due">${esc(i.due)}</span>`:"<span></span>"}
+      </button>`;
+    }).join("");
+  }
+  $("reg").innerHTML=html||`<div class="empty"><b>Nothing matches</b>Clear a filter to see the rest.</div>`;
+  $("reg").querySelectorAll(".row").forEach(b=>b.onclick=()=>{sel=b.dataset.c;render();inspect()});
+  const open=ITEMS.filter(i=>!CLOSED.has(i.status)).length;
+  $("m-count").textContent=`${open} open of ${ITEMS.length} items`;
+  $("m-owner").textContent=canWrite?"you can change state here":"read only for you";
+  readiness();
+}
+function inspect(){
+  const i=ITEMS.find(x=>x.code===sel);
+  if(!i)return;
+  const o=OWNERS[i.owner]||{};
+  $("insp").innerHTML=`<div class="code">${esc(i.code)} · ${esc(o.label||"")}</div>
+    <h3>${esc(i.title)}</h3>
+    ${i.detail?`<p>${esc(i.detail)}</p>`:""}
+    <div class="k">What it blocks</div><p style="margin-top:3px">${esc(i.blocks)}</p>
+    ${i.due?`<div class="k">Needed by</div><p style="margin-top:3px">${esc(i.due)} · ${daysTo(i.due)} days</p>`:""}
+    <div class="k">State</div>
+    <div class="sbtns">${Object.entries(STATUS).map(([k,s])=>
+      `<button class="sbtn" data-set="${k}" aria-pressed="${i.status===k}">${esc(s.label)}</button>`).join("")}</div>
+    ${canWrite?"":`<div class="ro">You can read this register but not change it.</div>`}`;
+  $("insp").querySelectorAll("[data-set]").forEach(b=>b.onclick=()=>setStatus(i.code,b.dataset.set));
+}
+function readiness(){
+  const done=READY.filter(r=>{const i=ITEMS.find(r.key);return i&&CLOSED.has(i.status)});
+  $("rbar").style.width=(done.length/READY.length*100).toFixed(0)+"%";
+  $("rlist").innerHTML=READY.map(r=>{
+    const i=ITEMS.find(r.key), pass=i&&CLOSED.has(i.status);
+    return `<div class="rchk${pass?" pass":""}"><span class="mark"></span>
+      <span class="n2">${esc(r.n)}</span><span class="t2">${esc(r.t)}</span></div>`;
+  }).join("");
+}
+async function setStatus(code,st){
+  const i=ITEMS.find(x=>x.code===code);
+  if(!i||i.status===st)return;
+  if(!canWrite||!db){return}
+  i.status=st; render(); inspect();
+  try{ await db.collection("items").doc(code).update({status:st}); }
+  catch(e){ /* a refused write reverts on the next snapshot */ }
+}
+
+(async()=>{
+  rail(); chips();
+  const user=await claude.use("user").catch(()=>null);
+  canWrite = user ? (await user.can("data.write").catch(()=>null)) !== false : false;
+  db=await claude.use("db").catch(()=>null);
+  if(!db){ $("m-count").textContent="sign in to load the register"; return }
+  db.collection("items").onSnapshot(snap=>{
+    ITEMS=snap.docs.map(d=>({code:d.id,...d.data()}));
+    if(!ITEMS.length){
+      $("reg").innerHTML=`<div class="empty"><b>The register is empty</b>No items have been written to this page's database yet.</div>`;
+      return;
+    }
+    if(!sel)sel=ITEMS.slice().sort((a,b)=>(a.code>b.code?1:-1))[0]?.code||null;
+    render(); inspect();
+  });
+})();
+</script>

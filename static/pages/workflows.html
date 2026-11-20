@@ -1,0 +1,2058 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foundry Protocols</title>
+<style>
+  :root {
+    --bg:#fff; --ink:#1d1d1f; --muted:#8e8e93; --rule:#d2d2d7; --tab-bg:#f2f2f4;
+    --fillop:0.14; --chipop:0.10; --warn:#E69F00;
+    --font:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme=light]){
+    --bg:#141416; --ink:#f2f2f4; --muted:#8e8e93; --rule:#3a3a3d; --tab-bg:#242427;
+    --fillop:0.24; --chipop:0.20;
+  }}
+  :root[data-theme=dark]{ --bg:#141416; --ink:#f2f2f4; --rule:#3a3a3d; --tab-bg:#242427;
+                          --fillop:0.24; --chipop:0.20; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px 16px 56px}
+  header{text-align:center;margin-bottom:22px}
+  h1{font-weight:400;font-size:clamp(22px,3vw,34px);margin:0;letter-spacing:-.01em}
+  .sub{font-size:clamp(15px,2vw,19px);margin-top:3px}
+  .note{color:var(--muted);font-size:13px;margin-top:6px}
+  .nav{text-align:center;font-size:13px;margin-top:10px}
+  .nav a{color:var(--muted)}
+  .nav a:hover{color:var(--ink)}
+
+  /* instrument bar */
+  .bar{border:1px solid var(--rule);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+  .bar h3{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+          font-weight:500;margin:0 0 9px}
+  .insts{display:flex;flex-wrap:wrap;gap:7px}
+  .ichip{font:inherit;font-size:12.5px;color:var(--ink);background:var(--tab-bg);
+         border:1px solid transparent;border-radius:999px;padding:4px 10px;cursor:pointer;
+         display:inline-flex;align-items:center;gap:7px;transition:background .12s,border-color .12s}
+  .ichip:hover{border-color:var(--rule)}
+  .ichip .n{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+  .ichip[aria-pressed=true]{background:var(--bg);border-color:var(--ink)}
+  .ichip[aria-pressed=true] .n{color:var(--ink)}
+  .ichip.store{background:transparent;border:1px dashed var(--rule)}
+  .ichip.store[aria-pressed=true]{border-style:solid;border-color:var(--ink)}
+  .role{color:var(--muted);font-size:12.5px;margin-top:10px;min-height:1.3em}
+  .role b{color:var(--ink);font-weight:500}
+  .role .sp{display:block;margin-top:4px;line-height:1.5}
+  /* --- plan a day --- */
+  .plan{border:1px solid var(--rule);border-radius:12px;padding:14px 16px 16px;margin:18px 0 4px}
+  .plan h2{font-size:16px;font-weight:500;margin:0 0 3px}
+  .plan .lede{color:var(--muted);font-size:12.5px;margin-bottom:11px;max-width:74ch}
+  .routes{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .rt{border:1px solid var(--rule);background:none;color:inherit;border-radius:999px;
+      padding:4px 12px;font:inherit;font-size:12.5px;cursor:pointer}
+  .rt:hover{border-color:var(--ink)}
+  .rt.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .rt.clr{color:var(--muted)}
+  .chain-edit{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:13px;min-height:26px}
+  .pill2{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--rule);
+         border-radius:7px;padding:3px 5px 3px 9px;font-size:12.5px}
+  .pill2 .x{cursor:pointer;color:var(--muted);border:0;background:none;font:inherit;padding:0 3px}
+  .pill2 .x:hover{color:#D55E00}
+  .pill2 .n{font-variant-numeric:tabular-nums;color:var(--muted);min-width:18px;text-align:center}
+  .pill2 button.s{border:1px solid var(--rule);background:none;color:inherit;border-radius:4px;
+       width:19px;height:19px;line-height:1;cursor:pointer;font:inherit;padding:0}
+  .bars{display:grid;gap:8px}
+  .barrow{display:grid;grid-template-columns:78px minmax(0,1fr) 98px;gap:11px;align-items:center;font-size:12.5px}
+  .barrow .nm2{color:var(--muted)}
+  .track{height:9px;background:var(--tab-bg);border-radius:5px;overflow:hidden}
+  .track i{display:block;height:100%;border-radius:5px;transition:width .25s}
+  .barrow .v2{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+  .verdict{margin-top:12px;padding-top:11px;border-top:1px solid var(--rule);font-size:13px}
+  .verdict b{font-weight:500}
+  .verdict .cult{color:#D55E00;font-weight:500}
+  .plan .empty2{color:var(--muted);font-size:12.5px;font-style:italic}
+  @media (max-width:560px){ .barrow{grid-template-columns:62px minmax(0,1fr) 80px;gap:8px} }
+  .ceil{border-top:1px solid var(--rule);margin-top:11px;padding-top:9px;
+        font-size:12px;color:var(--muted);line-height:1.5}
+  .ceil b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+  .ceil .sep{opacity:.5;padding:0 6px}
+
+  /* status legend */
+  .legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--muted);
+          margin:0 0 26px;padding-left:2px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:9px;height:9px;border-radius:999px;flex:none}
+
+  /* phases */
+  .phase{margin-top:30px}
+  .phase > h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:500;
+              margin:0 0 10px;padding-bottom:6px;border-bottom:2px solid currentColor}
+  .cards{display:flex;flex-direction:column;gap:9px}
+
+  /* a workflow */
+  .wf{border:1px solid var(--rule);border-left-width:3px;border-radius:10px;
+      padding:12px 14px;display:grid;grid-template-columns:238px 1fr;gap:4px 20px;
+      transition:opacity .15s}
+  .wf.dim{opacity:.26}
+  .wf .id{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+  .wf .nm{font-size:15px;margin-top:1px}
+  .wf .sb{color:var(--muted);font-size:12.5px;margin-top:1px}
+  .wf .tags{margin-top:7px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+  .pill{font-size:11px;border-radius:999px;padding:1px 8px;border:1px solid}
+  .gate{font-size:11px;border-radius:4px;padding:1px 5px;background:var(--tab-bg);color:var(--muted);
+        font-variant-numeric:tabular-nums}
+  .right{min-width:0}
+
+  .chain{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:1px 0 9px}
+  .step{font-size:12.5px;border:1px solid var(--rule);border-radius:7px;padding:3px 9px;
+         white-space:nowrap;transition:background .12s,border-color .12s,color .12s}
+  .step.on{border-color:var(--ink);background:var(--tab-bg);font-weight:500}
+  .step.off{border-style:dashed;color:var(--muted)}
+  .arr{color:var(--muted);font-size:12px;flex:none}
+
+  .meta{font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:2px 14px}
+  .meta b{font-weight:400;color:var(--ink)}
+  .holds{font-size:12px;color:var(--muted);margin:-4px 0 9px;display:flex;
+         flex-wrap:wrap;align-items:center;gap:5px}
+  .holds .lbl{text-transform:uppercase;letter-spacing:.06em;font-size:10.5px}
+  .hchip{font-size:12px;border:1px dashed var(--rule);border-radius:7px;padding:2px 8px;
+         white-space:nowrap;transition:border-color .12s,color .12s,background .12s}
+  .hchip.on{border-style:solid;border-color:var(--ink);background:var(--tab-bg);color:var(--ink)}
+  .hchip.off{color:var(--muted);opacity:.5}
+  .cost{font-size:12px;margin-top:8px;padding:6px 10px;border-radius:7px;
+        background:var(--tab-bg);line-height:1.5;color:var(--muted)}
+  .cost b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+  .cost .bar{display:inline-block;vertical-align:middle;width:84px;height:5px;border-radius:999px;
+             background:var(--rule);overflow:hidden;margin:0 7px;border:0;padding:0}
+  .cost .bar i{display:block;height:100%;background:var(--ink)}
+  .cost .lim{display:block;margin-top:2px}
+  .ends{font-size:12.5px;color:var(--muted);margin-top:5px}
+  .ins{margin-top:9px;border-top:1px solid var(--rule);padding-top:7px}
+  .ins > summary{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+                 cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px}
+  .ins > summary::-webkit-details-marker{display:none}
+  .ins > summary::before{content:"+";font-size:13px;line-height:1;width:11px;text-align:center}
+  .ins[open] > summary::before{content:"\2212"}
+  .ins > summary:hover{color:var(--ink)}
+  .ins dl{margin:8px 0 2px;display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:12.5px;
+          line-height:1.45}
+  .ins dt{font-weight:500;white-space:nowrap}
+  .ins dd{margin:0;color:var(--muted)}
+  @media (max-width:620px){ .ins dl{grid-template-columns:1fr;gap:1px} .ins dd{margin-bottom:6px} }
+  .body{font-size:13px;line-height:1.46;margin:8px 0 0}
+  .warn{font-size:12.5px;line-height:1.45;margin:8px 0 0;padding:7px 10px;border-radius:7px;
+        border:1px solid var(--warn);background:var(--tab-bg)}
+  .fmts{margin:9px 0 0;padding:0;list-style:none;font-size:12.5px;line-height:1.5}
+  .fmts li{padding:2px 0 2px 13px;position:relative;color:var(--muted)}
+  .fmts li::before{content:"";position:absolute;left:2px;top:.72em;width:4px;height:4px;
+                   border-radius:999px;background:var(--muted)}
+  .fmts b{color:var(--ink);font-weight:500}
+
+  /* loops */
+  .loops{margin-top:42px;padding-top:4px}
+  .loops > h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:500;
+              margin:0 0 4px;padding-bottom:6px;border-bottom:2px solid var(--rule)}
+  .loops .intro{color:var(--muted);font-size:12.5px;margin:10px 0 18px}
+  .loop{border:1px solid var(--rule);border-radius:10px;padding:13px 14px 10px;margin-bottom:9px}
+  .loop .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .loop .hd h3{font-size:15px;font-weight:400;margin:0}
+  .loop .closes{font-size:11.5px;color:var(--muted)}
+  .loop .scroll{overflow-x:auto;margin-top:4px}
+  .loop svg{display:block;width:100%;min-width:560px;height:auto;font-family:var(--font)}
+  .loop .rt{font-size:13px;line-height:1.46;margin:4px 0 0}
+  .lp-lbl{font-size:12.5px;fill:var(--ink)}
+  .lp-arc{font-size:11.5px;fill:var(--muted)}
+
+  @media (max-width:780px){
+    .wf{grid-template-columns:1fr;gap:2px}
+    .wf .tags{margin-bottom:8px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="t"></h1>
+    <div class="sub" id="s"></div>
+    <div class="note" id="n"></div>
+    <div class="nav"><a href="foundry.html">&larr; the loop and the gates</a>
+      &nbsp;&middot;&nbsp; <a href="blueprint.html">the system blueprint &rarr;</a>
+      &nbsp;&middot;&nbsp; <a href="maps.html">one-page maps &rarr;</a>
+      &nbsp;&middot;&nbsp; full input spec in <code>reference/constructs.md</code></div>
+  </header>
+
+  <div class="bar">
+    <h3>Instruments</h3>
+    <div class="insts" id="insts"></div>
+    <div class="role" id="role"></div>
+    <div class="ceil" id="ceil"></div>
+  </div>
+  <div class="legend" id="legend"></div>
+
+  <section class="plan">
+    <h2>Plan a day</h2>
+    <div class="lede" id="plan-lede"></div>
+    <div class="routes" id="routes"></div>
+    <div class="chain-edit" id="chain-edit"></div>
+    <div class="bars" id="bars"></div>
+    <div class="verdict" id="verdict"></div>
+  </section>
+
+  <div id="phases"></div>
+
+  <section class="loops">
+    <h2>The loops</h2>
+    <div class="intro" id="lintro"></div>
+    <div id="loops"></div>
+    <div class="legend" id="wlegend" style="margin-top:16px"></div>
+  </section>
+</div>
+
+<script>
+window.PROTOCOLS = {
+ "title": "Foundry protocols",
+ "subtitle": "Every workflow as a deck sequence",
+ "note": "Click an instrument to see everything that needs it. Each workflow also carries what it costs the day.",
+ "rates": {
+  "day_min": 1200,
+  "bravo_96": 8,
+  "bravo_384": 32,
+  "echo_pl": 3,
+  "read_trf": 8,
+  "read_lum": 3,
+  "ceilings": [
+   {
+    "what": "Bravo",
+    "limit": 75,
+    "per": "two-plate protocols per 20 h day"
+   },
+   {
+    "what": "PHERAstar",
+    "limit": 150,
+    "per": "384-well TR-FRET plates per 20 h day"
+   },
+   {
+    "what": "Echo",
+    "limit": 400,
+    "per": "384-well plates per 20 h day"
+   },
+   {
+    "what": "Cytomat",
+    "limit": 7,
+    "per": "concurrent protocols that culture \u2014 14 deep-well positions"
+   }
+  ],
+  "note": "Modelled, not measured. The rates are arithmetic off Ginkgo's own throughput figures; the step counts are read off each deck sequence below. Treat a cost as the right order of magnitude and the ratio between two workflows as the thing worth trusting.\n"
+ },
+ "instruments": [
+  {
+   "id": "echo",
+   "label": "Echo 655",
+   "vendor": "Beckman Coulter",
+   "kind": "deck",
+   "role": "acoustic nL transfer \u2014 and the only way around the Bravo's 4x cost at 384",
+   "spec": "Beckman Coulter, 600 Series. 2.5 nL drop, 2.5-5,000 nL transfer range, 96/384/1536, DMSO to 100% from 384PP 2.0 and LDV plates, glycerol to 50%, proteins and nucleic acids. Tipless, so no carryover and no consumable per sample. 74.6 cm deep, 130 kg. ~400 384-well plates per 20 h day.\n"
+  },
+  {
+   "id": "multiflo",
+   "label": "MultiFlo FX",
+   "vendor": "Agilent",
+   "kind": "deck",
+   "role": "bulk dispense \u2014 anything added to every well",
+   "spec": "Agilent (BioTek). Peristaltic cassettes at 1, 5 and 10 uL, giving recommended per-well ranges of 1-50 uL, 5-2,500 uL and 10-3,000 uL. 6- through 1536-well plates, standard, deep-well and PCR. A whole 1536 plate at 1 uL a well takes 21 s, accuracy +/-5% at 1 uL \u2014 so the 2.5 uL cell-free dispense into 1536 sits comfortably inside the 1 uL cassette.\n"
+  },
+  {
+   "id": "bravo",
+   "label": "Bravo 96 + magnet",
+   "vendor": "Agilent",
+   "kind": "deck",
+   "role": "96-channel pipetting, bead handling, and the two temperature-controlled deck nests. The system throughput ceiling",
+   "spec": "Agilent, 96-channel head, nine deck positions. Carries the magnet plate for bead work and TWO temperature-controlled nests held at 4 C and 42 C \u2014 QInstruments Peltier blocks, -20 to 99.9 C, 12 K/min. Those two fixed positions with a plate move between them are what gives a 45-second heat shock. ~75 two-plate protocols per 20 h day; one 96-well transfer step is ~8 min and a 384-well plate is four offset quadrant transfers, so ~32 min.\n"
+  },
+  {
+   "id": "bioshake",
+   "label": "BioShake",
+   "vendor": "QInstruments",
+   "kind": "deck",
+   "role": "on-deck orbital shaking \u2014 mixing and bead resuspension without the plate leaving the Bravo",
+   "spec": "QInstruments, elm series, mounted as a Bravo deck position. 200-3,000 rpm on microplates with a 2.0 mm orbit (D30 variant 3.0 mm for deep-well, 5000 variant 1.2 mm and up to 5,000 rpm for 384/1536). T variants are heater-shakers, ambient to 99 C. 142 x 170 x 80 mm, 2.7 kg.\n"
+  },
+  {
+   "id": "lynx",
+   "label": "Lynx LM900 VVP",
+   "vendor": "Dynamic Devices",
+   "kind": "deck",
+   "role": "variable-volume pipetting with per-channel volume verification \u2014 concentration normalisation before assay",
+   "spec": "Dynamic Devices. 900 mm X travel, 30 microplate deck positions, ~40 x 36 x 40 in. VVP tools come as 96-channel and 8-channel heads. Volume Verified Pipetting puts an in-line flow sensor on every channel and measures what was actually aspirated and dispensed, in real time, per channel \u2014 which is what makes normalising a plate to a target mass trustworthy rather than nominal. 1 uL minimum, 2 uL at 2% CV. Three tip types, 35 / 300 / 1200 uL, filter tips included. Tip detection per channel, contact dispense and mixing by pipetting are standard. VVP 2.0 ships at SLAS at no price difference \u2014 take the upgrade path in writing.\n"
+  },
+  {
+   "id": "magniflex",
+   "label": "Magniflex",
+   "vendor": "Tecan",
+   "kind": "deck",
+   "role": "the system's positive-displacement, variable-spacing channel \u2014 viscous and tube-based reagents the Echo cannot transfer",
+   "spec": "Tecan Cavro Magni Flex, an OEM liquid-handling framework. Two, four or eight independent Y and Z channels with variable tip spacing from 9 to 445 mm, so it reformats between tubes, troughs and plates. Cavro Pulssar PBC piston pumps \u2014 positive displacement \u2014 over 5-1,000 uL; the optional Air Restriction Pipettor covers 1 uL to 5 mL by air displacement. Fixed or disposable tips. 100-240 V, 480 VA. Note the name: Magni Flex is a pipetting framework, NOT a magnet. Bead separation is the Bravo's job.\n"
+  },
+  {
+   "id": "atc",
+   "label": "ATC x4",
+   "vendor": "Thermo Fisher",
+   "kind": "deck",
+   "role": "four thermal cyclers running independent programs \u2014 PCR, Golden Gate, heat lysis, melts, and held temperatures",
+   "spec": "Thermo Fisher Applied Biosystems Automated Thermal Cycler, four units on one cart: three 96-well and one 384-well. The 96-well blocks take 10-100 uL full-skirted; the 384-well block is a 0.02 mL block and takes 5-20 uL, which is the number that decides what can run in it. Both formats 0-105 C, ramp 2.8 C/s block and 1.6 C/s sample, accuracy +/-0.25 C from 35 to 99.9 C, uniformity under 0.5 C twenty seconds after reaching 95 C. All four run independent programs at once.\n"
+  },
+  {
+   "id": "plateloc",
+   "label": "PlateLoc",
+   "vendor": "Agilent",
+   "kind": "deck",
+   "role": "heat seal \u2014 foil and PCR seals",
+   "spec": "Agilent thermal microplate sealer. 30-200 C, temperature held to +/-2 C, seal time set per seal type, about 8 s a plate end to end and 2.5 min to warm up. One seal roll resident, which is why the a4s carries the second seal type.\n"
+  },
+  {
+   "id": "xpeel",
+   "label": "XPeel",
+   "vendor": "Azenta",
+   "kind": "deck",
+   "role": "peel \u2014 the only de-sealer on the system",
+   "spec": "Azenta Automated Plate Seal Remover. Up to 200 seals an hour. Removes both heat-applied and pressure-applied full-plate seals using a proprietary tape good for about 400 removals a roll. Takes full-skirted PCR plates, low-base microplates and deep-well plates to 2 mL. 35 kg.\n"
+  },
+  {
+   "id": "a4s",
+   "label": "a4s sealer",
+   "vendor": "Azenta",
+   "kind": "deck",
+   "role": "the second sealer \u2014 the seal type the PlateLoc is not holding, plus agar plates and over-tall stacks",
+   "spec": "Azenta a4S, now sold as the Automated Roll Heat Sealer (4ti-0665). 100-195 C, seal time 0.1-10 s, SBS footprint from 96 through 1536, 230 x 507 x 276 mm, 27 kg, RS-232 and USB. Having two sealers is what lets a gas-permeable culture seal and a foil PCR seal both be resident without a manual roll change mid-run. It also covers the agar plates and the filter-plus-carrier stacks that are too tall for the PlateLoc.\n"
+  },
+  {
+   "id": "pherastar",
+   "label": "PHERAstar FSX",
+   "vendor": "BMG LABTECH",
+   "kind": "deck",
+   "role": "every readout on this page. Tied with the Bravo as the system bottleneck",
+   "spec": "BMG LABTECH. Every detection method in well formats from 6 through 3456. FI, FP, luminescence, BRET; absorbance spectrometer 220-1000 nm; High-End TRF/HTRF with two red-sensitive photon-counting PMTs; HTS AlphaScreen laser; simultaneous dual emission; two reagent injectors. Optic modules for DAPI, FITC, TAMRA, Cy5, AlphaScreen, AlphaLISA, NanoBRET, FP, LanthaScreen and HTRF, filling five of six slots. Incubation caps at 45 C, so melts run in an ATC and are read after. ~8 min a 384-well TR-FRET plate, ~3 min luminescence; 150 plates per 20 h day.\n"
+  },
+  {
+   "id": "hig3",
+   "label": "HiG 3",
+   "vendor": "BioNex",
+   "kind": "deck",
+   "role": "plate centrifuge \u2014 cell harvest",
+   "spec": "BioNex. Two plates a run, direct robotic access, about 20 s to speed. 5,000 g maximum, 100 g imbalance tolerance, fan cooling. Chosen over the HiG 4 deliberately: the HiG 4 trades down to 4,000 g and halves imbalance tolerance to 50 g for a Peltier that only holds ambient, and odd plate counts fault twice as often at 50 g.\n"
+  },
+  {
+   "id": "cytomat",
+   "label": "Cytomat 2",
+   "vendor": "Thermo Fisher",
+   "kind": "deck",
+   "role": "the deck's only shaking incubator, and so the cap on everything that cultures",
+   "spec": "Thermo Fisher Cytomat 2 C-LiN. Two stackers, 11 standard or 7 deep-well positions each, so 14 deep-well culture positions and 7 concurrent culture protocols. Series range is ambient +4 C to 50 C on the C450-LiN and to 70 C on the C470 \u2014 30 C for yeast and 37 C for E. coli are both well inside it. The floor is the catch: ambient +4 C means a 25 C setpoint needs a room at 21 C or below. Tower Shaker gives 100-1200 rpm at 850 g a position on a 1-3 mm amplitude; the Selector variant offers 25 mm at 100-350 rpm with active clamping, which is the orbit published deep-well microbial protocols actually use.\n"
+  },
+  {
+   "id": "ambistore",
+   "label": "AmbiStore D",
+   "vendor": "HighRes Biosolutions",
+   "kind": "store",
+   "role": "controlled ambient storage \u2014 crystallography trays, Echo source plates, assay plates in flight",
+   "spec": "HighRes Biosolutions random-access carousel. 14 stackers, each holding 24 standard or 10 deep-well plates, so 336 standard or 140 deep-well at the extremes. Configured here as 9 standard + 5 deep-well = 216 + 50. Up to six transfer nests and a plate delivered in as few as 12 seconds. The same chassis is also specified down to -20 C, which is the route to frozen storage on the system if it is ever wanted.\n"
+  },
+  {
+   "id": "steristore_cold",
+   "label": "SteriStore D 4 C",
+   "vendor": "HighRes Biosolutions",
+   "kind": "store",
+   "role": "cold hold \u2014 DNA, detection reagents, competent cells on the day, grown blocks, outgrowth",
+   "spec": "HighRes Biosolutions self-sterilising incubator. 4-100 C, humidity to 98% RH, CO2-ready as standard, and it sterilises itself with dry heat at about 180 C for three hours. 14 stackers of 24 standard or 10 deep-well. Configured here at 9 standard + 5 deep-well = 216 + 50.\n"
+  },
+  {
+   "id": "steristore_warm",
+   "label": "SteriStore D 37 C",
+   "vendor": "HighRes Biosolutions",
+   "kind": "store",
+   "role": "where cell-free actually scales \u2014 bulk 37 C incubation, plus static recovery",
+   "spec": "The second SteriStore D, same unit, held at 37 C. Configured 12 standard + 2 deep-well = 288 + 20. 288 standard positions of static incubation is an order of magnitude more cell-free capacity than the four cycler blocks, which is why production cell-free lives here and the ATCs are kept for the temperature-arm DOE. Its 98% RH ceiling also covers the 85% RH a eukaryotic ALiCE reaction wants, for a static position.\n"
+  },
+  {
+   "id": "microserve",
+   "label": "MicroServe",
+   "vendor": "HighRes Biosolutions",
+   "kind": "consumable",
+   "role": "every tip box on the system. The Bravo, the Lynx and the Magniflex all draw from here",
+   "spec": "HighRes Biosolutions consumable store. About 770 microplates, or 154 standard tip boxes, in under three feet of floor space. Per Ginkgo's Q&A all tip boxes live here, which is why no separate 8-position tip-box stacker is quoted. Tip inventory has to cover 250 uL+ for deep-well transfers, low-retention for cell-free, and the Lynx's 35 / 300 / 1200 uL types including filter tips.\n"
+  },
+  {
+   "id": "offline",
+   "label": "Offline",
+   "kind": "virtual",
+   "role": "not on the rack",
+   "spec": "Not an instrument. The chain leaves the system here \u2014 bench work, sequencing, diffraction, or an imager that is not yet on the floor.\n"
+  }
+ ],
+ "racs": [
+  {
+   "n": 9,
+   "id": "echo",
+   "unitop": "Non-contact acoustic cherry picking",
+   "class": [
+    "liquid handling"
+   ],
+   "instruments": [
+    "echo"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "The only tipless transfer on the system, and the way every 384 and 1536 plate gets built without paying the Bravo's quadrant tax.\n",
+   "runs": [
+    "4.1",
+    "4.2",
+    "4.13",
+    "4.3",
+    "4.7",
+    "4.8",
+    "4.9",
+    "4.14",
+    "4.11",
+    "4.12",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 10,
+   "id": "multiflo",
+   "unitop": "Bulk dispensing",
+   "class": [
+    "liquid handling"
+   ],
+   "instruments": [
+    "multiflo"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "Anything added to every well. Three peristaltic cassettes cover 1 uL to 3 mL, and a whole 1536 plate at 1 uL a well takes 21 s.\n",
+   "runs": [
+    "4.2",
+    "4.13",
+    "4.3",
+    "4.4",
+    "4.6",
+    "4.7",
+    "4.8",
+    "4.9",
+    "4.14",
+    "4.12",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 3,
+   "id": "bravo",
+   "unitop": "Contact stamping pipetting",
+   "class": [
+    "liquid handling",
+    "incubating"
+   ],
+   "instruments": [
+    "bravo",
+    "bioshake"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "96-channel head, magnet plate, on-deck orbital shaking, and the two temperature-controlled nests at 4 C and 42 C that make heat shock a plate move. The system throughput ceiling.\n",
+   "runs": [
+    "4.2",
+    "4.13",
+    "4.5",
+    "4.14",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 11,
+   "id": "magniflex",
+   "unitop": "Positive-displacement channel pipetting",
+   "class": [
+    "liquid handling"
+   ],
+   "instruments": [
+    "magniflex"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "2/4/8 independent channels, tip spacing 9-445 mm, piston pumps over 5-1000 uL. The only way to move a glycerol-based enzyme master mix out of a tube.\n",
+   "runs": [
+    "4.2",
+    "4.13"
+   ]
+  },
+  {
+   "n": 4,
+   "id": "lynx",
+   "unitop": "Volume-verified contact pipetting",
+   "class": [
+    "liquid handling"
+   ],
+   "instruments": [
+    "lynx"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "An in-line flow sensor on every channel, so a normalised plate is measured rather than nominal. Concentration normalisation before assay.\n",
+   "runs": [
+    "4.6"
+   ]
+  },
+  {
+   "n": 2,
+   "id": "thermal",
+   "unitop": "Thermal cycling",
+   "class": [
+    "incubating"
+   ],
+   "instruments": [
+    "atc"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "Four blocks running independent programs - three 96-well at 10-100 uL, one 384-well at 5-20 uL. PCR, Golden Gate, heat lysis, and the four temperature arms of the cell-free DOE.\n",
+   "runs": [
+    "4.2",
+    "4.13",
+    "4.3",
+    "4.10"
+   ]
+  },
+  {
+   "n": 1,
+   "id": "sealpeel",
+   "unitop": "Microplate sealing & seal peeling",
+   "class": [
+    "sealing"
+   ],
+   "instruments": [
+    "plateloc",
+    "xpeel"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "Ginkgo gives sealing and peeling a cart each; ours shares one. PlateLoc applies foil at 30-200 C, XPeel removes up to 200 seals an hour.\n",
+   "runs": [
+    "4.3",
+    "4.7",
+    "4.8",
+    "4.9",
+    "4.10",
+    "4.12",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 15,
+   "id": "breathable",
+   "unitop": "Microplate breathable sealing",
+   "class": [
+    "sealing"
+   ],
+   "instruments": [
+    "a4s"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "The second sealer, so a gas-permeable culture roll and a foil PCR roll are both resident. Without it a 20 h deep-well culture goes anaerobic under foil.\n",
+   "runs": [
+    "4.4",
+    "4.14"
+   ]
+  },
+  {
+   "n": 12,
+   "id": "spin",
+   "unitop": "Centrifugation",
+   "class": [
+    "centrifugation"
+   ],
+   "instruments": [
+    "hig3"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "Two plates a run, 5000 g, about 20 s to speed. Cell harvest before lysis, and that is all it needs to do.\n",
+   "runs": [
+    "4.4"
+   ]
+  },
+  {
+   "n": 8,
+   "id": "shaking",
+   "unitop": "Temp-control shaking incubation",
+   "class": [
+    "incubating",
+    "storage"
+   ],
+   "instruments": [
+    "cytomat"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "The only shaking position on the system, so 14 deep-well slots and 7 concurrent culture protocols is the hard cap on everything that grows.\n",
+   "runs": [
+    "4.2",
+    "4.4",
+    "4.14"
+   ]
+  },
+  {
+   "n": 7,
+   "id": "static37",
+   "unitop": "37 C static incubation",
+   "class": [
+    "incubating",
+    "storage"
+   ],
+   "instruments": [
+    "steristore_warm"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "288 standard positions. This, not the four cycler blocks, is where cell-free actually scales.\n",
+   "runs": [
+    "4.3",
+    "4.4"
+   ]
+  },
+  {
+   "n": 6,
+   "id": "cold",
+   "unitop": "Refrigerated random access storage",
+   "class": [
+    "storage"
+   ],
+   "instruments": [
+    "steristore_cold"
+   ],
+   "status": "installed",
+   "io": true,
+   "note": "4 C, 216 standard + 50 deep-well. DNA, detection reagents, grown blocks, and competent cells on the day. The coldest position on the system.\n",
+   "runs": [
+    "4.2",
+    "4.13",
+    "4.4",
+    "4.5",
+    "4.7",
+    "4.8",
+    "4.9",
+    "4.14",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 5,
+   "id": "ambient",
+   "unitop": "Ambient random access storage",
+   "class": [
+    "storage"
+   ],
+   "instruments": [
+    "ambistore"
+   ],
+   "status": "installed",
+   "io": true,
+   "note": "216 standard + 50 deep-well, delivered in as little as 12 s. Crystallography trays, Echo source plates, assay plates in flight.\n",
+   "runs": [
+    "4.1",
+    "4.2",
+    "4.13",
+    "4.3",
+    "4.4",
+    "4.5",
+    "4.6",
+    "4.7",
+    "4.8",
+    "4.9",
+    "4.10",
+    "4.14",
+    "4.11",
+    "4.12",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 14,
+   "id": "consumable",
+   "unitop": "Tip & consumable storage",
+   "class": [
+    "storage"
+   ],
+   "instruments": [
+    "microserve"
+   ],
+   "status": "installed",
+   "io": true,
+   "note": "About 770 plates or 154 tip boxes. Every tip box on the system lives here, which is why no separate tip-box stacker is quoted.\n",
+   "runs": [
+    "4.2",
+    "4.13",
+    "4.5",
+    "4.6",
+    "4.14",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 13,
+   "id": "reader",
+   "unitop": "Plate reading",
+   "class": [
+    "assaying"
+   ],
+   "instruments": [
+    "pherastar"
+   ],
+   "status": "installed",
+   "io": false,
+   "note": "Every readout in the spec, 6 to 3456 wells. Tied with the Bravo as the system bottleneck at 150 384-well TR-FRET plates a day.\n",
+   "runs": [
+    "4.3",
+    "4.6",
+    "4.7",
+    "4.8",
+    "4.9",
+    "4.10",
+    "4.12",
+    "CF2H"
+   ]
+  },
+  {
+   "n": 16,
+   "id": "imaging",
+   "unitop": "Crystal imaging",
+   "class": [
+    "assaying"
+   ],
+   "instruments": [],
+   "status": "phase2",
+   "io": false,
+   "note": "Not quoted. The crystallography protocol puts 560 imaging events in a campaign - 37 h by hand against 9 h on an imager cart - and it is what makes Aim 3 unattended.\n",
+   "runs": []
+  },
+  {
+   "n": 17,
+   "id": "ambient2",
+   "unitop": "Ambient random access storage",
+   "class": [
+    "storage"
+   ],
+   "instruments": [],
+   "status": "phase2",
+   "io": true,
+   "note": "A second AmbiStore. Crystallography raises the tray count, and 216 standard positions is 2x headroom only until trays start rotating.\n",
+   "runs": []
+  },
+  {
+   "n": 18,
+   "id": "sealer2",
+   "unitop": "Microplate sealing",
+   "class": [
+    "sealing"
+   ],
+   "instruments": [],
+   "status": "phase2",
+   "io": false,
+   "note": "A third seal type resident. Flagged in the notes as needing a fit check - there is no space in the sealer/peeler cart.\n",
+   "runs": []
+  },
+  {
+   "n": 19,
+   "id": "handler2",
+   "unitop": "Contact stamping pipetting",
+   "class": [
+    "liquid handling"
+   ],
+   "instruments": [],
+   "status": "phase2",
+   "io": false,
+   "note": "A second liquid handler is the only thing that moves the ~75 two-plate protocols a day ceiling without changing the Bravo's head.\n",
+   "runs": []
+  }
+ ],
+ "phases": [
+  {
+   "id": "dna",
+   "label": "DNA",
+   "c": "#0072B2"
+  },
+  {
+   "id": "express",
+   "label": "Express",
+   "c": "#009E73"
+  },
+  {
+   "id": "purify",
+   "label": "Purify and QC",
+   "c": "#56B4E9"
+  },
+  {
+   "id": "bind",
+   "label": "Bind",
+   "c": "#D55E00"
+  },
+  {
+   "id": "structure",
+   "label": "Structure",
+   "c": "#CC79A7"
+  }
+ ],
+ "workflows": [
+  {
+   "id": "4.1",
+   "name": "Build a clonal array",
+   "short": "Build a clonal array",
+   "sub": "no cloning at all",
+   "phase": "dna",
+   "status": "ready",
+   "deck": [
+    "echo"
+   ],
+   "holds": [
+    "ambistore"
+   ],
+   "gives": "a template plate ready for any expression route",
+   "scale": "384 per plate",
+   "time": "one hour",
+   "cost": {
+    "bravo": 0,
+    "echo": 3,
+    "reader": 0,
+    "binds": "Echo \u2014 and it is the cheapest workflow on the deck",
+    "worst": 3,
+    "runs": 400,
+    "share": 0.2
+   },
+   "gates": [],
+   "inputs": [
+    {
+     "item": "Gene fragments",
+     "spec": "one per design \u2014 IDT eBlocks or Twist Gene Fragments, ~300 bp to 1.5 kb"
+    },
+    {
+     "item": "Nuclease-free water",
+     "spec": "resuspension; eBlocks at 10 ng/uL, Twist fragments at 0.5 ng/uL"
+    }
+   ],
+   "note": "Linear dsDNA arrives plated and the Echo normalises concentration into a destination plate. That is the entire build step. The Bravo never touches it, which is why 384 format costs nothing here and costs 4x everywhere the Bravo does the dispensing.\n"
+  },
+  {
+   "id": "4.2",
+   "name": "Build a pooled library",
+   "short": "Build a pooled library",
+   "sub": "oligo pool to liquid culture",
+   "phase": "dna",
+   "status": "offline",
+   "deck": [
+    "echo",
+    "atc",
+    "bravo",
+    "magniflex",
+    "echo",
+    "atc",
+    "bravo",
+    "multiflo",
+    "cytomat",
+    "offline"
+   ],
+   "holds": [
+    "ambistore",
+    "steristore_cold",
+    "microserve"
+   ],
+   "gives": "a library in liquid culture, never plated for colonies",
+   "scale": "one pool per run",
+   "time": "overnight",
+   "cost": {
+    "bravo": 24,
+    "echo": 6,
+    "reader": 0,
+    "binds": "Cytomat \u2014 the outgrowth occupies a shaking position for the night",
+    "worst": 24,
+    "runs": 50,
+    "share": 2.0
+   },
+   "gates": [],
+   "inputs": [
+    {
+     "item": "Oligo pool",
+     "spec": "20-350 nt. Plan the coding budget at ~75 aa. Subpool adapters split one order into several libraries"
+    },
+    {
+     "item": "BsaI-HFv2 + T4 DNA ligase",
+     "spec": "overhang set from NEBridge GetSet, not from intuition"
+    },
+    {
+     "item": "Linearised backbone",
+     "spec": "low copy, Kan \u2014 ampicillin satellites on a long unattended outgrowth"
+    },
+    {
+     "item": "SPRI beads",
+     "spec": "0.8x drops anything under ~200 bp. The only size selection the deck has"
+    },
+    {
+     "item": "Competent cells + recovery medium",
+     "spec": "electrocompetent; outgrown as a pool, never plated. Delivered cold on the day; the coldest position on the system is the 4 C SteriStore"
+    }
+   ],
+   "ends": "sequencing, to find out what is actually in the pool",
+   "blocked": "NGS path undecided \u2014 in-lab Nanopore or a campus core",
+   "note": "Pool PCR at 384 off the Echo, Type IIS digestion-ligation into a linearised backbone, bead cleanup, transformation, outgrowth as a pool. The Magniflex moves the enzyme master mixes: BsaI-HFv2 and T4 ligase ship in glycerol and the Echo will not transfer them, so a positive-displacement channel from the tube is the right tool. The transformation runs on the Bravo's two temperature-controlled nests (4.14). Transformation is only here to amplify a pool - for an arrayed build, 4.13 skips cells entirely.\n"
+  },
+  {
+   "id": "4.13",
+   "name": "In-vitro assembly to expression",
+   "short": "In-vitro assembly",
+   "sub": "a plasmid without ever touching a cell",
+   "phase": "dna",
+   "status": "ready",
+   "deck": [
+    "echo",
+    "atc",
+    "bravo",
+    "magniflex",
+    "echo",
+    "atc",
+    "bravo",
+    "multiflo"
+   ],
+   "holds": [
+    "ambistore",
+    "steristore_cold",
+    "microserve"
+   ],
+   "gives": "a circular, expression-ready construct per design, no colonies",
+   "scale": "96-384 per run",
+   "time": "one day",
+   "cost": {
+    "bravo": 16,
+    "echo": 6,
+    "reader": 0,
+    "binds": "Bravo \u2014 two SPRI cleanups at 96. Run the assembly at 384 and they cost 64 min instead of 16",
+    "worst": 16,
+    "runs": 75,
+    "share": 1.3
+   },
+   "gates": [],
+   "inputs": [
+    {
+     "item": "Linear dsDNA gene fragments",
+     "spec": "one per design, with Golden Gate handles designed in at order time"
+    },
+    {
+     "item": "Circularising CFPS vector",
+     "spec": "a backbone that closes on itself in the Golden Gate - pALiCE01-derived in the source paper, carrying an FP fusion, a protease site and an affinity tag"
+    },
+    {
+     "item": "High-fidelity PCR master mix",
+     "spec": "Platinum SuperFi II 2x in the source paper; 30 cycles, 30 uL"
+    },
+    {
+     "item": "BsaI-HFv2 + T4 DNA ligase",
+     "spec": "30 x (37 C 60 s / 16 C 60 s), then 60 C 10 min"
+    },
+    {
+     "item": "SPRI beads",
+     "spec": "twice - after the PCR and after the assembly. 1.8x then elute small"
+    }
+   ],
+   "note": "Golden Gate closes a circle in vitro, so the assembled product goes straight into the expression reaction. No transformation, no outgrowth, no colony, no miniprep. This is the step the deck could not do well, and it turns out not to be needed. Normalise the insert by mass on the Echo - the source paper added a fixed volume and let the molar ratio drift. Retrieval PCR runs in the 384 block, Golden Gate in a 96 block: the 384 block takes 5-20 uL and the 96 block takes 10-100 uL, and a 30 uL assembly only fits the latter. The Magniflex delivers the enzyme master mixes from tubes - they are glycerol-based and the Echo will not move them. Note what the two SPRI cleanups cost: they are the only Bravo steps here, and taking the assembly to 384 quadruples them. From reference/fida-pipeline.md.\n"
+  },
+  {
+   "id": "4.3",
+   "name": "Cell-free expression, arrayed",
+   "short": "Cell-free expression",
+   "sub": "the bread and butter",
+   "phase": "express",
+   "status": "ready",
+   "protocol": "express.cfps.doe",
+   "deck": [
+    "echo",
+    "multiflo",
+    "plateloc",
+    "atc",
+    "xpeel",
+    "multiflo",
+    "pherastar"
+   ],
+   "holds": [
+    "steristore_warm",
+    "ambistore"
+   ],
+   "gives": "ug/mL per well against a standard curve",
+   "scale": "384 per plate, four plates in parallel",
+   "time": "4-6 h",
+   "cost": {
+    "bravo": 0,
+    "echo": 12,
+    "reader": 32,
+    "binds": "PHERAstar \u2014 four reads at 8 min; the Bravo is never in the chain",
+    "worst": 32,
+    "runs": 37,
+    "share": 2.7
+   },
+   "gates": [
+    "D1",
+    "D2"
+   ],
+   "inputs": [
+    {
+     "item": "Lysate or PURE kit",
+     "spec": "two lots \u2014 lot is a factor in the DOE, not a constant"
+    },
+    {
+     "item": "Mg- and K-glutamate stocks",
+     "spec": "Echo-compatible. Glycerol is the usual reason a stock will not transfer"
+    },
+    {
+     "item": "Template",
+     "spec": "linear dsDNA or plasmid; linear needs GamS in lysate, nothing in PURE"
+    },
+    {
+     "item": "GFP1-10 reagent + GFP11 standard",
+     "spec": "added in excess after expression; the standard curve is on every plate"
+    }
+   ],
+   "note": "Run the four ATCs as four temperature arms. It is the only way to treat temperature as a real factor instead of a plate-level confound. The four are 3 x 96-well plus 1 x 384-well and all four run independent programs at once. The 384 block takes 5-20 uL against the 96 block's 10-100 uL, so both of the DOE's volume levels fit it \u2014 give the 384 arm the 5 uL runs and nothing about the design changes. At production scale the arms stop being the point and the 37 C SteriStore is: 288 standard positions of static incubation, at up to 98% RH if a reaction wants it, against four cycler blocks.\n"
+  },
+  {
+   "id": "4.4",
+   "name": "E. coli expression, arrayed",
+   "short": "E. coli expression",
+   "sub": "for what cell-free will not make",
+   "phase": "express",
+   "status": "ready",
+   "deck": [
+    "multiflo",
+    "a4s",
+    "cytomat",
+    "hig3",
+    "multiflo",
+    "hig3"
+   ],
+   "holds": [
+    "steristore_cold",
+    "steristore_warm",
+    "ambistore"
+   ],
+   "gives": "lysate ready for purification",
+   "scale": "96 per plate",
+   "time": "overnight",
+   "cost": {
+    "bravo": 0,
+    "echo": 0,
+    "reader": 0,
+    "binds": "Cytomat \u2014 14 deep-well positions and 7 concurrent culture protocols. Nothing else on the deck binds this",
+    "worst": 0,
+    "runs": null,
+    "share": 0.0
+   },
+   "gates": [
+    "D1"
+   ],
+   "inputs": [
+    {
+     "item": "Plasmid or fragment",
+     "spec": "pET29b \u2014 Kan, because this incubates unattended overnight"
+    },
+    {
+     "item": "BL21(DE3)",
+     "spec": "chemically competent is fine; no colony picking either way"
+    },
+    {
+     "item": "Autoinduction medium",
+     "spec": "ZYM-5052. Avoids timed IPTG, which is the point"
+    },
+    {
+     "item": "Lysis reagent",
+     "spec": "detergent-based, plate-compatible; no sonication on deck"
+    }
+   ],
+   "note": "Autoinduction avoids timed IPTG and suits unattended overnight running. The a4s applies the gas-permeable seal before the block goes in \u2014 a foil seal off the PlateLoc would take a 20 h deep-well culture anaerobic, and having two sealers is what keeps both seal types resident without a manual roll change. Growth goes on the Cytomat, which shakes and incubates \u2014 not the Bravo deck nests, which hold fixed temperatures and do not aerate. Grown blocks come off the Cytomat into the 4 C SteriStore; static, non-shaking recovery goes to the 37 C one.\n",
+   "blocked": "Confirm the Cytomat's temperature range covers 30 C. If it does, yeast and slow-folding constructs stop being blocked on hardware.\n"
+  },
+  {
+   "id": "4.5",
+   "name": "Magnetic bead purification",
+   "short": "Magnetic bead purification",
+   "sub": "His-tag on IMAC beads",
+   "phase": "purify",
+   "status": "ready",
+   "deck": [
+    "bravo",
+    "bioshake"
+   ],
+   "holds": [
+    "microserve",
+    "steristore_cold",
+    "ambistore"
+   ],
+   "gives": "micrograms, which is plenty for plate assays",
+   "scale": "96 per plate",
+   "time": "one hour",
+   "cost": {
+    "bravo": 60,
+    "echo": 0,
+    "reader": 0,
+    "binds": "Bravo \u2014 96 lysates per hour. A full 14-plate E. coli round is a 14 h serial step",
+    "worst": 60,
+    "runs": 20,
+    "share": 5.0
+   },
+   "gates": [
+    "D2"
+   ],
+   "inputs": [
+    {
+     "item": "MagStrep Strep-Tactin XT",
+     "spec": "IBA 2-5090-002. Magnetic 6% agarose, binds Twin-Strep, 96-well compatible"
+    },
+    {
+     "item": "Buffer BXT",
+     "spec": "biotin elution, mild. It poisons any downstream streptavidin step \u2014 buffer-exchange or use His instead"
+    },
+    {
+     "item": "EDTA/DTT-tolerant IMAC bead",
+     "spec": "only if the construct is His-tagged: PureCube Ni-INDIGO (20 mM EDTA/DTT) or Pierce High-Capacity Ni-IMAC. Plain Ni-NTA strips in a cell-free reaction"
+    }
+   ],
+   "note": "The BioShake resuspends beads between washes without the plate leaving the Bravo deck \u2014 200-3,000 rpm on a 2.0 mm orbit, right next to the magnet. This is the most expensive hour on the system: at 96 lysates per hour it is the dominant cost in the E. coli route, and heat lysis at 95 C in a 96 block removes it entirely, 14 h to 2.1 h. Bead separation is the Bravo's job, not the Magniflex's \u2014 despite the name, a Cavro Magni Flex is a 2/4/8-channel pipetting framework with piston pumps and no magnet.\n",
+   "blocked": "Not milligrams. Crystallography protein cannot come from here.\n"
+  },
+  {
+   "id": "4.6",
+   "name": "Protein QC without a gel",
+   "short": "Protein QC",
+   "sub": "three questions, one instrument",
+   "phase": "purify",
+   "status": "ready",
+   "deck": [
+    "multiflo",
+    "pherastar",
+    "lynx"
+   ],
+   "holds": [
+    "microserve",
+    "ambistore"
+   ],
+   "gives": "concentration, nucleic-acid carryover, aggregation \u2014 and a normalised plate",
+   "scale": "384 per plate",
+   "time": "30 min",
+   "cost": {
+    "bravo": 0,
+    "echo": 0,
+    "reader": 24,
+    "binds": "PHERAstar \u2014 three reads of the same plate at 8 min each",
+    "worst": 24,
+    "runs": 50,
+    "share": 2.0
+   },
+   "gates": [
+    "D2"
+   ],
+   "inputs": [
+    {
+     "item": "GFP1-10, or LgBiT + furimazine",
+     "spec": "concentration; HiBiT if you want the dynamic range"
+    },
+    {
+     "item": "UV-transparent plate",
+     "spec": "A260/A280 for nucleic-acid carryover"
+    },
+    {
+     "item": "FP tracer",
+     "spec": "fluorescein or TAMRA; doubles as the aggregation readout"
+    }
+   ],
+   "note": "Concentration from split-GFP, HiBiT or A280; carryover from A260/A280; aggregation by fluorescence polarisation. Purity as band identity still needs a gel on a subset, offline. The Lynx then normalises concentration across the plate before anything reaches an assay \u2014 1 uL minimum, 2 uL at 2% CV \u2014 so D3's concentration series starts from a flat plate rather than from whatever each well happened to express. Volume Verified Pipetting is what makes that worth doing: an in-line flow sensor on every channel measures what was actually delivered, per channel, in real time, so a normalised plate is measured rather than nominal and the per-well correction can be logged against the design.\n"
+  },
+  {
+   "id": "4.7",
+   "name": "Binding \u2014 the assay ladder",
+   "short": "Binding ladder",
+   "sub": "four homogeneous formats",
+   "phase": "bind",
+   "status": "ready",
+   "deck": [
+    "echo",
+    "multiflo",
+    "plateloc",
+    "pherastar"
+   ],
+   "holds": [
+    "ambistore",
+    "steristore_cold"
+   ],
+   "gives": "a binding signal per well",
+   "scale": "384 routine, 1536 reachable",
+   "time": "1-2 h",
+   "cost": {
+    "bravo": 0,
+    "echo": 3,
+    "reader": 8,
+    "binds": "PHERAstar \u2014 150 plates per 20 h day, and 3 min rather than 8 if the format is luminescent",
+    "worst": 8,
+    "runs": 150,
+    "share": 0.7
+   },
+   "gates": [
+    "D3",
+    "D4"
+   ],
+   "inputs": [
+    {
+     "item": "Detection reagents",
+     "spec": "by format: furimazine; Tb/Eu cryptate anti-tag donor + d2 acceptor; Alpha bead pair; or a tracer peptide"
+    },
+    {
+     "item": "Protein",
+     "spec": "purified for HTRF/Alpha/FP, crude cell-free is enough for NanoBiT"
+    },
+    {
+     "item": "Target",
+     "spec": "tagged to match the donor antibody"
+    }
+   ],
+   "formats": [
+    {
+     "name": "NanoBiT / split luciferase",
+     "note": "reads straight out of crude cell-free, no purification \u2014 reach for it first"
+    },
+    {
+     "name": "HTRF",
+     "note": "ratiometric 665/620, matrix-tolerant, the PARP14 workhorse"
+    },
+    {
+     "name": "AlphaScreen",
+     "note": "the most sensitive, but bead-dependent and shows a hook effect"
+    },
+    {
+     "name": "Fluorescence polarisation",
+     "note": "needs a ~10x mass ratio, so peptides and small molecules only"
+    }
+   ],
+   "note": "The Echo builds the plate, so 384 and 1536 cost the same deck time as 96. Every format here is tipless on the way in and one read on the way out \u2014 this is the cheapest thing the foundry does per design, and it is why the ceiling that matters is the reader's 150 plates, not the Bravo's 75.\n",
+   "blocked": "All four need protein in hand.\n"
+  },
+  {
+   "id": "4.8",
+   "name": "Counter-screen and competition",
+   "short": "Counter-screen",
+   "sub": "did it bind the right face?",
+   "phase": "bind",
+   "status": "ready",
+   "deck": [
+    "echo",
+    "multiflo",
+    "plateloc",
+    "pherastar"
+   ],
+   "holds": [
+    "ambistore",
+    "steristore_cold"
+   ],
+   "gives": "selectivity margin and IC50",
+   "scale": "same plate as 4.7",
+   "time": "1-2 h",
+   "cost": {
+    "bravo": 0,
+    "echo": 3,
+    "reader": 8,
+    "binds": "PHERAstar \u2014 but it is three extra columns on 4.7's plate, so in practice it costs nothing new",
+    "worst": 8,
+    "runs": 150,
+    "share": 0.7
+   },
+   "gates": [
+    "D6"
+   ],
+   "inputs": [
+    {
+     "item": "Counter-target",
+     "spec": "a homolog \u2014 Mac1 against MD1"
+    },
+    {
+     "item": "Hotspot point-mutant of your own target",
+     "spec": "one extra construct. The only one of the three that catches a wrong-face binder"
+    },
+    {
+     "item": "Non-binder control",
+     "spec": "a design against an unrelated target, carried on the same plate"
+    }
+   ],
+   "note": "Three extra columns on the binding plate: the counter-target, the non-binder control, and the hotspot point-mutant of your own target. The mutant is the only one of the three that catches a wrong-face binder.\n"
+  },
+  {
+   "id": "4.9",
+   "name": "Dose-response",
+   "short": "Dose-response",
+   "sub": "the thing the Echo is best at",
+   "phase": "bind",
+   "status": "ready",
+   "deck": [
+    "echo",
+    "multiflo",
+    "plateloc",
+    "pherastar"
+   ],
+   "holds": [
+    "ambistore",
+    "steristore_cold"
+   ],
+   "gives": "KD or IC50 per hit",
+   "scale": "384 per plate",
+   "time": "1-2 h",
+   "cost": {
+    "bravo": 0,
+    "echo": 3,
+    "reader": 8,
+    "binds": "PHERAstar \u2014 a serial dilution on the Bravo would cost 32 min of the bottleneck instead of 3 on the Echo",
+    "worst": 8,
+    "runs": 150,
+    "share": 0.7
+   },
+   "gates": [
+    "D5"
+   ],
+   "inputs": [
+    {
+     "item": "One Echo source plate of titrant",
+     "spec": "the series is built acoustically in the destination; no serial dilution"
+    }
+   ],
+   "note": "The dilution series is built acoustically in the destination plate. No serial pipetting, no tip-to-tip carryover, non-linear spacing if you want it.\n"
+  },
+  {
+   "id": "4.10",
+   "name": "Thermal stability",
+   "short": "Thermal stability",
+   "sub": "a challenge, not a melt",
+   "phase": "purify",
+   "status": "limited",
+   "deck": [
+    "plateloc",
+    "atc",
+    "xpeel",
+    "pherastar"
+   ],
+   "holds": [
+    "ambistore"
+   ],
+   "gives": "residual binding after a temperature ladder",
+   "scale": "384 per plate",
+   "time": "3 h",
+   "cost": {
+    "bravo": 0,
+    "echo": 0,
+    "reader": 32,
+    "binds": "PHERAstar \u2014 four reads. The four ATC blocks run independent programs, so the ladder costs one pass, not four",
+    "worst": 32,
+    "runs": 37,
+    "share": 2.7
+   },
+   "gates": [],
+   "inputs": [
+    {
+     "item": "The binding assay's reagents",
+     "spec": "residual binding is the readout, so this is 4.7 run after a heat step"
+    },
+    {
+     "item": "Sealed plates for the ladder",
+     "spec": "four ATCs, four temperatures, one plate each \u2014 three 96-well at 10-100 uL and one 384-well at 5-20 uL"
+    }
+   ],
+   "blocked": "DSF is not available. Neither ATC version has optical detection, so melt curves have nowhere to be read. This gives real stability data, but not a Tm.\n"
+  },
+  {
+   "id": "4.14",
+   "name": "Heat-shock transformation",
+   "short": "Heat-shock transformation",
+   "sub": "the 45-second pulse, on the Bravo deck",
+   "phase": "dna",
+   "status": "ready",
+   "deck": [
+    "echo",
+    "bravo",
+    "multiflo",
+    "bioshake",
+    "cytomat",
+    "a4s",
+    "offline"
+   ],
+   "holds": [
+    "steristore_cold",
+    "microserve",
+    "ambistore"
+   ],
+   "gives": "transformants in liquid \u2014 a pool, or one well per design",
+   "scale": "96 per plate",
+   "time": "~2 h, plus an hour of recovery",
+   "cost": {
+    "bravo": 24,
+    "echo": 3,
+    "reader": 0,
+    "binds": "Bravo \u2014 the pulse is a plate move between two deck nests, so the whole transformation is Bravo time",
+    "worst": 24,
+    "runs": 50,
+    "share": 2.0
+   },
+   "gates": [],
+   "inputs": [
+    {
+     "item": "Chemically competent cells",
+     "spec": "delivered cold on the day; the coldest position on the system is the 4 C SteriStore, which also holds them in-run"
+    },
+    {
+     "item": "Assembled DNA",
+     "spec": "Golden Gate product or plasmid, held at 4 C in SteriStore #1"
+    },
+    {
+     "item": "SOC or recovery medium",
+     "spec": "MultiFlo, immediately after the pulse. The 1 uL cassette covers anything down to 1 uL a well"
+    },
+    {
+     "item": "Agar plates",
+     "spec": "plating is in scope for titre and QC, lidded on the a4s. Colony picking is not \u2014 nothing returns a clone to liquid"
+    }
+   ],
+   "ends": "plating for titre and QC, and sequencing \u2014 nothing picks a colony",
+   "note": "The Bravo carries TWO temperature-controlled deck nests, held at 4 C and 42 C. The 45-second pulse is a plate move between them, which is the only way to get it: a single block ramps at 12 K/min and would take about three minutes to go from 4 C to 42 C, and a thermal cycler in another RAC cannot time it at all. Two fixed-temperature positions, one move. Transformation and plating are in scope on the RAC; colony picking is not, so plating is for titre and QC. This is why the pET21b/29b/22b/28a and pSB4k5 backbones in reference/constructs.md are specified as they are.\n"
+  },
+  {
+   "id": "4.11",
+   "name": "Crystallisation screening",
+   "short": "Crystallisation screen",
+   "sub": "screens protein, does not make it",
+   "phase": "structure",
+   "status": "offline",
+   "deck": [
+    "offline",
+    "echo",
+    "offline"
+   ],
+   "holds": [
+    "ambistore"
+   ],
+   "gives": "nL drops in condition matrices",
+   "scale": 1536,
+   "time": "hours to set, weeks to grow",
+   "cost": {
+    "bravo": 0,
+    "echo": 9,
+    "reader": 0,
+    "binds": "Echo \u2014 80 trays is 11.5 h on-system against 48.9 h once imaging is done by hand",
+    "worst": 9,
+    "runs": 133,
+    "share": 0.8
+   },
+   "gates": [
+    "D7"
+   ],
+   "inputs": [
+    {
+     "item": "Protein at >=10 mg/mL",
+     "spec": "from offline expression. Mag beads cannot reach this"
+    },
+    {
+     "item": "Commercial screens",
+     "spec": "standard sparse-matrix kits as Echo source plates"
+    },
+    {
+     "item": "SwissCI plates",
+     "spec": "sitting-drop, Echo-addressable"
+    },
+    {
+     "item": "Compound stocks in DMSO",
+     "spec": "needs the Echo 6XX; the 525 cannot transfer DMSO"
+    }
+   ],
+   "ends": "imaging, then diffraction",
+   "blocked": "Needs the Echo 6XX, not the 525 \u2014 the 525 cannot do DMSO, 1536, or the drop volumes this needs. Imagers and automated scoring are unquoted.\n",
+   "note": "Purified protein at milligram scale and 10+ mg/mL comes in from offline expression. Then: drop setting, co-crystallisation against soaking, and fragment screening from DMSO stocks. A tray with drops already in it is closed with a lid, not a seal \u2014 both sealers on the system are thermal (PlateLoc 30-200 C, a4s 100-195 C) and a 200 nL drop has no thermal mass to survive either. Trays live in the AmbiStore, which is why that unit carries 216 standard positions and is delivered by a carousel that returns a plate in as little as 12 seconds: a rotating tray library is exactly the access pattern it is built for.\n"
+  },
+  {
+   "id": "4.12",
+   "name": "Compound and fragment screening",
+   "short": "Fragment screen",
+   "sub": "the same spine, compound plates instead",
+   "phase": "bind",
+   "status": "ready",
+   "deck": [
+    "echo",
+    "multiflo",
+    "plateloc",
+    "pherastar"
+   ],
+   "holds": [
+    "ambistore"
+   ],
+   "gives": "hit list from a compound library",
+   "scale": 1536,
+   "time": "1-2 h",
+   "cost": {
+    "bravo": 0,
+    "echo": 3,
+    "reader": 8,
+    "binds": "PHERAstar \u2014 the same plate cost as 4.7 for four times the wells",
+    "worst": 8,
+    "runs": 150,
+    "share": 0.7
+   },
+   "gates": [],
+   "inputs": [
+    {
+     "item": "Compound plates in DMSO",
+     "spec": "the Echo 6XX again"
+    },
+    {
+     "item": "The 4.7 reagents",
+     "spec": "same spine, different source plate"
+    }
+   ],
+   "note": "Essentially free once 4.7 works, and it is what makes the foundry useful to labs that are not designing proteins at all. Compound source plates sit in the AmbiStore between runs.\n"
+  },
+  {
+   "id": "CF2H",
+   "name": "Cell-free two-hybrid screen",
+   "short": "Two-hybrid, one well",
+   "sub": "expression and binding in one well",
+   "phase": "bind",
+   "status": "build",
+   "protocol": "bind.cf2h.screen",
+   "deck": [
+    "echo",
+    "multiflo",
+    "bravo",
+    "plateloc",
+    "pherastar"
+   ],
+   "holds": [
+    "microserve",
+    "steristore_cold",
+    "ambistore"
+   ],
+   "gives": "a rank, not a number \u2014 fold-activation per design",
+   "scale": "36 designs per 384 plate, in triplicate",
+   "time": "4-8 h",
+   "cost": {
+    "bravo": 32,
+    "echo": 3,
+    "reader": 8,
+    "binds": "Bravo \u2014 the cold master mix goes into a 384 plate, which is four offset quadrant transfers",
+    "worst": 32,
+    "runs": 37,
+    "share": 2.7
+   },
+   "gates": [
+    "D1",
+    "D4",
+    "D6"
+   ],
+   "inputs": [
+    {
+     "item": "dRecBCD extract",
+     "spec": "BL21 Rosetta 2 dRecBCD, homemade S30 at EUR0.10/reaction, or commercial lysate plus GamS at EUR5-10"
+    },
+    {
+     "item": "CF2H buffer",
+     "spec": "15 mM Mg-glutamate, 100 mM K-glutamate in their hands \u2014 recalibrate per extract lot"
+    },
+    {
+     "item": "pRM/OR3* sfGFP reporter plasmid",
+     "spec": "5 nM final, low copy. A high-copy reporter titrates CI"
+    },
+    {
+     "item": "CI-fusion fragments",
+     "spec": "PCR-amplified from eBlocks, gel-checked, normalised to 50 nM"
+    },
+    {
+     "item": "FITC standard",
+     "spec": "converts raw RFU to mean-equivalent units so numbers survive a change of reader"
+    },
+    {
+     "item": "Biotinylated target + streptavidin",
+     "spec": "format 3 only: pre-mixed 1:1 at 150 nM"
+    }
+   ],
+   "blocked": "Three offline components that do not exist yet: the pRM/OR3* sfGFP reporter plasmid, the CI(1-92)+GGSx5 cassette, and a dRecBCD extract.\n",
+   "note": "No purified protein on either side. Dispense every DNA component before the cold master mix \u2014 that ordering is what makes an ambient-deck sequence survivable. Nothing weaker than ~100 nM is detected. Note the cost: this is the only binding workflow that puts the Bravo in the chain, and at 384 that single step costs 32 min of the system bottleneck against 3 min on the Echo. If the cold master mix can be acoustic, move it.\n"
+  }
+ ],
+ "loops": [
+  {
+   "id": "expression",
+   "name": "Expression loop",
+   "closes": "days",
+   "steps": [
+    {
+     "label": "factorial screen",
+     "where": "rac"
+    },
+    {
+     "label": "effect sizes",
+     "where": "compute"
+    },
+    {
+     "label": "optimise",
+     "where": "compute"
+    },
+    {
+     "label": "fix condition",
+     "where": "rac"
+    }
+   ],
+   "returns": "An expression route assigned to each new target. That model is Aim 1's real product \u2014 not the condition for any one protein.\n"
+  },
+  {
+   "id": "binder",
+   "name": "Binder loop",
+   "closes": "weeks",
+   "steps": [
+    {
+     "label": "design",
+     "where": "compute"
+    },
+    {
+     "label": "express",
+     "where": "rac"
+    },
+    {
+     "label": "screen",
+     "where": "rac"
+    },
+    {
+     "label": "confirm",
+     "where": "rac"
+    },
+    {
+     "label": "counter-screen",
+     "where": "rac"
+    },
+    {
+     "label": "retrain",
+     "where": "compute"
+    }
+   ],
+   "returns": "Every measured design, failures included. A design that did not express is not a non-binder \u2014 keep three outcomes, True / False / Unknown, the way Adaptyv does.\n"
+  },
+  {
+   "id": "maturation",
+   "name": "Affinity-maturation loop",
+   "closes": "weeks",
+   "steps": [
+    {
+     "label": "NNK design",
+     "where": "compute"
+    },
+    {
+     "label": "build library",
+     "where": "rac"
+    },
+    {
+     "label": "screen",
+     "where": "rac"
+    },
+    {
+     "label": "rank",
+     "where": "compute"
+    }
+   ],
+   "returns": "Ranked variants around a confirmed hit. This is the loop that genuinely wants pooled handling, and the strongest argument for settling NGS.\n"
+  },
+  {
+   "id": "structure",
+   "name": "Structure loop",
+   "closes": "months",
+   "steps": [
+    {
+     "label": "pick hits",
+     "where": "compute"
+    },
+    {
+     "label": "scale up",
+     "where": "offrac"
+    },
+    {
+     "label": "crystallise",
+     "where": "rac"
+    },
+    {
+     "label": "diffract",
+     "where": "offrac"
+    },
+    {
+     "label": "compare to model",
+     "where": "compute"
+    }
+   ],
+   "returns": "Filters promoted or demoted on evidence. The only loop that tells you whether the models were right about *where* a binder sits.\n"
+  },
+  {
+   "id": "compound",
+   "name": "Compound loop",
+   "closes": "months",
+   "steps": [
+    {
+     "label": "fragment screen",
+     "where": "rac"
+    },
+    {
+     "label": "hits",
+     "where": "compute"
+    },
+    {
+     "label": "co-crystallise",
+     "where": "rac"
+    },
+    {
+     "label": "diffract",
+     "where": "offrac"
+    },
+    {
+     "label": "chemistry",
+     "where": "offrac"
+    }
+   ],
+   "returns": "Not your programme. It is what makes this a service rather than a project, and it runs on the same Echo-plus-PHERAstar spine.\n"
+  }
+ ],
+ "routes": [
+  {
+   "id": "cellfree",
+   "name": "Cell-free, arrayed",
+   "sub": "the bread and butter - no cells anywhere",
+   "steps": [
+    "4.1",
+    "4.3",
+    "4.5",
+    "4.6",
+    "4.7",
+    "4.9"
+   ]
+  },
+  {
+   "id": "ecoli",
+   "name": "E. coli, arrayed",
+   "sub": "for designs cell-free will not make",
+   "steps": [
+    "4.1",
+    "4.4",
+    "4.5",
+    "4.6",
+    "4.7",
+    "4.9"
+   ]
+  },
+  {
+   "id": "invitro",
+   "name": "In-vitro assembly",
+   "sub": "a plasmid that never sees a cell",
+   "steps": [
+    "4.13",
+    "4.3",
+    "4.5",
+    "4.6",
+    "4.7"
+   ]
+  },
+  {
+   "id": "cf2h",
+   "name": "CF2H",
+   "sub": "expression and binding in one well, nothing purified",
+   "steps": [
+    "4.1",
+    "CF2H"
+   ]
+  },
+  {
+   "id": "selectivity",
+   "name": "The selectivity block",
+   "sub": "what D6 needs, on one plate",
+   "steps": [
+    "4.7",
+    "4.8",
+    "4.9"
+   ]
+  }
+ ]
+};
+</script>
+<script>
+(() => {
+  const P = window.PROTOCOLS, WF = P.workflows;
+  const INST = Object.fromEntries(P.instruments.map(i => [i.id, i]));
+  const STATUS = {
+    ready:   {c:'#009E73', label:'runs on the deck as quoted'},
+    limited: {c:'#E69F00', label:'runs, but not the thing you wanted'},
+    build:   {c:'#0072B2', label:'needs an offline build first'},
+    offline: {c:'#8e8e93', label:'ends in a sample prepared off the rack'}
+  };
+  const esc = t => String(t).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+
+  document.getElementById('t').textContent = P.title;
+  document.getElementById('s').textContent = P.subtitle;
+  document.getElementById('n').textContent = P.note;
+
+  // how many workflows need each instrument — on the deck, or holding a plate
+  const uses = (w, id) => w.deck.includes(id) || (w.holds || []).includes(id);
+  const count = id => WF.filter(w => uses(w, id)).length;
+  const isStore = i => i.kind === 'store' || i.kind === 'consumable';
+
+  document.getElementById('insts').innerHTML = P.instruments.map(i =>
+    `<button class="ichip${isStore(i) ? ' store' : ''}" type="button" aria-pressed="false"
+       data-i="${esc(i.id)}">${esc(i.label)}<span class="n">${count(i.id)}</span></button>`).join('');
+
+  // the ceiling. Solid chips act on a plate; dashed ones hold it.
+  const R = P.rates;
+  document.getElementById('ceil').innerHTML =
+    'Solid acts on the plate &middot; dashed holds it. The day is ' +
+    `<b>${R.day_min / 60} h</b>, and these are its ceilings:<br>` +
+    R.ceilings.map(c => `<b>${esc(c.what)} ${c.limit}</b> ${esc(c.per)}`)
+      .join('<span class="sep">&middot;</span>') +
+    `<br>One Bravo step costs <b>${R.bravo_96} min</b> on a 96-well plate and ` +
+    `<b>${R.bravo_384} min</b> on a 384 — four offset quadrant transfers with a 96-channel ` +
+    'head. That 4&times; is why so much of this page runs through the Echo.';
+
+  document.getElementById('legend').innerHTML = Object.entries(STATUS).map(([k, v]) =>
+    `<span><i class="dot" style="background:${v.c}"></i>${esc(k)} &mdash; ${esc(v.label)}</span>`).join('');
+
+  const chain = w => w.deck.map((d, i) => {
+    const label = INST[d] ? INST[d].label : d;
+    return (i ? '<span class="arr">&rarr;</span>' : '') +
+      `<span class="step" data-i="${esc(d)}">${esc(label)}</span>`;
+  }).join('');
+
+  const holds = w => {
+    const h = w.holds || [];
+    if (!h.length) return '';
+    return `<div class="holds"><span class="lbl">waits in</span>` + h.map(d =>
+      `<span class="hchip" data-i="${esc(d)}">${esc(INST[d] ? INST[d].label : d)}</span>`
+    ).join('') + `</div>`;
+  };
+
+  // what the workflow costs the day. build.py derives worst/runs/share from
+  // the three minute figures, so this never disagrees with the YAML.
+  const cost = w => {
+    const c = w.cost, parts = [];
+    if (c.bravo)  parts.push(`Bravo <b>${c.bravo} min</b>`);
+    if (c.echo)   parts.push(`Echo <b>${c.echo} min</b>`);
+    if (c.reader) parts.push(`reader <b>${c.reader} min</b>`);
+    const spend = parts.length ? parts.join(' &middot; ')
+                               : 'no time on the Bravo, the Echo or the reader';
+    // the share is of the three instruments priced above. Where something
+    // else binds first - shaking, a cycler - c.binds says so, and the
+    // runs-a-day figure is then an upper bound rather than the answer.
+    const run = c.runs
+      ? `<span class="bar"><i style="width:${Math.min(100, c.share)}%"></i></span>` +
+        `<b>${c.share}%</b> of a 20 h day, so those three allow <b>${c.runs}</b> a day`
+      : '';
+    return `<p class="cost">${spend}${run}` +
+           `<span class="lim">What actually limits it: ${esc(c.binds)}</span></p>`;
+  };
+
+  const card = w => {
+    const st = STATUS[w.status], ph = P.phases.find(p => p.id === w.phase);
+    const gates = (w.gates || []).map(g => `<span class="gate">${esc(g)}</span>`).join('');
+    const fmts = (w.formats || []).map(f =>
+      `<li><b>${esc(f.name)}</b> &mdash; ${esc(f.note)}</li>`).join('');
+    return `<article class="wf" style="border-left-color:${ph.c}" data-id="${esc(w.id)}">
+      <div>
+        <div class="id">${esc(w.id)}</div>
+        <div class="nm">${esc(w.name)}</div>
+        <div class="sb">${esc(w.sub)}</div>
+        <div class="tags">
+          <span class="pill" style="color:${st.c};border-color:${st.c}">${esc(w.status)}</span>
+          ${gates}
+        </div>
+      </div>
+      <div class="right">
+        <div class="chain">${chain(w)}</div>
+        ${holds(w)}
+        <div class="meta">
+          <span><b>${esc(w.gives)}</b></span>
+          <span>${esc(w.scale)}</span>
+          <span>${esc(w.time)}</span>
+          ${w.protocol ? `<span>${esc(w.protocol)}</span>` : ''}
+        </div>
+        ${cost(w)}
+        ${w.ends ? `<div class="ends">hands off to &rarr; ${esc(w.ends)}</div>` : ''}
+        <button class="rt" data-add="${esc(w.id)}" style="margin-top:9px">+ add to the day</button>
+        ${fmts ? `<ul class="fmts">${fmts}</ul>` : ''}
+        ${w.note ? `<p class="body">${esc(w.note)}</p>` : ''}
+        <details class="ins"><summary>what goes in &middot; ${w.inputs.length}</summary>
+          <dl>${w.inputs.map(x =>
+            `<dt>${esc(x.item)}</dt><dd>${esc(x.spec)}</dd>`).join('')}</dl></details>
+        ${w.blocked ? `<p class="warn">${esc(w.blocked)}</p>` : ''}
+      </div>
+    </article>`;
+  };
+
+  document.getElementById('phases').innerHTML = P.phases.map(ph => {
+    const mine = WF.filter(w => w.phase === ph.id);
+    if (!mine.length) return '';
+    return `<section class="phase" style="color:${ph.c}">
+      <h2>${esc(ph.label)}</h2>
+      <div class="cards" style="color:var(--ink)">${mine.map(card).join('')}</div>
+    </section>`;
+  }).join('');
+
+  // ---- the loops, drawn as loops ----
+  const WHERE = {
+    compute: {c:'#0072B2', label:'yours to build'},
+    rac:     {c:'#009E73', label:'on the Ginkgo'},
+    offrac:  {c:'#999999', label:'not there yet'}
+  };
+  const NS = 'http://www.w3.org/2000/svg';
+
+  // ---- plan a day: one workflow's cost is not a day, a chain is ----
+  const PH = Object.fromEntries(P.phases.map(x => [x.id, x]));
+  const BY = Object.fromEntries(WF.map(w => [w.id, w]));
+  const COST = [['bravo', 'Bravo'], ['echo', 'Echo'], ['reader', 'PHERAstar']];
+  let plan = [];   // [{id, n}]
+
+  document.getElementById('plan-lede').textContent =
+    'Pick a route, or build a chain. Minutes are modelled off Ginkgo’s own throughput figures '
+    + 'against a ' + (R.day_min / 60) + '-hour day — trust the ratio between two chains more than '
+    + 'either absolute number.';
+
+  document.getElementById('routes').innerHTML =
+    P.routes.map(r => `<button class="rt" data-r="${esc(r.id)}" title="${esc(r.sub)}">${esc(r.name)}</button>`).join('')
+    + `<button class="rt clr" data-r="">clear</button>`;
+
+  function setRoute(id) {
+    const r = P.routes.find(x => x.id === id);
+    plan = r ? r.steps.map(s => ({ id: s, n: 1 })) : [];
+    document.querySelectorAll('.rt').forEach(b => b.classList.toggle('on', b.dataset.r === id && !!id));
+    draw();
+  }
+
+  function draw() {
+    const ce = document.getElementById('chain-edit');
+    ce.innerHTML = plan.length ? plan.map((s, i) => {
+      const w = BY[s.id], ph = PH[w.phase];
+      return `<span class="pill2" style="border-left:3px solid ${ph.c}">
+        <span>${esc(w.id)} ${esc(w.name)}</span>
+        <button class="s" data-d="${i}" aria-label="one fewer">&minus;</button>
+        <span class="n">&times;${s.n}</span>
+        <button class="s" data-u="${i}" aria-label="one more">+</button>
+        <button class="x" data-rm="${i}" aria-label="remove">&times;</button></span>`;
+    }).join('') : `<span class="empty2">Nothing chained yet — pick a route above, or add from any card below.</span>`;
+
+    const tot = { bravo: 0, echo: 0, reader: 0 };
+    plan.forEach(s => COST.forEach(([k]) => { tot[k] += (BY[s.id].cost?.[k] || 0) * s.n; }));
+    const worst = Math.max(...COST.map(([k]) => tot[k]), 0);
+
+    document.getElementById('bars').innerHTML = COST.map(([k, label]) => {
+      const pct = Math.min(100, tot[k] / R.day_min * 100);
+      const col = tot[k] === worst && worst > 0 ? '#D55E00' : '#0072B2';
+      return `<div class="barrow"><span class="nm2">${esc(label)}</span>
+        <span class="track"><i style="width:${pct.toFixed(1)}%;background:${col}"></i></span>
+        <span class="v2">${tot[k]} min &middot; ${pct.toFixed(0)}%</span></div>`;
+    }).join('');
+
+    const v = document.getElementById('verdict');
+    if (!plan.length) { v.innerHTML = ''; return; }
+    const binder = COST.find(([k]) => tot[k] === worst);
+    const rounds = worst > 0 ? Math.floor(R.day_min / worst) : Infinity;
+    const culture = plan.map(s => BY[s.id]).filter(w => /Cytomat/i.test(w.cost?.binds || ''));
+    v.innerHTML =
+      `<b>${esc(binder[1])}</b> is the binding instrument at <b>${worst} min</b>, so this chain runs `
+      + `<b>${rounds === Infinity ? '—' : rounds}×</b> in a ${R.day_min / 60}-hour day.`
+      + (culture.length ? `<br><span class="cult">But ${esc(culture[0].id)} cultures.</span> `
+          + esc(culture[0].cost.binds) + ' — a concurrency cap, not a minutes one, so the day'
+          + ' arithmetic above does not describe it.' : '');
+  }
+
+  document.getElementById('routes').addEventListener('click', e => {
+    const b = e.target.closest('[data-r]'); if (b) setRoute(b.dataset.r);
+  });
+  document.getElementById('chain-edit').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.rm !== undefined) plan.splice(+b.dataset.rm, 1);
+    else if (b.dataset.u !== undefined) plan[+b.dataset.u].n++;
+    else if (b.dataset.d !== undefined && plan[+b.dataset.d].n > 1) plan[+b.dataset.d].n--;
+    document.querySelectorAll('.rt').forEach(x => x.classList.remove('on'));
+    draw();
+  });
+  document.addEventListener('click', e => {
+    const a = e.target.closest('[data-add]'); if (!a) return;
+    const hit = plan.find(s => s.id === a.dataset.add);
+    hit ? hit.n++ : plan.push({ id: a.dataset.add, n: 1 });
+    document.querySelectorAll('.rt').forEach(x => x.classList.remove('on'));
+    draw();
+    document.querySelector('.plan').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+  setRoute(P.routes[0].id);
+
+  function loopSvg(lp) {
+    const n = lp.steps.length, VW = 840, PAD = 8;
+    const gap = 16, W = (VW - PAD * 2 - gap * (n - 1)) / n, H = 40, Y = 8;
+    const mk = 'lpar-' + lp.id, parts = [];
+    lp.steps.forEach((st, i) => {
+      const x = PAD + i * (W + gap), c = WHERE[st.where].c;
+      parts.push(`<rect x="${x}" y="${Y}" width="${W}" height="${H}" rx="8" fill="${c}"
+        fill-opacity="var(--fillop)" stroke="${c}" stroke-width="1.2"/>`);
+      parts.push(`<text x="${x + W / 2}" y="${Y + H / 2 + 4.5}" text-anchor="middle"
+        class="lp-lbl">${esc(st.label)}</text>`);
+      if (i < n - 1) parts.push(`<line x1="${x + W + 3}" y1="${Y + H / 2}"
+        x2="${x + W + gap - 3}" y2="${Y + H / 2}" stroke="var(--muted)" stroke-width="1.3"
+        marker-end="url(#${mk})"/>`);
+    });
+    // the return path: last box down, back along the bottom, up into the first
+    const x0 = PAD + W / 2, xN = PAD + (n - 1) * (W + gap) + W / 2, by = Y + H + 22;
+    parts.push(`<path d="M${xN} ${Y + H + 2} L${xN} ${by} L${x0} ${by} L${x0} ${Y + H + 4}"
+      fill="none" stroke="var(--muted)" stroke-width="1.3" marker-end="url(#${mk})"/>`);
+    parts.push(`<text x="${VW / 2}" y="${by + 15}" text-anchor="middle" class="lp-arc"
+      >closes in ${esc(lp.closes)}</text>`);
+    return `<svg viewBox="0 0 ${VW} ${by + 22}" role="img"
+      aria-label="${esc(lp.name)}, closes in ${esc(lp.closes)}">
+      <defs><marker id="${mk}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7"
+        markerHeight="7" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none"
+        stroke="var(--muted)" stroke-width="1.6" stroke-linecap="round"
+        stroke-linejoin="round"/></marker></defs>${parts.join('')}</svg>`;
+  }
+
+  document.getElementById('lintro').textContent =
+    'Five, nested, each returning something different. Colour is where each step happens.';
+  document.getElementById('loops').innerHTML = (P.loops || []).map(lp =>
+    `<article class="loop">
+       <div class="hd"><h3>${esc(lp.name)}</h3><span class="closes">${esc(lp.steps.length)} steps</span></div>
+       <div class="scroll">${loopSvg(lp)}</div>
+       <p class="rt">${esc(lp.returns)}</p>
+     </article>`).join('');
+
+  document.getElementById('wlegend').innerHTML = Object.values(WHERE).map(w =>
+    `<span><i class="dot" style="background:${w.c}"></i>${esc(w.label)}</span>`).join('');
+
+  // click an instrument: dim every workflow that does not use it
+  let sel = null;
+  const role = document.getElementById('role');
+  document.getElementById('insts').addEventListener('click', e => {
+    const b = e.target.closest('.ichip'); if (!b) return;
+    sel = (sel === b.dataset.i) ? null : b.dataset.i;
+    document.querySelectorAll('.ichip').forEach(c =>
+      c.setAttribute('aria-pressed', String(c.dataset.i === sel)));
+    role.innerHTML = sel
+      ? `<b>${esc(INST[sel].label)}</b> &mdash; ${esc(INST[sel].role)}` +
+        `<span class="sp">${esc(INST[sel].spec)}</span>`
+      : '';
+    document.querySelectorAll('.wf').forEach(c => {
+      const w = WF.find(x => x.id === c.dataset.id);
+      c.classList.toggle('dim', !!sel && !uses(w, sel));
+    });
+    document.querySelectorAll('.step, .hchip').forEach(s => {
+      s.classList.toggle('on', !!sel && s.dataset.i === sel);
+      s.classList.toggle('off', !!sel && s.dataset.i !== sel);
+    });
+  });
+})();
+</script>
+</body>
+</html>
