@@ -51,7 +51,13 @@ RAC_STATUSES = ("installed", "phase2")
 # Sofia, 2026-11-20: hide all phase 2 crystallography from the pages. The data
 # stays in _data/ and is still checked - phase 2 carts, the phase 2 entries in
 # future.yml and the phase 2 programme are simply not bundled into any page.
-# Putting it back is this one line.
+#
+# Putting it back is this line AND four drawings. The CART FIGURES entries
+# for imaging, ambient2, handler2 and sealer2 were taken out of
+# pages/blueprint.html to satisfy the guard in check(), so setting this True
+# on its own fails the build naming all four. Lift them back first:
+#     git show ed3d02f:pages/blueprint.html
+# README.md, "Phase 2 is hidden", says the same thing at more length.
 SHOW_PHASE2 = False
 
 
