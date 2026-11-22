@@ -68,6 +68,18 @@ protocol, a cart or a loop step has no drawing, or names one that does not
 exist: the figures are drawing code, so they live in the pages and in
 `pages/figkit.js`, and the build reads the registries back out of them.
 
+**Every protocol carries its own procedure.** `steps:` under a workflow in
+`_data/protocols.yml` is the step-by-step method, written the way a journal's
+methods section is written: a numbered instruction per step, the machine it
+runs on in `at:`, a timing in `t:` where the rate model has a real figure, and
+`crit:` or `note:` for what goes wrong. The build checks that every machine in
+the workflow's `deck:` chain is used by some step, and that no step claims a
+machine the workflow does not have — so the deck chain, the drawing and the
+written method cannot drift apart. `at:` is spelt `at` and not `on` on purpose:
+YAML 1.1 reads a bare `on:` key as the boolean `true`, which is the comma
+trap's cousin and just as silent. `boolkeys()` in `build_pages.py` now fails
+the build on any boolean key, beside the `nulls()` scan for the comma trap.
+
 **Phase 2 is hidden.** `SHOW_PHASE2 = False` in `build_pages.py` keeps the four
 reserved crystallography carts, the phase 2 entries in `_data/future.yml` and
 the phase 2 programme out of every page and out of the generated inventory.

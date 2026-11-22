@@ -7,10 +7,30 @@
 #         build    needs something built or bought offline first
 #         offline  runs, but its endpoint is a sample prepared for something
 #                  off the rack - the chain ends in an Offline chip
+#
+# steps:  the step-by-step method, written the way a journal methods section
+#         is written. One numbered instruction per step:
+#
+#           - do: >-
+#               What to do, in the imperative.
+#             at: "echo"          the machine it runs on
+#             t:  "3 min a plate" only where the rate model has a real figure
+#             crit: >-            what goes wrong if this step is got wrong
+#             note: >-            what is worth knowing, but will not bite
+#
+#         THE KEY IS `at`, NOT `on`. YAML 1.1 reads a bare `on:` key as the
+#         boolean true, so `- on: echo` parses as {True: "echo"} and the page
+#         silently renders nothing. That is the comma trap's cousin and the
+#         build now fails on it, but it is easier not to write.
+#
+#         The build checks that every machine in deck: is used by some step,
+#         and that no step names a machine the workflow does not have. The
+#         deck chain, the drawing and the written method stay in step because
+#         none of the three can be changed alone.
 
 title: Sample protocols
 subtitle: What each one does on the deck, and what it hands back
-note: Click an instrument to see everything that needs it.
+note: Click a protocol to open it. Click an instrument to see everything that needs it.
 
 # ---------------------------------------------------------------------------
 # Machine time. Added 2026-11-17 to close audit finding 3.
@@ -560,6 +580,29 @@ workflows:
     output: "A 384-well template plate, every well at the same concentration"
     cost: {bravo: 0, echo: 3, reader: 0, binds: Echo — and it is the cheapest workflow on the deck}
     gates: []
+    steps:
+      - do: >-
+          Resuspend the ordered fragment plate in nuclease-free water at the vendor's stated
+          concentration: eBlocks at 10 ng/uL, Twist fragments at 0.5 ng/uL.
+        at: "offline"
+        note: >-
+          The two vendors arrive at different concentrations. That difference is the whole
+          reason the next transfer exists.
+      - do: >-
+          Spin the plate down and load it as an Echo source plate.
+        at: "offline"
+      - do: >-
+          Acoustically transfer each fragment into the destination plate at a fixed mass per
+          well, backfilling with water so every well leaves at one concentration.
+        at: "echo"
+        t: "3 min a plate"
+        crit: >-
+          Normalise by mass, not by volume. A fixed volume lets the molar ratio drift design
+          to design, and every route downstream inherits that drift.
+      - do: >-
+          Return the source plate to ambient storage. The destination plate is the template
+          plate that 4.3, 4.4 and 4.13 all draw from.
+        at: "ambistore"
     inputs:
       - item: Gene fragments
         spec: "one per design — IDT eBlocks or Twist Gene Fragments, ~300 bp to 1.5 kb"
@@ -587,6 +630,47 @@ workflows:
     output: "The library in liquid culture, plus the sequencing read that says what is in it"
     cost: {bravo: 24, echo: 6, reader: 0, binds: Cytomat — the outgrowth occupies a shaking position for the night}
     gates: []
+    steps:
+      - do: >-
+          Build the pool PCR in 384: oligo pool plus flanking primers into the destination
+          plate, one subpool per library.
+        at: "echo"
+        t: "3 min a plate"
+      - do: >-
+          Cycle the retrieval PCR.
+        at: "atc"
+      - do: >-
+          SPRI cleanup at 0.8x, which drops anything under about 200 bp.
+        at: "bravo"
+        t: "32 min at 384"
+        note: >-
+          This is the only size selection the deck has.
+      - do: >-
+          Deliver the BsaI-HFv2 and T4 ligase master mix from the tube.
+        at: "magniflex"
+        crit: >-
+          Enzyme mixes ship in glycerol and the Echo will not transfer them. A positive-
+          displacement channel from the tube is the only route onto the plate.
+      - do: >-
+          Run the Type IIS digestion-ligation cycling, then the final hold.
+        at: "atc"
+      - do: >-
+          Second SPRI cleanup, then heat-shock the assembly on the two temperature-controlled
+          deck nests, exactly as 4.14.
+        at: "bravo"
+      - do: >-
+          Add recovery medium immediately after the pulse.
+        at: "multiflo"
+      - do: >-
+          Outgrow the whole transformation as a pool in liquid, shaken and incubated.
+        at: "cytomat"
+        t: "overnight"
+        crit: >-
+          Never plate for colonies. The pool is the product; plating it would select a handful
+          of members out of a library.
+      - do: >-
+          Sequence the outgrown pool to find out what is actually in it.
+        at: "offline"
     inputs:
       - item: Oligo pool
         spec: "20-350 nt. Plan the coding budget at ~75 aa. Subpool adapters split one order into several libraries"
@@ -626,6 +710,51 @@ workflows:
     output: "One circular, expression-ready construct per design, no colonies"
     cost: {bravo: 16, echo: 6, reader: 0, binds: Bravo — two SPRI cleanups at 96. Run the assembly at 384 and they cost 64 min instead of 16}
     gates: []
+    steps:
+      - do: >-
+          Build the retrieval PCR in the 384 block: fragment template plus high-fidelity
+          master mix.
+        at: "echo"
+        t: "3 min a plate"
+      - do: >-
+          Cycle the retrieval PCR, 30 cycles.
+        at: "atc"
+      - do: >-
+          SPRI cleanup at 1.8x and elute small.
+        at: "bravo"
+        t: "32 min at 384"
+      - do: >-
+          Normalise the cleaned insert into the assembly plate by mass, with the circularising
+          vector.
+        at: "echo"
+        t: "3 min a plate"
+        crit: >-
+          Normalise by mass. The source paper added a fixed volume and let the insert-to-
+          vector molar ratio drift, which is the one variable this step exists to hold.
+      - do: >-
+          Deliver the BsaI-HFv2 and T4 ligase master mix from the tube.
+        at: "magniflex"
+        note: >-
+          Glycerol-based, so the Echo cannot move it.
+      - do: >-
+          Run the Golden Gate in a 96 block: 30 cycles of 37 C for 60 s and 16 C for 60 s,
+          then 60 C for 10 min, in 30 uL.
+        at: "atc"
+        crit: >-
+          The assembly runs in a 96 block and not the 384 one. The 384 block takes 5-20 uL and
+          a 30 uL assembly does not fit it.
+      - do: >-
+          Second SPRI cleanup.
+        at: "bravo"
+        t: "32 min at 384"
+        note: >-
+          These two cleanups are the only Bravo steps in the workflow. Taking the assembly to
+          384 quadruples both of them.
+      - do: >-
+          Dispense the assembled circular product straight into the expression reaction.
+        at: "multiflo"
+        note: >-
+          No transformation, no outgrowth, no colony, no miniprep.
     inputs:
       - item: Linear dsDNA gene fragments
         spec: "one per design, with Golden Gate handles designed in at order time"
@@ -668,6 +797,47 @@ workflows:
     output: "Protein in ug/mL per well, read against the GFP11 standard curve"
     cost: {bravo: 0, echo: 12, reader: 32, binds: PHERAstar — four reads at 8 min; the Bravo is never in the chain}
     gates: [D1, D2]
+    steps:
+      - do: >-
+          Acoustically dispense the Mg-glutamate, K-glutamate and energy stocks that build the
+          16 conditions of the design matrix.
+        at: "echo"
+        t: "3 min a plate"
+        crit: >-
+          Check every stock is Echo-compatible before the first run. Glycerol is the usual
+          reason a stock will not transfer.
+      - do: >-
+          Add template to each condition, linear dsDNA or plasmid as the run calls for.
+        at: "echo"
+        t: "3 min a plate"
+        note: >-
+          Linear template needs GamS in a lysate system and nothing at all in PURE.
+      - do: >-
+          Bulk-dispense the common lysate or PURE mix to final volume.
+        at: "multiflo"
+      - do: >-
+          Seal the plate.
+        at: "plateloc"
+      - do: >-
+          Incubate, one temperature arm per unit, so temperature is a replicated factor rather
+          than a plate-level confound.
+        at: "atc"
+        t: "4-6 h"
+        note: >-
+          Three of the four blocks are 96-well at 10-100 uL and the fourth is 384-well at 5-20
+          uL. Give the 384 arm the small-volume runs and the design is unchanged.
+      - do: >-
+          Peel the seal.
+        at: "xpeel"
+      - do: >-
+          Add GFP1-10 detection reagent in excess and leave it to complement.
+        at: "multiflo"
+        t: "30 min"
+      - do: >-
+          Read fluorescence and convert RFU to ug/mL against the standard curve carried on the
+          same plate.
+        at: "pherastar"
+        t: "8 min a plate"
     inputs:
       - item: Lysate or PURE kit
         spec: "two lots — lot is a factor in the DOE, not a constant"
@@ -704,6 +874,40 @@ workflows:
     output: "A deep-well block of lysate, one culture per well"
     cost: {bravo: 0, echo: 0, reader: 0, binds: Cytomat — 14 deep-well positions and 7 concurrent culture protocols. Nothing else on the deck binds this}
     gates: [D1]
+    steps:
+      - do: >-
+          Dispense autoinduction medium into the deep-well block and inoculate from the
+          transformation.
+        at: "multiflo"
+        note: >-
+          Autoinduction avoids timed IPTG, which is what makes an unattended overnight run
+          possible at all. Kan selection, for the same reason.
+      - do: >-
+          Apply the gas-permeable seal.
+        at: "a4s"
+        crit: >-
+          Not a foil seal. A thermal foil off the PlateLoc would take a 20 h deep-well culture
+          anaerobic. Two sealers is what keeps both seal types resident without a manual roll
+          change.
+      - do: >-
+          Grow the block with shaking and incubation.
+        at: "cytomat"
+        t: "overnight"
+        note: >-
+          Growth goes here and not on the Bravo deck nests, which hold a fixed temperature and
+          do not aerate.
+      - do: >-
+          Spin the block and discard the supernatant.
+        at: "hig3"
+      - do: >-
+          Add plate-compatible detergent lysis reagent and resuspend the pellets.
+        at: "multiflo"
+        note: >-
+          There is no sonication on deck, so lysis is chemical.
+      - do: >-
+          Spin again to clear the lysate. Cleared lysate goes straight to 4.5; a block that
+          has to wait goes to cold storage.
+        at: "hig3"
     inputs:
       - item: Plasmid or fragment
         spec: "pET29b — Kan, because this incubates unattended overnight"
@@ -742,6 +946,37 @@ workflows:
     output: "Micrograms of eluted protein per well, in elution buffer"
     cost: {bravo: 60, echo: 0, reader: 0, binds: Bravo — 96 lysates per hour. A full 14-plate E. coli round is a 14 h serial step}
     gates: [D2]
+    steps:
+      - do: >-
+          Add tagged magnetic beads to each well of cleared lysate or finished cell-free
+          reaction.
+        at: "bravo"
+        t: "8 min at 96"
+      - do: >-
+          Resuspend and bind, 200-3,000 rpm on a 2.0 mm orbit, on the deck beside the magnet.
+        at: "bioshake"
+      - do: >-
+          Engage the magnet and aspirate the supernatant.
+        at: "bravo"
+      - do: >-
+          Wash: resuspend off the magnet, re-capture, aspirate. Repeat for the bead
+          chemistry's wash count.
+        at: "bioshake"
+        note: >-
+          The plate never leaves the deck between washes, which is the only reason this fits
+          in an hour.
+      - do: >-
+          Elute into the bead chemistry's elution buffer.
+        at: "bravo"
+        crit: >-
+          Biotin elution buffer poisons any downstream streptavidin step. Buffer-exchange
+          afterwards, or run the construct on a His tag and an EDTA/DTT-tolerant IMAC bead
+          instead.
+      - do: >-
+          Hold the eluate cold, or hand the plate straight to 4.6.
+        at: "steristore_cold"
+        crit: >-
+          What comes off here is micrograms. Crystallography protein does not.
     inputs:
       - item: MagStrep Strep-Tactin XT
         spec: "IBA 2-5090-002. Magnetic 6% agarose, binds Twin-Strep, 96-well compatible"
@@ -776,6 +1011,38 @@ workflows:
     output: "Concentration, A260/A280 and an aggregation flag per well, and a plate normalised to one concentration"
     cost: {bravo: 0, echo: 0, reader: 24, binds: PHERAstar — three reads of the same plate at 8 min each}
     gates: [D2]
+    steps:
+      - do: >-
+          Split the eluate into one aliquot per question and add the concentration reagent,
+          GFP1-10 or LgBiT plus furimazine.
+        at: "multiflo"
+      - do: >-
+          Read concentration against the standard curve.
+        at: "pherastar"
+        t: "3 min a plate"
+      - do: >-
+          Move an aliquot into a UV-transparent plate.
+        at: "multiflo"
+      - do: >-
+          Read A260/A280 for nucleic-acid carryover.
+        at: "pherastar"
+      - do: >-
+          Add the FP tracer, fluorescein or TAMRA.
+        at: "multiflo"
+      - do: >-
+          Read polarisation. A rise against the monomer control is the aggregation flag.
+        at: "pherastar"
+      - do: >-
+          Normalise every well to one concentration before anything reaches an assay.
+        at: "lynx"
+        note: >-
+          1 uL minimum and 2 uL at 2% CV. An in-line flow sensor measures what each channel
+          actually delivered, so the normalised plate is measured rather than nominal and the
+          per-well correction can be logged against the design.
+      - do: >-
+          Run a gel on a subset, offline, if band identity is the question. Purity in that
+          sense is the one thing this workflow cannot answer.
+        at: "offline"
     inputs:
       - item: GFP1-10, or LgBiT + furimazine
         spec: "concentration; HiBiT if you want the dynamic range"
@@ -811,6 +1078,32 @@ workflows:
     output: "A binding signal per well: a TR-FRET ratio, a luminescence count or a polarisation"
     cost: {bravo: 0, echo: 3, reader: 8, binds: "PHERAstar — 150 plates per 20 h day, and 3 min rather than 8 if the format is luminescent"}
     gates: [D3, D4]
+    steps:
+      - do: >-
+          Pick the format. NanoBiT reads straight out of crude cell-free and is the one to
+          reach for first; the other three need protein in hand.
+        at: "offline"
+      - do: >-
+          Build the plate: protein, target and controls into 384 or 1536.
+        at: "echo"
+        t: "3 min a plate"
+        note: >-
+          The Echo builds it, so 384 and 1536 cost the same deck time as 96.
+      - do: >-
+          Add the format's detection reagents.
+        at: "multiflo"
+      - do: >-
+          Seal the plate.
+        at: "plateloc"
+      - do: >-
+          Hold to equilibrium for the format's incubation.
+        at: "ambistore"
+      - do: >-
+          One read: a TR-FRET ratio, a luminescence count or a polarisation.
+        at: "pherastar"
+        t: "8 min a TR-FRET plate"
+        note: >-
+          Tipless in, one read out. This is the cheapest thing the foundry does per design.
     inputs:
       - item: Detection reagents
         spec: "by format: furimazine; Tb/Eu cryptate anti-tag donor + d2 acceptor; Alpha bead pair; or a tracer peptide"
@@ -851,6 +1144,32 @@ workflows:
     output: "A selectivity margin per design: on-target signal against each control"
     cost: {bravo: 0, echo: 3, reader: 8, binds: "PHERAstar — but it is three extra columns on 4.7's plate, so in practice it costs nothing new"}
     gates: [D6]
+    steps:
+      - do: >-
+          Lay three extra columns onto the binding plate: the counter-target homolog, a
+          hotspot point-mutant of your own target, and a non-binder control carried from an
+          unrelated campaign.
+        at: "echo"
+        t: "3 min a plate"
+        crit: >-
+          The hotspot mutant is the only one of the three that catches a binder that found the
+          wrong face. A homolog alone cannot tell you that.
+      - do: >-
+          Where an IC50 is wanted, build the competitor titration into the same destination.
+        at: "echo"
+      - do: >-
+          Add detection reagents, as 4.7.
+        at: "multiflo"
+      - do: >-
+          Seal and hold to equilibrium.
+        at: "plateloc"
+      - do: >-
+          Read the whole plate in one pass.
+        at: "pherastar"
+        t: "8 min a TR-FRET plate"
+      - do: >-
+          Report each design's on-target signal against each control as a selectivity margin.
+        at: "offline"
     inputs:
       - item: Counter-target
         spec: "a homolog — Mac1 against MD1"
@@ -879,6 +1198,28 @@ workflows:
     output: "A KD or IC50 per hit, with the fitted curve behind it"
     cost: {bravo: 0, echo: 3, reader: 8, binds: PHERAstar — a serial dilution on the Bravo would cost 32 min of the bottleneck instead of 3 on the Echo}
     gates: [D5]
+    steps:
+      - do: >-
+          Build the dilution series acoustically in the destination plate from a single
+          titrant source plate.
+        at: "echo"
+        t: "3 min a plate"
+        crit: >-
+          No serial pipetting, so no tip-to-tip carryover down the series. Spacing can be non-
+          linear where the interesting part of the curve is not evenly spread.
+      - do: >-
+          Backfill to constant volume and add the assay's detection reagents.
+        at: "multiflo"
+      - do: >-
+          Seal and hold to equilibrium.
+        at: "plateloc"
+      - do: >-
+          Read the whole series on one plate.
+        at: "pherastar"
+        t: "8 min a TR-FRET plate"
+      - do: >-
+          Fit the curve and report a KD or IC50 per hit, with the fit behind it.
+        at: "offline"
     inputs:
       - item: One Echo source plate of titrant
         spec: "the series is built acoustically in the destination; no serial dilution"
@@ -902,6 +1243,32 @@ workflows:
     output: "Residual binding after each step of the temperature ladder, four points, not a Tm"
     cost: {bravo: 0, echo: 0, reader: 32, binds: "PHERAstar — four reads. The four ATC blocks run independent programs, so the ladder costs one pass, not four"}
     gates: []
+    steps:
+      - do: >-
+          Prepare the binding assay exactly as 4.7 and split it across four plates, one per
+          temperature.
+        at: "offline"
+      - do: >-
+          Seal each plate.
+        at: "plateloc"
+      - do: >-
+          Hold each plate at its own temperature, four arms in parallel.
+        at: "atc"
+        note: >-
+          Three blocks are 96-well at 10-100 uL and the fourth is 384-well at 5-20 uL.
+      - do: >-
+          Peel the seals.
+        at: "xpeel"
+      - do: >-
+          Read residual binding at each temperature.
+        at: "pherastar"
+        t: "8 min a TR-FRET plate"
+      - do: >-
+          Report four points of residual binding.
+        at: "offline"
+        crit: >-
+          This is not a Tm. Neither ATC version has optical detection, so a melt curve has
+          nowhere to be read on this system.
     inputs:
       - item: The binding assay's reagents
         spec: "residual binding is the readout, so this is 4.7 run after a heat step"
@@ -927,6 +1294,47 @@ workflows:
     output: "Transformants in liquid, and a titre from the plated dilution series"
     cost: {bravo: 24, echo: 3, reader: 0, binds: "Bravo — the pulse is a plate move between two deck nests, so the whole transformation is Bravo time"}
     gates: []
+    steps:
+      - do: >-
+          Hold competent cells and assembled DNA at 4 C until the run starts.
+        at: "steristore_cold"
+      - do: >-
+          Dispense assembled DNA into the cold plate sitting on the 4 C deck nest.
+        at: "echo"
+        t: "3 min a plate"
+      - do: >-
+          Add chemically competent cells and hold on the 4 C nest.
+        at: "bravo"
+        t: "8 min at 96"
+      - do: >-
+          Move the plate to the 42 C nest, hold, and move it back to 4 C.
+        at: "bravo"
+        t: "45 s at 42 C"
+        crit: >-
+          The pulse is a plate move between two fixed nests. A single block ramps at about 12
+          K/min and would take roughly three minutes to cross from 4 C to 42 C, and a cycler
+          in another cart cannot time it at all.
+      - do: >-
+          Add recovery medium immediately after the pulse.
+        at: "multiflo"
+        note: >-
+          The 1 uL cassette covers anything down to 1 uL a well.
+      - do: >-
+          Recover with shaking on the deck, then move the plate to outgrowth.
+        at: "bioshake"
+        t: "about 1 h"
+      - do: >-
+          Outgrow in liquid, shaken and incubated.
+        at: "cytomat"
+      - do: >-
+          Lid the agar plates for the titre dilution series.
+        at: "a4s"
+      - do: >-
+          Plate the dilution series for titre and QC, and sequence.
+        at: "offline"
+        crit: >-
+          Nothing picks a colony. No step on this system returns a clone from agar to liquid,
+          so plating is for counting and checking only.
     inputs:
       - item: Chemically competent cells
         spec: "delivered cold on the day; the coldest position on the system is the 4 C SteriStore, which also holds them in-run"
@@ -963,6 +1371,40 @@ workflows:
     output: "1,536 sitting drops, scored clear, precipitate or crystal"
     cost: {bravo: 0, echo: 9, reader: 0, binds: Echo — 80 trays is 11.5 h on-system against 48.9 h once imaging is done by hand}
     gates: [D7]
+    steps:
+      - do: >-
+          Express and purify offline to milligram scale at 10 mg/mL or better.
+        at: "offline"
+        crit: >-
+          This has to come from offline expression. Magnetic bead purification reaches
+          micrograms, and the gap is not close. The deck screens crystallisation protein; it
+          does not make it.
+      - do: >-
+          Load commercial sparse-matrix screens as Echo source plates, plus compound stocks in
+          DMSO where the run is a fragment screen.
+        at: "offline"
+      - do: >-
+          Set sitting drops into the tray: protein against condition, apo or co-
+          crystallisation, at 1536.
+        at: "echo"
+        t: "3 min a plate"
+      - do: >-
+          Close the tray with a lid.
+        at: "offline"
+        crit: >-
+          A lid, never a seal. Both sealers on the system are thermal and a 200 nL drop has no
+          thermal mass to survive either of them.
+      - do: >-
+          Store the trays and retrieve them for each scoring round.
+        at: "ambistore"
+        t: "weeks to grow"
+        note: >-
+          216 standard positions on a carousel that returns a tray in as little as 12 seconds,
+          which is exactly the access pattern a growing tray library needs.
+      - do: >-
+          Image and score each drop clear, precipitate or crystal, then take hits to
+          diffraction.
+        at: "offline"
     inputs:
       - item: Protein at >=10 mg/mL
         spec: "from offline expression. Mag beads cannot reach this"
@@ -1003,6 +1445,30 @@ workflows:
     output: "A hit list: percent effect per compound, against the plate's own controls"
     cost: {bravo: 0, echo: 3, reader: 8, binds: PHERAstar — the same plate cost as 4.7 for four times the wells}
     gates: []
+    steps:
+      - do: >-
+          Transfer compound from the DMSO library plate into the destination at 1536.
+        at: "echo"
+        t: "3 min a plate"
+        crit: >-
+          DMSO transfer needs the 6XX-series Echo. The 525 cannot do it.
+      - do: >-
+          Add protein and target on top, the same spine as 4.7.
+        at: "echo"
+      - do: >-
+          Add the 4.7 detection reagents.
+        at: "multiflo"
+      - do: >-
+          Seal and hold to equilibrium.
+        at: "plateloc"
+      - do: >-
+          Read the plate.
+        at: "pherastar"
+        t: "8 min a TR-FRET plate"
+      - do: >-
+          Report percent effect per compound against the plate's own controls, and return the
+          compound source plate to ambient storage.
+        at: "ambistore"
     inputs:
       - item: Compound plates in DMSO
         spec: "the Echo 6XX again"
@@ -1030,6 +1496,41 @@ workflows:
     output: "Fold activation per design, a rank rather than an affinity"
     cost: {bravo: 32, echo: 3, reader: 8, binds: "Bravo — the cold master mix goes into a 384 plate, which is four offset quadrant transfers"}
     gates: [D1, D4, D6]
+    steps:
+      - do: >-
+          Dispense every DNA component first: the CI-fusion fragments normalised to 50 nM and
+          the reporter plasmid to 5 nM final.
+        at: "echo"
+        t: "3 min a plate"
+        crit: >-
+          DNA before the cold master mix. That ordering is what makes an ambient-deck sequence
+          survivable.
+      - do: >-
+          Add the cold extract and CF2H buffer master mix.
+        at: "bravo"
+        t: "32 min at 384"
+        note: >-
+          This is the only binding workflow with the Bravo in the chain, and at 384 that one
+          step costs 32 min of the system bottleneck against 3 min on the Echo. If the cold
+          master mix can be made acoustic, move it.
+      - do: >-
+          Top up to final volume. In the streptavidin format, add the pre-mixed biotinylated
+          target at 150 nM here.
+        at: "multiflo"
+      - do: >-
+          Seal the plate.
+        at: "plateloc"
+      - do: >-
+          Hold the sealed plate while expression and binding run in the same well.
+        at: "ambistore"
+        t: "4-8 h"
+      - do: >-
+          Read sfGFP and convert raw RFU to mean-equivalent units against the FITC standard.
+        at: "pherastar"
+        t: "3 min a plate"
+        note: >-
+          The output is a rank, not an affinity, and nothing weaker than about 100 nM is
+          detected at all.
     inputs:
       - item: dRecBCD extract
         spec: "BL21 Rosetta 2 dRecBCD, homemade S30 at EUR0.10/reaction, or commercial lysate plus GamS at EUR5-10"

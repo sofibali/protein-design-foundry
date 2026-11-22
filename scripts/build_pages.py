@@ -90,6 +90,25 @@ def nulls(obj, path=""):
             yield from nulls(v, f"{path}[{i}]")
 
 
+def boolkeys(obj, path=""):
+    """Every key in these files that YAML turned into a boolean.
+
+    The comma trap's cousin, and this project hit it on 2026-11-21 writing the
+    step procedures. YAML 1.1 reads `on`, `off`, `yes`, `no`, `y` and `n` as
+    booleans, so a step written `- on: echo` parses as {True: "echo"} and the
+    page reads `step.on` as undefined. Nothing here wants a boolean key, so
+    any boolean key is that bug. Quote the key, or pick another word.
+    """
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if isinstance(k, bool):
+                yield path or "(root)", k, v
+            yield from boolkeys(v, f"{path}.{k}" if path else str(k))
+    elif isinstance(obj, list):
+        for i, v in enumerate(obj):
+            yield from boolkeys(v, f"{path}[{i}]")
+
+
 def figures(page, marker, keys):
     """What a page can draw, read back out of the page itself.
 
@@ -121,6 +140,10 @@ def check(gates, stages, protos, progs):
             errs.append(f"{label}: {where} has a null-valued key — quote the value. "
                         f"An unquoted comma in a flow mapping split it, and the text "
                         f"after the comma became this key: {key[:70]!r}")
+        for where, key, val in boolkeys(blob):
+            errs.append(f"{label}: {where} has the key {key} — YAML read an unquoted "
+                        f"on/off/yes/no as a boolean. Quote the key or rename it. "
+                        f"Its value is {str(val)[:60]!r}")
 
     # --- stages against gates ---
     used = set()
@@ -234,6 +257,32 @@ def check(gates, stages, protos, progs):
         for x in w.get("inputs", []):
             if not x.get("item") or not x.get("spec"):
                 errs.append(f"workflow {wid!r}: an input is missing item or spec")
+        # --- the procedure, STAR Methods style ---
+        # Numbered steps, each naming the machine it runs on, so the deck
+        # chain, the drawing and the written protocol cannot drift apart. The
+        # chain says which machines; steps: says what each one does with the
+        # plate. A machine in one and not the other means one of them is lying.
+        steps = w.get("steps") or []
+        if len(steps) < 3:
+            errs.append(f"workflow {wid!r}: steps: must carry the procedure, at least "
+                        f"three numbered steps — the card has no prose fallback")
+        ran_on = set()
+        for n, s_ in enumerate(steps, 1):
+            if not (s_.get("do") or "").strip():
+                errs.append(f"workflow {wid!r} step {n}: no do:, so the step says nothing")
+            a = s_.get("at")
+            if a is None:
+                continue
+            ran_on.add(a)
+            if a not in insts:
+                errs.append(f"workflow {wid!r} step {n}: unknown instrument {a!r}")
+            elif a != "offline" and a not in w["deck"] and a not in w.get("holds", []):
+                errs.append(f"workflow {wid!r} step {n}: runs at {a!r}, which is in neither "
+                            f"this workflow's deck chain nor its holds")
+        for d in sorted(set(w["deck"]) - ran_on):
+            errs.append(f"workflow {wid!r}: {d!r} is in the deck chain but no step runs on "
+                        f"it — the procedure has to account for every machine the cost "
+                        f"model charges for")
         # a named protocol has to be a real file AND be on a stage
         pid = w.get("protocol")
         if pid:
