@@ -27,14 +27,17 @@ staged, not only your own work. Use `git commit -- <paths>`.
 
 **Nor does it name anyone.** The four pages in `static/pages/` are mailed and
 dropped in Slack, so a source comment, a built-in default or a bundled data blob
-travels with them even when nothing on screen shows it. Who decided a threshold,
-and when, belongs in `_data` and in the internal repo; the page carries the
-decision, not the decider. Two things this has already cost: the nine gate notes
+travels with them even when nothing on screen shows it. WHO decided a threshold
+belongs in the internal repo; WHEN it was decided can stay here. Both the pages
+and this repository carry the decision and its date, not the decider. Applied
+2026-11-23: seven notes lost the name and kept the date. The four `lead:` lines
+in `_projects/` are public attribution of who runs a project, which is the
+opposite case, and stayed. Two things this has already cost: the nine gate notes
 were shipping inside every page without being rendered, so `build_pages.py` now
 strips `note` from the gate data at bundle time, leaving `gates.yml` whole; and
 the intake page's mail target is a build-time constant, so whatever goes there
-is published with the page. It is unset, and a role address rather than a
-person's is the one to put in it.
+is published with the page. It is set deliberately rather than by default, and
+a role address would be the better answer if one is ever created.
 
 **What this rule does not reach is git itself.** Every commit here is authored
 under a name and an email address, both public in the history of a public
