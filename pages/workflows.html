@@ -54,8 +54,11 @@
     --bg:#141416; --ink:#f2f2f4; --muted:#8e8e93; --rule:#3a3a3d; --tab-bg:#242427;
     --fillop:0.24; --chipop:0.20; --accent:#56B4E9;
   }}
+  /* --muted has to be here too, not only in the media query: with the
+     attribute set and a light OS preference, the light #6e6e73 was left on
+     the dark background at 3.63:1. The blueprint carries the same line. */
   :root[data-theme=dark]{ --bg:#141416; --ink:#f2f2f4; --rule:#3a3a3d; --tab-bg:#242427;
-                          --fillop:0.24; --chipop:0.20; --accent:#56B4E9; }
+                          --muted:#8e8e93; --fillop:0.24; --chipop:0.20; --accent:#56B4E9; }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
        -webkit-font-smoothing:antialiased}
