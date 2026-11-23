@@ -79,6 +79,7 @@ static/pages/      the built self-contained pages
 scripts/
   build_pages.py   builds static/pages/* and writes _data/instruments.yml
   check_data.py    validates everything, including the device set
+  check_templates.py  Liquid, includes, and every internal link
 ```
 
 **`_data/protocols.yml` is the single source for the device set.** The carts on
@@ -88,7 +89,8 @@ committed only because GitHub Pages needs it at build time.
 
 ```bash
 python3 scripts/build_pages.py   # rebuild the pages and the inventory
-python3 scripts/check_data.py    # validate; runs the device-set checks too
+python3 scripts/check_data.py       # validate; runs the device-set checks too
+python3 scripts/check_templates.py  # Liquid, includes, every link
 ```
 
 `check_data.py` fails if an instrument is on the capability map and on no cart,

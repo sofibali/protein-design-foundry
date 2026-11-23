@@ -246,6 +246,7 @@ That answers the question without touching anyone's checkout.
 
 ```
 python3 scripts/check_data.py        # data, sheets, and the device set
+python3 scripts/check_templates.py   # Liquid, includes, and every link
 python3 scripts/build_pages.py       # then commit only your own output
 ```
 

@@ -1,7 +1,10 @@
-name: Check data files
+name: Check data and templates
 
-# GitHub Pages builds the site itself, so this only checks what Jekyll cannot:
-# that every key in the data files and project front matter actually resolves.
+# GitHub Pages builds the site itself, so this only checks what Jekyll will
+# not: that every key in the data files and project front matter resolves,
+# and that the templates hold together. There is no Ruby on the machines
+# these are written on, so without this a template fault is first seen on
+# the live page.
 on:
   push:
     branches: [main]
@@ -16,3 +19,4 @@ jobs:
         with: {python-version: "3.12"}
       - run: pip install pyyaml
       - run: python3 scripts/check_data.py
+      - run: python3 scripts/check_templates.py
