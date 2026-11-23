@@ -288,8 +288,7 @@
 
   <section class="band" id="happens">
     <div class="bandhead"><h2>What happens here</h2>
-      <span class="lede">Four stages, one loop, and a named decision at the end of each.
-        Click a stage for what it decides and on what number.</span></div>
+      <span class="lede" id="stage-lede"></span></div>
     <div class="main">
       <div class="stage">
         <div class="figwrap">
@@ -1222,6 +1221,7 @@ window.FOUNDRY = {
 <script>
 (() => {
   const F = window.FOUNDRY, S = F.stages;
+  const COUNT = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'];
   const WHERE = {
     compute:  {c:'#0072B2', label:'yours to build'},
     rac:      {c:'#009E73', label:'on the Ginkgo'},
@@ -1292,6 +1292,10 @@ window.FOUNDRY = {
   // reaches the figure at all, which a plain overflow box does not give you.
   // Both are attached only while there is something to scroll, so a desktop
   // reader does not tab into a box that cannot move.
+  document.getElementById('stage-lede').textContent =
+    `${COUNT[S.length - 1] || S.length} stages, one loop, and a named decision at the end ` +
+    `of each. Click a stage for what it decides and on what number.`;
+
   const scroller = document.getElementById('scroller');
   const figwrap = document.querySelector('.figwrap');
   function scrollState() {
@@ -1356,7 +1360,6 @@ window.FOUNDRY = {
     'taking proposals': {c:'#0072B2'},
     'phase 2':          {c:'#8e8e93'}
   };
-  const COUNT = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'];
   document.getElementById('pr-lede').textContent =
     (COUNT[PR.length - 1] || PR.length) + ' shapes of project. Click one for what it solves '
     + 'and what you get back.';
