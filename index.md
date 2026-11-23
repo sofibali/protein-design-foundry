@@ -32,7 +32,11 @@ Everything else on this site is the detail behind that page.
   <div class="card"><h3><a href="{{ '/projects/' | relative_url }}">Projects</a></h3>
     <p>Foundational test projects. Each is a claim about a capability.</p></div>
   <div class="card"><h3><a href="{{ '/inventory/' | relative_url }}">Inventory</a></h3>
-    <p>{{ site.data.instruments.instruments | where: "status", "quoted" | size }} instruments across {{ site.data.instruments.racs | size }} carts.</p></div>
+    <p>{%- assign quoted = site.data.instruments.instruments | where: "status", "quoted" -%}
+    {%- assign gaps = site.data.instruments.instruments | where: "status", "gap" -%}
+    {{ quoted | size }} instruments quoted for install, across {{ site.data.instruments.racs | size }} carts.
+    {% if gaps.size > 0 %}The {{ gaps | size }} capabilities the system will not have are listed
+    beside them.{% endif %}</p></div>
 </div>
 
 <details markdown="1">

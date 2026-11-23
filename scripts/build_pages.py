@@ -872,6 +872,13 @@ def main():
     # preconditions under "can the foundry take your project" read as entry
     # requirements, which is the opposite of what they are.
     loop.pop("guidance", None)
+    # The "can the foundry take your project" band came off the landing page
+    # on 2026-11-23, when the page was rebuilt to four sections and to be read
+    # in a minute. These three blocks were its content; they stay in
+    # stages.yml, but shipping them into a page that does not render them
+    # would mail several thousand words of unread text with every link.
+    for dead in ("fit", "provide", "returns"):
+        loop.pop(dead, None)
     loop["gates"] = gates
     loop["programmes"] = progs
     # Two figures the landing band shows are computed here rather than typed
@@ -879,6 +886,12 @@ def main():
     # is whatever racs: holds after phase 2 is dropped, and the decision count
     # is whatever gates.yml holds. `headline.items[].count` names which one.
     loop["counts"] = {"carts": len(protos["racs"]), "gates": len(gates)}
+    # How many protocols are drawn in each experimental type. Counted off
+    # workflows: rather than written into stages.yml, so the figure beside a
+    # category cannot disagree with the protocols the site actually holds.
+    for ph in protos["phases"]:
+        loop["counts"]["phase_" + ph["id"]] = sum(
+            1 for w in protos["workflows"] if w["phase"] == ph["id"])
     # The built pages are self-contained - mailed, opened off a disk - so a
     # link back to the Jekyll site has to be absolute. {{SITE}} is substituted
     # into the HTML before the payload is inlined, so it cannot be used inside

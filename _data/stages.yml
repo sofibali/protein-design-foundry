@@ -13,61 +13,54 @@ subtitle: Lab-in-the-loop automated protein targeting
 # "year 1 · 4 labs" was also here and has been dropped: no file in this
 # repository carries that number, so it could not be given a source.
 note: >-
-  In build at UCSF Mission Bay · not open for general submissions yet ·
-  first campaign, designed binders against PARP14 MD1
+  In build at UCSF Mission Bay · not open for general submissions yet
 
 # ---------------------------------------------------------------------------
-# The landing band: four claims for a reader who will not click anything.
-# Every figure here is already published somewhere in this repository, and
-# the two that would go stale are not written down at all - `count:` names a
-# value the build computes and the page substitutes, so the number on the
-# page cannot drift from the data it came from.
+# Section 1 of the landing page: what the place is, in two halves that only
+# work together. The lab half and the design half.
 #
-# Source, per item:
-#   carts      computed from racs: in _data/protocols.yml, installed only.
-#   library    _projects/parp14-binders.md front matter (scale: 1,152 designs,
-#              one backbone) and "What it can do" in capabilities/index.md
-#              for the plate arithmetic.
-#   routes     the throughput table in capabilities/index.md, which gives
-#              51.5 h in-cell and 11.7 h cell-free for those same 1,152
-#              designs. Modelled from the device set, not measured.
-#   decisions  computed from _data/gates.yml.
-headline:
+# NO NUMBERS HERE ON PURPOSE. The landing page carries a figure only when it
+# is a fact about the build as it stands, with its referent beside it. A
+# planned library size, a modelled run time, or arithmetic over hardware that
+# is not installed yet is not that, and reads to someone outside the project
+# as a measurement the foundry cannot have made. The one survivor is the cart
+# count, which is what has been quoted and is counted at build time from
+# racs: in _data/protocols.yml rather than typed here.
+#
+# Source for the design half: the `design` stage below (where: compute, "Runs
+# on UCSF compute, not on the machine"), gate D0 in _data/gates.yml, which is
+# the computational decision to onboard a target at all, and the return arc
+# on the loop figure - every result goes back into the models, failures
+# included. reference/design-quality-invariants.md is the long form of why
+# the measured failures are the valuable part; it is excluded from the build.
+what:
   title: What it is
   lede: >-
-    One enclosed system that takes a designed sequence to measured data
-    without a person moving a plate. It is being built, and nothing below is
-    running yet.
-  items:
-    - id: carts
+    Two halves that only work together: a design platform that proposes and
+    filters, and an enclosed lab that makes and measures what survives.
+  halves:
+    - id: lab
       count: carts
-      fig: carts, one track
+      fig: carts, one enclosed system
+      name: The automated lab
       say: >-
-        Each cart is a sealed micro-environment with its own six-axis arm,
-        sitting on a shared magnetic transport track. Plates move between
-        instruments without anyone opening a door, which is what makes a
-        20-hour unattended run possible.
-    - id: library
-      fig: 1,152 designs
+        Each cart is a sealed micro-environment with its own six-axis arm, on
+        a shared transport track. A plate moves from one instrument to the
+        next without anyone opening a door, so a run can continue unattended
+        overnight.
+    - id: design
+      fig: The design platform
+      name: Designs, before anything is made
       say: >-
-        The first campaign's library, and the unit everything on this site is
-        costed against: 3 plates at 384-well, or 12 at 96-well.
-    - id: routes
-      fig: 51.5 h or 11.7 h
-      say: >-
-        The same 1,152 designs, by two expression routes on the same
-        hardware. In-cell growth, or cell-free with no growth step at all.
-        Both figures are modelled from the device set rather than measured.
-    - id: decisions
-      count: gates
-      fig: named decisions
-      say: >-
-        Every design comes back with a verdict at every gate it reached, and
-        the measured failures come back too. That record is what the next
-        round gets designed from.
+        Candidates are generated and scored computationally, and only what
+        survives that filter is ever made. What comes back off the plates -
+        the failures as much as the hits - goes into the next round, so each
+        round is designed from what the last one actually did.
 
 # ---------------------------------------------------------------------------
-# The four foundational test projects, in short form.
+# The first projects, shown inside section 2 behind a shut disclosure rather
+# than as a band of their own. They are the evidence under the goals above:
+# each one exists to prove a capability.
 #
 # Source: the front matter of the four files in _projects/, which are already
 # published at /projects/. name, status and say are the title, status and
@@ -131,9 +124,7 @@ stages:
       Cell-free and E. coli in parallel, optimised by fractional-factorial
       screen then Bayesian optimisation. Magnetic-bead purification, then a
       quality gate before anything reaches an assay. Transformation and
-      plating run on the deck; colony picking does not. The ceiling is the
-      Bravo at about 75 two-plate protocols in a 20-hour day, tied with the
-      PHERAstar at 150 384-well TR-FRET plates.
+      plating run on the deck; colony picking does not.
     gates: [D1, D2]
     protocols:
       - {id: express.cfps.doe, status: draft}
@@ -208,7 +199,66 @@ stages:
         trays are set here and scored by hand.
 
 # ---------------------------------------------------------------------------
-# The user-facing half. A foundry user is a PI or postdoc from one of the
+# Section 3 of the landing page: the experimental types.
+#
+# Source: phases: in _data/protocols.yml, which is the list of big categories
+# every protocol on the site is filed under. The five ids and labels are
+# taken from there and must match it - DO NOT add a sixth or rename one here;
+# the page reads the label and the colour out of protocols.yml and only the
+# sentence below comes from this file. The count of protocols in each
+# category is counted off workflows: in the same file at build time, so it
+# cannot go stale either.
+types:
+  title: Experimental types
+  lede: >-
+    Every protocol on the site is filed under one of five categories. A
+    campaign is a chain through them.
+  note: >-
+    Counts are the protocols drawn so far, not a limit on what can be added.
+  say:
+    dna: >-
+      Building and amplifying the DNA for a design set, in plate format.
+    express: >-
+      Making the protein, by growth in cells or by cell-free reaction with no
+      growth step at all.
+    purify: >-
+      Pulling the protein out and asking whether it is good enough to test
+      before anything is spent on an assay.
+    bind: >-
+      Asking whether a design binds its target, how tightly, and whether it
+      bound the face it was designed for.
+    structure: >-
+      Setting crystallisation trays, to ask where a binder actually sits
+      rather than only how well it works.
+
+# ---------------------------------------------------------------------------
+# Section 4: the sign on the door. One line, and deliberately not a
+# countdown - Sofia has asked repeatedly that the date not be the framing, so
+# it is the last thing on the page and nothing is organised around it.
+#
+# Source for the date: pages/tracker.html (the footer, and the 2027-04-01
+# milestone) and reference/capabilities.md, which calls April 2027 the line
+# after which anything bought is off-rack. Nothing in either repository says
+# April 2026. Marked tentative because an install date is a vendor schedule.
+soon:
+  title: Coming soon
+  when: Tentative — April 2027
+  say: >-
+    The system is being built and is not open for general submissions yet.
+    If you think a workflow belongs here, the most useful thing to send is
+    the step list, the plate formats and the volumes, because that is what
+    decides whether it fits.
+
+# ---------------------------------------------------------------------------
+# NOT ON THE LANDING PAGE since 2026-11-23: fit:, provide: and returns: below.
+# They were the "Can the foundry take your project?" band - five questions
+# each with a paragraph, a three-level risk scale with nine examples, and two
+# five-row tables. That was the largest block of text on the page and the
+# page was rebuilt to be read in a minute. The data is kept rather than
+# deleted: the exchange and the risk levels are real and the proposal page is
+# where they belong, next to the form they are advice for.
+#
+# A foundry user is a PI or postdoc from one of the
 # labs bringing a target; they need to know whether it can be taken, what
 # they hand over, and what comes back. Everything below answers one of those.
 
