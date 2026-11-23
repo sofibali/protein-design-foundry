@@ -38,9 +38,29 @@ co-written. Ask before editing either.
 
 ## Sessions: one front door
 
-**A side session never asks Sofia anything.** It asks the session that started
-it. That session collects the questions from every lane and puts them to her
-once, in one place, with the options side by side.
+**A side session never puts a question to Sofia.** It sends it to the front
+door — the session she is actually working in — which collects every lane's
+questions and puts them to her once, in one place, with the options side by
+side.
+
+**The front door is named in your brief. It is not necessarily your parent.**
+Send questions straight there. A chain of "ask whoever started you" gives the
+deepest lane the longest route and the most places to stall, and a link in it
+may be idle. If your brief did not name a front door, ask your parent who it
+is before you need one; a parent that is itself a side session forwards
+upward at once rather than holding the question.
+
+**This covers the wrap-up box, not just messages.** A question with buttons
+at the end of your turn renders in her view of your chat, so a tool putting
+it there does not make it something other than asking her directly. In a side
+session the wrap-up carries a recap and nothing else: no question, no
+buttons.
+
+**It governs what you initiate, not what she starts.** If Sofia writes to you
+in your own chat, answer her there — declining to answer your own user and
+sending her to another session is not the rule and would be worse than the
+problem. Then tell the front door what she said, so it is not learned
+secondhand later.
 
 This is the rule that matters most, and it is not about tidiness. On
 2026-11-23 the same question — whether the cost model should come off the
@@ -61,9 +81,15 @@ So:
 - **Reactivation comes from the main session**, by `SendMessage` to your
   session id, with her answer in it. She should never have to open a side
   chat to unblock one.
-- **Answer the parent, not the user, even when the question is for the user.**
-  If you think the parent has it wrong, say so to the parent. Disagreement
-  between sessions is settled between sessions; only the outcome goes to her.
+- **Settle disagreement between sessions, between sessions.** If you think
+  the front door has it wrong, argue it there rather than going around it.
+  Only the outcome reaches her.
+- **Urgent classes skip the batch.** Her personal data on a public surface,
+  a repository that may be world-readable, anything already exposed and
+  getting worse: send it at once and say it is that class. The front door
+  passes it straight through rather than collating it. Collation is for
+  product decisions, where a duplicated question is the only cost; for
+  exposure the cost of a day is the exposure.
 
 ### Opening one
 
@@ -79,8 +105,16 @@ starts:
 3. **The instruction to report to you and not to Sofia.** New sessions do not
    read this file until they are already running in the repository.
 
-Two lanes can run at once. Three is what produced the mess this file exists
-to prevent.
+**How many can run at once is not a number.** Any lane may run alongside any
+other provided one of two things is true: they are working on genuinely
+separate things, with no shared path and no shared section of a shared file;
+or they are sub-tasks of one lane and each knows it, which means one of them
+owns the paths and the others are working inside that ownership with its
+agreement.
+
+Three sessions that each thought they were independent is what produced the
+mess this file exists to prevent. Three that have checked the table against
+each other first is fine.
 
 ### Finishing and archiving
 
@@ -235,5 +269,7 @@ git grep -nIE "Sofia|sofia\.bali"
 ```
 
 What should come back: `lead:` lines in `_projects/`, which are ordinary
-authorship credit, and the intake page's mail target. Anything else is a
-leak.
+authorship credit, and the intake page's mail target in both the source and
+the built copy. **Do not remove the mail target.** It is deliberate, set in
+385a0b4 with the reason in a comment beside it, and it is the form's only
+destination. Anything else the grep returns is a leak.
