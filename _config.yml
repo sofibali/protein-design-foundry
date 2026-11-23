@@ -44,6 +44,7 @@ nav:
 
 exclude:
   - README.md
+  - CLAUDE.md      # instructions for sessions, not a page
   - scripts/
   - pages/          # page templates; the built versions are in static/pages/
   - protocols/      # protocol source, no front matter yet
