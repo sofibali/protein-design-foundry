@@ -639,7 +639,14 @@
           <span class="sv">${i.vendor ? esc(i.vendor) : ''}</span>
           <span class="cnt">${rows ? i.rows.length + ' specs' : 'no spec sheet'}</span></summary>
         <div class="ddb">
-          ${i.role ? `<p class="prose" style="margin-top:0">${esc(i.role)}</p>` : ''}
+          ${/* On a cart with one machine, the instrument's role is the cart's
+                note again in fewer words - the lead paragraph three inches
+                above says it already. It earns its place only where a cart
+                holds more than one machine and the roles tell them apart.
+                It still drives the instrument chips on the protocols page,
+                which is why it stays in the data. */ ''}
+          ${i.role && insts.length > 1
+            ? `<p class="prose" style="margin-top:0">${esc(i.role)}</p>` : ''}
           ${rows ? `<table class="kv">${rows}</table>` : ''}
           ${/* The paragraph and the table are the same facts twice over - the
                 Bravo's 8 min, 32 min and ~75 protocols are rows above and a
