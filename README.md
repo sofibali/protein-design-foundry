@@ -18,6 +18,13 @@ question the figures are withheld from. Nothing in this repository should
 reintroduce either, and `scripts/check_data.py` fails the build if
 `_data/decisions.yml` reappears.
 
+Their removal is split across two commits, which `git log` on the deleted
+files will not explain on its own. `ef32f41` carries the reasoning and the
+rewritten references; the four deletions themselves landed in `d472824`,
+whose message is about cart schematics. Three sessions were committing
+through one shared git index at the time, and `git add -A` takes whatever is
+staged, not only your own work. Use `git commit -- <paths>`.
+
 **Nor does it name anyone.** The four pages in `static/pages/` are mailed and
 dropped in Slack, so a source comment, a form field or a bundled data blob
 travels with them even when nothing on screen shows it. Who decided a threshold,
