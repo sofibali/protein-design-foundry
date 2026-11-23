@@ -258,27 +258,34 @@ def check(gates, stages, protos, progs):
             if not x.get("item") or not x.get("spec"):
                 errs.append(f"workflow {wid!r}: an input is missing item or spec")
         # --- the procedure, STAR Methods style ---
-        # Numbered steps, each naming the machine it runs on, so the deck
-        # chain, the drawing and the written protocol cannot drift apart. The
-        # chain says which machines; steps: says what each one does with the
-        # plate. A machine in one and not the other means one of them is lying.
+        # Each step is the same operation said twice: hand: is what it is at
+        # the bench, deck: is what it becomes on the rack. at: names the
+        # machines, so the deck chain, the drawing and the written procedure
+        # cannot drift apart. A machine in one and not the other means one of
+        # them is lying.
         steps = w.get("steps") or []
         if len(steps) < 3:
             errs.append(f"workflow {wid!r}: steps: must carry the procedure, at least "
-                        f"three numbered steps — the card has no prose fallback")
+                        f"three steps — the card has no prose fallback")
         ran_on = set()
         for n, s_ in enumerate(steps, 1):
-            if not (s_.get("do") or "").strip():
-                errs.append(f"workflow {wid!r} step {n}: no do:, so the step says nothing")
+            for k, why in (("step", "the step has no name"),
+                           ("hand", "no bench side, so there is nothing to compare against"),
+                           ("deck", "no deck side, so the comparison says nothing")):
+                if not (s_.get(k) or "").strip():
+                    errs.append(f"workflow {wid!r} step {n}: no {k}: — {why}")
             a = s_.get("at")
-            if a is None:
-                continue
-            ran_on.add(a)
-            if a not in insts:
-                errs.append(f"workflow {wid!r} step {n}: unknown instrument {a!r}")
-            elif a != "offline" and a not in w["deck"] and a not in w.get("holds", []):
-                errs.append(f"workflow {wid!r} step {n}: runs at {a!r}, which is in neither "
-                            f"this workflow's deck chain nor its holds")
+            if isinstance(a, str):
+                errs.append(f"workflow {wid!r} step {n}: at: is a list of machines, "
+                            f"not {a!r} on its own — write at: [{a!r}]")
+                a = [a]
+            for one in a or []:
+                ran_on.add(one)
+                if one not in insts:
+                    errs.append(f"workflow {wid!r} step {n}: unknown instrument {one!r}")
+                elif one != "offline" and one not in w["deck"] and one not in w.get("holds", []):
+                    errs.append(f"workflow {wid!r} step {n}: runs at {one!r}, which is in "
+                                f"neither this workflow's deck chain nor its holds")
         for d in sorted(set(w["deck"]) - ran_on):
             errs.append(f"workflow {wid!r}: {d!r} is in the deck chain but no step runs on "
                         f"it — the procedure has to account for every machine the cost "

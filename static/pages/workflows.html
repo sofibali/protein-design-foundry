@@ -68,6 +68,16 @@
   .bar{border:1px solid var(--rule);border-radius:12px;padding:12px 14px;margin-bottom:8px}
   .bar h3{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
           font-weight:500;margin:0 0 9px}
+  .barnote{color:var(--muted);font-size:12.5px;line-height:1.5;margin:-4px 0 12px}
+  .barnote a{color:var(--ink)}
+  .igroups{display:grid;gap:11px}
+  .ig{display:grid;grid-template-columns:118px minmax(0,1fr);gap:4px 12px;align-items:baseline}
+  .ig > h4{font-size:11.5px;font-weight:500;color:var(--ink);margin:3px 0 0}
+  .ig > h4 .gn{display:block;color:var(--muted);font-size:11px;font-weight:400;
+                line-height:1.35;margin-top:1px}
+  /* sealing, peeling and spinning serve the plate rather than the assay, so
+     the group is here but reads quieter than the four that do the science. */
+  .ig.minor{opacity:.72;border-top:1px solid var(--rule);padding-top:9px}
   .insts{display:flex;flex-wrap:wrap;gap:7px}
   .ichip{font:inherit;font-size:12.5px;color:var(--ink);background:var(--tab-bg);
          border:1px solid transparent;border-radius:999px;padding:4px 10px;cursor:pointer;
@@ -76,11 +86,10 @@
   .ichip .n{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
   .ichip[aria-pressed=true]{background:var(--bg);border-color:var(--ink)}
   .ichip[aria-pressed=true] .n{color:var(--ink)}
-  .ichip.store{background:transparent;border:1px dashed var(--rule)}
-  .ichip.store[aria-pressed=true]{border-style:solid;border-color:var(--ink)}
-  .role{color:var(--muted);font-size:12.5px;margin-top:10px;min-height:1.3em}
+  .role{color:var(--muted);font-size:12.5px;margin-top:12px;min-height:1.3em;line-height:1.5}
   .role b{color:var(--ink);font-weight:500}
-  .role .sp{display:block;margin-top:4px;line-height:1.5}
+  .role a{color:var(--muted)}
+  @media (max-width:620px){ .ig{grid-template-columns:1fr;gap:2px} }
   /* --- plan a day --- */
   .plan{border:1px solid var(--rule);border-radius:12px;padding:14px 16px 16px;margin:34px 0 4px}
   .plan h2{font-size:16px;font-weight:500;margin:0 0 3px}
@@ -208,22 +217,27 @@
   .wf .sb{color:var(--muted);font-size:12.5px;margin-top:1px}
   .wf .tags{margin-top:11px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 
-  /* the procedure. Numbered, one machine named per step, criticals called
-     out the way a methods section calls them out. */
-  .steps{margin:7px 0 0;padding:0 0 0 22px;font-size:13px;line-height:1.5}
-  .steps > li{margin-bottom:9px;padding-left:3px}
+  /* the procedure, as a comparison. Each row is one operation said twice:
+     by hand, then on the deck. The two columns are the content, so they are
+     given equal width and the deck side is never styled as the winner. */
+  .steps{margin:8px 0 0;padding:0 0 0 22px;font-size:13px;line-height:1.5}
+  .steps > li{margin-bottom:11px;padding-left:3px}
   .steps > li::marker{color:var(--muted);font-variant-numeric:tabular-nums}
-  .smeta{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:3px}
+  .sname{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
+  .sname > b{font-weight:500}
   .son{font-size:11.5px;border:1px solid var(--rule);border-radius:6px;padding:1px 7px;
        color:var(--muted);white-space:nowrap;transition:background .12s,border-color .12s,color .12s}
   .son.on{border-color:var(--ink);background:var(--tab-bg);color:var(--ink);font-weight:500}
   .son.off{border-style:dashed;opacity:.55}
   .st{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
-  .crit,.snote{font-size:12.5px;line-height:1.45;margin:4px 0 0;padding:5px 9px;
-               border-radius:6px;background:var(--tab-bg);color:var(--muted)}
-  .crit{border-left:2px solid var(--warn)}
-  .crit b,.snote b{color:var(--ink);font-weight:500;text-transform:uppercase;
-                   letter-spacing:.05em;font-size:10.5px;margin-right:5px}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:5px;
+       background:var(--rule);border:1px solid var(--rule);border-radius:7px;overflow:hidden}
+  .cmp > div{background:var(--bg);padding:6px 9px 7px;font-size:12.5px;line-height:1.45;
+             color:var(--muted)}
+  .cmp .lbl{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;
+            color:var(--muted);margin-bottom:2px}
+  .cmp .ondeck{color:var(--ink)}
+  @media (max-width:620px){ .cmp{grid-template-columns:1fr} }
   .pill{font-size:11px;border-radius:999px;padding:1px 8px;border:1px solid}
   .gate{font-size:11px;border-radius:4px;padding:1px 5px;background:var(--tab-bg);color:var(--muted);
         font-variant-numeric:tabular-nums}
@@ -371,16 +385,21 @@
 
   <div class="bar">
     <h3>Instruments</h3>
-    <div class="insts" id="insts"></div>
+    <p class="barnote">Grouped by what they do, in the order a plate meets them. Click one to
+      see which protocols need it &mdash; the <a href="blueprint.html">system blueprint</a> has
+      what each machine is and what it can do.</p>
+    <div class="igroups" id="insts"></div>
     <div class="role" id="role"></div>
     <div class="ceil" id="ceil"></div>
   </div>
   <div class="legend" id="legend"></div>
 
   <h2 class="libhead">Protocols</h2>
-  <p class="libnote">Fifteen of them, each with a schematic of what happens on the deck and a
-    sample output drawn in the shape the readout comes back in, not from real results. Add any
-    protocol to the campaign at the foot of the page; its gates come with it.</p>
+  <p class="libnote">Fifteen examples of what this system can run &mdash; not a fixed menu, and
+    not everything it can do. Each one sets the bench method beside what it becomes as a
+    sequence of moves on the rack, so you can see where your own protocol would translate and
+    where it would not. Open one for the steps, the schematic and the shape of the readout; add
+    it to the campaign at the foot of the page and its decision gates come with it.</p>
   <div id="phases"></div>
 
   <section class="plan">
@@ -755,6 +774,7 @@ window.PROTOCOLS = {
   {
    "id": "handle",
    "label": "Plate handling",
+   "minor": true,
    "note": "Sealing, peeling and spinning. These serve the plate rather than the assay, but nothing runs overnight without them.\n"
   }
  ],
@@ -1166,23 +1186,29 @@ window.PROTOCOLS = {
    "gates": [],
    "steps": [
     {
-     "do": "Resuspend the ordered fragment plate in nuclease-free water at the vendor's stated concentration: eBlocks at 10 ng/uL, Twist fragments at 0.5 ng/uL.",
-     "at": "offline",
-     "note": "The two vendors arrive at different concentrations. That difference is the whole reason the next transfer exists."
+     "step": "Resuspend the ordered fragments",
+     "hand": "Add water to each well at the vendor's stated concentration - eBlocks at 10 ng/uL, Twist fragments at 0.5 ng/uL.",
+     "deck": "Still done by hand, off the deck. The fragments arrive plated, so this is one addition per plate rather than one per design.",
+     "at": [
+      "offline"
+     ]
     },
     {
-     "do": "Spin the plate down and load it as an Echo source plate.",
-     "at": "offline"
+     "step": "Normalise every design to one concentration",
+     "hand": "Quantify each well, work out a dilution, pipette it. The answer is nominal, and the molar ratio drifts design to design.",
+     "deck": "One acoustic transfer at a fixed mass per well, backfilled with water. 384 wells in three minutes, normalised by mass and not by volume.",
+     "at": [
+      "echo"
+     ],
+     "t": "3 min a plate"
     },
     {
-     "do": "Acoustically transfer each fragment into the destination plate at a fixed mass per well, backfilling with water so every well leaves at one concentration.",
-     "at": "echo",
-     "t": "3 min a plate",
-     "crit": "Normalise by mass, not by volume. A fixed volume lets the molar ratio drift design to design, and every route downstream inherits that drift."
-    },
-    {
-     "do": "Return the source plate to ambient storage. The destination plate is the template plate that 4.3, 4.4 and 4.13 all draw from.",
-     "at": "ambistore"
+     "step": "Keep the source plate for the next protocol",
+     "hand": "A labelled box in a drawer, found by whoever put it there.",
+     "deck": "Ambient random-access storage returns it in about 12 seconds when 4.3, 4.4 or 4.13 ask for it.",
+     "at": [
+      "ambistore"
+     ]
     }
    ],
    "inputs": [
@@ -1239,46 +1265,58 @@ window.PROTOCOLS = {
    "gates": [],
    "steps": [
     {
-     "do": "Build the pool PCR in 384: oligo pool plus flanking primers into the destination plate, one subpool per library.",
-     "at": "echo",
+     "step": "Retrieve the subpool",
+     "hand": "Set the pool PCR up in strips and run a block.",
+     "deck": "The reactions are built acoustically at 384, one subpool per library, and one of four cycler blocks runs it while the other three are busy.",
+     "at": [
+      "echo",
+      "atc"
+     ],
      "t": "3 min a plate"
     },
     {
-     "do": "Cycle the retrieval PCR.",
-     "at": "atc"
+     "step": "Size-select the product",
+     "hand": "SPRI by hand on a magnet rack, a plate at a time.",
+     "deck": "SPRI at 0.8x on the 96-channel head beside the deck magnet. This is the only size selection the deck has.",
+     "at": [
+      "bravo"
+     ],
+     "t": "32 min at 384"
     },
     {
-     "do": "SPRI cleanup at 0.8x, which drops anything under about 200 bp.",
-     "at": "bravo",
-     "t": "32 min at 384",
-     "note": "This is the only size selection the deck has."
+     "step": "Assemble into the linearised backbone",
+     "hand": "Pipette the BsaI-HFv2 and T4 ligase mix out of the tube, then cycle the digestion-ligation.",
+     "deck": "A positive-displacement channel moves it from the tube - enzyme mixes ship in glycerol and the acoustic dispenser will not transfer them - and a cycler block runs the cycling.",
+     "at": [
+      "magniflex",
+      "atc"
+     ]
     },
     {
-     "do": "Deliver the BsaI-HFv2 and T4 ligase master mix from the tube.",
-     "at": "magniflex",
-     "crit": "Enzyme mixes ship in glycerol and the Echo will not transfer them. A positive- displacement channel from the tube is the only route onto the plate."
+     "step": "Clean up and transform",
+     "hand": "A second SPRI, then a water bath and a stopwatch for the heat shock.",
+     "deck": "A second SPRI, then the pulse as a plate move between the two temperature- controlled deck nests, exactly as 4.14.",
+     "at": [
+      "bravo"
+     ]
     },
     {
-     "do": "Run the Type IIS digestion-ligation cycling, then the final hold.",
-     "at": "atc"
+     "step": "Recover and outgrow as a pool, never plated",
+     "hand": "Add recovery medium, shake a flask overnight.",
+     "deck": "Bulk dispense straight after the pulse, then a shaking incubator position for the night. The pool is the product; plating it would pick a handful of members out of a library.",
+     "at": [
+      "multiflo",
+      "cytomat"
+     ],
+     "t": "overnight"
     },
     {
-     "do": "Second SPRI cleanup, then heat-shock the assembly on the two temperature-controlled deck nests, exactly as 4.14.",
-     "at": "bravo"
-    },
-    {
-     "do": "Add recovery medium immediately after the pulse.",
-     "at": "multiflo"
-    },
-    {
-     "do": "Outgrow the whole transformation as a pool in liquid, shaken and incubated.",
-     "at": "cytomat",
-     "t": "overnight",
-     "crit": "Never plate for colonies. The pool is the product; plating it would select a handful of members out of a library."
-    },
-    {
-     "do": "Sequence the outgrown pool to find out what is actually in it.",
-     "at": "offline"
+     "step": "Sequence the pool",
+     "hand": "Submit to a core, or run a flow cell.",
+     "deck": "Off the deck either way. Nothing on this system reads sequence.",
+     "at": [
+      "offline"
+     ]
     }
    ],
    "inputs": [
@@ -1347,45 +1385,50 @@ window.PROTOCOLS = {
    "gates": [],
    "steps": [
     {
-     "do": "Build the retrieval PCR in the 384 block: fragment template plus high-fidelity master mix.",
-     "at": "echo",
+     "step": "Retrieval PCR off the fragment plate",
+     "hand": "Master mix into strips, 30 cycles in a block.",
+     "deck": "Built acoustically in the 384 block; one of four cyclers runs it.",
+     "at": [
+      "echo",
+      "atc"
+     ],
      "t": "3 min a plate"
     },
     {
-     "do": "Cycle the retrieval PCR, 30 cycles.",
-     "at": "atc"
-    },
-    {
-     "do": "SPRI cleanup at 1.8x and elute small.",
-     "at": "bravo",
+     "step": "Clean up the insert",
+     "hand": "SPRI on a magnet rack.",
+     "deck": "SPRI at 1.8x on the deck magnet, eluted small. One of only two liquid-handler steps in the whole protocol.",
+     "at": [
+      "bravo"
+     ],
      "t": "32 min at 384"
     },
     {
-     "do": "Normalise the cleaned insert into the assembly plate by mass, with the circularising vector.",
-     "at": "echo",
-     "t": "3 min a plate",
-     "crit": "Normalise by mass. The source paper added a fixed volume and let the insert-to- vector molar ratio drift, which is the one variable this step exists to hold."
+     "step": "Normalise insert against vector by mass",
+     "hand": "Add a fixed volume and let the insert-to-vector molar ratio drift.",
+     "deck": "Acoustic transfer at a fixed mass, so the ratio is held. That ratio is the one variable this step exists to control.",
+     "at": [
+      "echo"
+     ],
+     "t": "3 min a plate"
     },
     {
-     "do": "Deliver the BsaI-HFv2 and T4 ligase master mix from the tube.",
-     "at": "magniflex",
-     "note": "Glycerol-based, so the Echo cannot move it."
+     "step": "Close the circle by Golden Gate",
+     "hand": "Pipette enzyme from the tube, cycle 37 C against 16 C, then hold at 60 C.",
+     "deck": "Positive-displacement delivery of the glycerol-based enzyme mix, then 30 cycles in a 96 block - the 384 block takes 5-20 uL and a 30 uL assembly does not fit it.",
+     "at": [
+      "magniflex",
+      "atc"
+     ]
     },
     {
-     "do": "Run the Golden Gate in a 96 block: 30 cycles of 37 C for 60 s and 16 C for 60 s, then 60 C for 10 min, in 30 uL.",
-     "at": "atc",
-     "crit": "The assembly runs in a 96 block and not the 384 one. The 384 block takes 5-20 uL and a 30 uL assembly does not fit it."
-    },
-    {
-     "do": "Second SPRI cleanup.",
-     "at": "bravo",
-     "t": "32 min at 384",
-     "note": "These two cleanups are the only Bravo steps in the workflow. Taking the assembly to 384 quadruples both of them."
-    },
-    {
-     "do": "Dispense the assembled circular product straight into the expression reaction.",
-     "at": "multiflo",
-     "note": "No transformation, no outgrowth, no colony, no miniprep."
+     "step": "Go straight into the expression reaction",
+     "hand": "Transform, plate, pick a colony, miniprep, sequence.",
+     "deck": "A second SPRI, then the circular product is dispensed into the expression reaction. No transformation, no colony, no miniprep.",
+     "at": [
+      "bravo",
+      "multiflo"
+     ]
     }
    ],
    "inputs": [
@@ -1454,43 +1497,56 @@ window.PROTOCOLS = {
    ],
    "steps": [
     {
-     "do": "Acoustically dispense the Mg-glutamate, K-glutamate and energy stocks that build the 16 conditions of the design matrix.",
-     "at": "echo",
-     "t": "3 min a plate",
-     "crit": "Check every stock is Echo-compatible before the first run. Glycerol is the usual reason a stock will not transfer."
+     "step": "Build the 16 conditions and add template",
+     "hand": "Hand-mix each Mg-glutamate, K-glutamate and energy combination, then add template to each one.",
+     "deck": "The stocks are dispensed acoustically straight into the destination and template goes on top. Check every stock transfers before the first run; glycerol is the usual reason one will not.",
+     "at": [
+      "echo"
+     ],
+     "t": "3 min a plate"
     },
     {
-     "do": "Add template to each condition, linear dsDNA or plasmid as the run calls for.",
-     "at": "echo",
-     "t": "3 min a plate",
-     "note": "Linear template needs GamS in a lysate system and nothing at all in PURE."
+     "step": "Dispense the common lysate or PURE mix",
+     "hand": "Multichannel from a reservoir.",
+     "deck": "Bulk dispense to final volume. A whole 1536 plate at 1 uL a well takes 21 seconds.",
+     "at": [
+      "multiflo"
+     ]
     },
     {
-     "do": "Bulk-dispense the common lysate or PURE mix to final volume.",
-     "at": "multiflo"
+     "step": "Seal the plate",
+     "hand": "Press a seal on by hand.",
+     "deck": "Thermal foil, applied at 30-200 C.",
+     "at": [
+      "plateloc"
+     ]
     },
     {
-     "do": "Seal the plate.",
-     "at": "plateloc"
+     "step": "Incubate, one temperature per block",
+     "hand": "One incubator, so temperature is a plate-level confound rather than a factor you can test.",
+     "deck": "Four cycler blocks run independent programs at once, so each temperature is a replicated arm of the design matrix.",
+     "at": [
+      "atc"
+     ],
+     "t": "4-6 h"
     },
     {
-     "do": "Incubate, one temperature arm per unit, so temperature is a replicated factor rather than a plate-level confound.",
-     "at": "atc",
-     "t": "4-6 h",
-     "note": "Three of the four blocks are 96-well at 10-100 uL and the fourth is 384-well at 5-20 uL. Give the 384 arm the small-volume runs and the design is unchanged."
+     "step": "Peel and develop",
+     "hand": "Peel by hand, add GFP1-10 with a multichannel.",
+     "deck": "Up to 200 seals an hour off the peeler, then GFP1-10 in excess from the bulk dispenser.",
+     "at": [
+      "xpeel",
+      "multiflo"
+     ],
+     "t": "30 min to complement"
     },
     {
-     "do": "Peel the seal.",
-     "at": "xpeel"
-    },
-    {
-     "do": "Add GFP1-10 detection reagent in excess and leave it to complement.",
-     "at": "multiflo",
-     "t": "30 min"
-    },
-    {
-     "do": "Read fluorescence and convert RFU to ug/mL against the standard curve carried on the same plate.",
-     "at": "pherastar",
+     "step": "Read against the standard curve",
+     "hand": "A plate at a time on a shared reader.",
+     "deck": "Eight minutes a plate, with the GFP11 standard curve carried on the same plate so RFU converts to ug/mL.",
+     "at": [
+      "pherastar"
+     ],
      "t": "8 min a plate"
     }
    ],
@@ -1554,33 +1610,46 @@ window.PROTOCOLS = {
    ],
    "steps": [
     {
-     "do": "Dispense autoinduction medium into the deep-well block and inoculate from the transformation.",
-     "at": "multiflo",
-     "note": "Autoinduction avoids timed IPTG, which is what makes an unattended overnight run possible at all. Kan selection, for the same reason."
+     "step": "Inoculate into autoinduction medium",
+     "hand": "Pipette medium into a deep-well block and inoculate well by well.",
+     "deck": "Bulk dispense into the block, then inoculate from the transformation. Autoinduction rather than timed IPTG is what makes an unattended overnight possible at all.",
+     "at": [
+      "multiflo"
+     ]
     },
     {
-     "do": "Apply the gas-permeable seal.",
-     "at": "a4s",
-     "crit": "Not a foil seal. A thermal foil off the PlateLoc would take a 20 h deep-well culture anaerobic. Two sealers is what keeps both seal types resident without a manual roll change."
+     "step": "Apply the gas-permeable seal",
+     "hand": "A breathable membrane, pressed on.",
+     "deck": "The second sealer carries the breathable roll, so both seal types stay resident. A thermal foil would take a 20 h deep-well culture anaerobic.",
+     "at": [
+      "a4s"
+     ]
     },
     {
-     "do": "Grow the block with shaking and incubation.",
-     "at": "cytomat",
-     "t": "overnight",
-     "note": "Growth goes here and not on the Bravo deck nests, which hold a fixed temperature and do not aerate."
+     "step": "Grow overnight",
+     "hand": "A shaking incubator, and someone there in the morning.",
+     "deck": "Fourteen deep-well positions that shake and incubate. This, not the liquid handler, is the cap on everything that grows.",
+     "at": [
+      "cytomat"
+     ],
+     "t": "overnight"
     },
     {
-     "do": "Spin the block and discard the supernatant.",
-     "at": "hig3"
+     "step": "Harvest the cells",
+     "hand": "A benchtop centrifuge, two plates at a time, by hand.",
+     "deck": "Two plates a run at 5000 g, about 20 seconds to speed, scheduled against everything else in flight.",
+     "at": [
+      "hig3"
+     ]
     },
     {
-     "do": "Add plate-compatible detergent lysis reagent and resuspend the pellets.",
-     "at": "multiflo",
-     "note": "There is no sonication on deck, so lysis is chemical."
-    },
-    {
-     "do": "Spin again to clear the lysate. Cleared lysate goes straight to 4.5; a block that has to wait goes to cold storage.",
-     "at": "hig3"
+     "step": "Lyse and clear",
+     "hand": "Sonicate, or add a detergent reagent and spin.",
+     "deck": "Detergent lysis from the bulk dispenser, then a second spin. There is no sonicator on the deck, so lysis is chemical.",
+     "at": [
+      "multiflo",
+      "hig3"
+     ]
     }
    ],
    "inputs": [
@@ -1640,32 +1709,39 @@ window.PROTOCOLS = {
    ],
    "steps": [
     {
-     "do": "Add tagged magnetic beads to each well of cleared lysate or finished cell-free reaction.",
-     "at": "bravo",
+     "step": "Bind",
+     "hand": "Add beads, mix by pipetting, incubate on a rocker.",
+     "deck": "Beads added by the 96-channel head and resuspended at 200-3,000 rpm on the deck shaker, right beside the magnet.",
+     "at": [
+      "bravo",
+      "bioshake"
+     ],
      "t": "8 min at 96"
     },
     {
-     "do": "Resuspend and bind, 200-3,000 rpm on a 2.0 mm orbit, on the deck beside the magnet.",
-     "at": "bioshake"
+     "step": "Wash",
+     "hand": "Magnet rack, aspirate, resuspend, repeat - the plate is moved by hand each time.",
+     "deck": "The plate never leaves the deck between washes. That is the only reason this fits in an hour.",
+     "at": [
+      "bioshake",
+      "bravo"
+     ]
     },
     {
-     "do": "Engage the magnet and aspirate the supernatant.",
-     "at": "bravo"
+     "step": "Elute",
+     "hand": "Elution buffer, off the magnet.",
+     "deck": "The same, into the bead chemistry's buffer. Biotin elution poisons any downstream streptavidin step, so buffer-exchange after it or run the construct on a His tag instead.",
+     "at": [
+      "bravo"
+     ]
     },
     {
-     "do": "Wash: resuspend off the magnet, re-capture, aspirate. Repeat for the bead chemistry's wash count.",
-     "at": "bioshake",
-     "note": "The plate never leaves the deck between washes, which is the only reason this fits in an hour."
-    },
-    {
-     "do": "Elute into the bead chemistry's elution buffer.",
-     "at": "bravo",
-     "crit": "Biotin elution buffer poisons any downstream streptavidin step. Buffer-exchange afterwards, or run the construct on a His tag and an EDTA/DTT-tolerant IMAC bead instead."
-    },
-    {
-     "do": "Hold the eluate cold, or hand the plate straight to 4.6.",
-     "at": "steristore_cold",
-     "crit": "What comes off here is micrograms. Crystallography protein does not."
+     "step": "Hold, or hand straight to QC",
+     "hand": "Ice, then a fridge.",
+     "deck": "4 C random-access storage, or straight into 4.6. What comes off here is micrograms - crystallography protein does not come from this protocol.",
+     "at": [
+      "steristore_cold"
+     ]
     }
    ],
    "inputs": [
@@ -1721,38 +1797,48 @@ window.PROTOCOLS = {
    ],
    "steps": [
     {
-     "do": "Split the eluate into one aliquot per question and add the concentration reagent, GFP1-10 or LgBiT plus furimazine.",
-     "at": "multiflo"
-    },
-    {
-     "do": "Read concentration against the standard curve.",
-     "at": "pherastar",
+     "step": "Concentration",
+     "hand": "A280 on a spectrophotometer, a sample at a time, and a reading that depends on how many tryptophans the design happens to have.",
+     "deck": "Split-GFP or HiBiT reagent from the bulk dispenser, read against a standard curve carried on the same plate - so designs are comparable with each other.",
+     "at": [
+      "multiflo",
+      "pherastar"
+     ],
      "t": "3 min a plate"
     },
     {
-     "do": "Move an aliquot into a UV-transparent plate.",
-     "at": "multiflo"
+     "step": "Nucleic-acid carryover",
+     "hand": "A260/A280 on the same instrument, sample by sample.",
+     "deck": "An aliquot into a UV-transparent plate, read in the same pass as everything else.",
+     "at": [
+      "multiflo",
+      "pherastar"
+     ]
     },
     {
-     "do": "Read A260/A280 for nucleic-acid carryover.",
-     "at": "pherastar"
+     "step": "Aggregation",
+     "hand": "SEC, which costs a column run per sample.",
+     "deck": "An FP tracer added and polarisation read. A rise against the monomer control is the flag. It detects aggregation, not a change of oligomer state.",
+     "at": [
+      "multiflo",
+      "pherastar"
+     ]
     },
     {
-     "do": "Add the FP tracer, fluorescein or TAMRA.",
-     "at": "multiflo"
+     "step": "Normalise the plate before any assay sees it",
+     "hand": "Work out a dilution per well and pipette it. The plate is normalised on paper.",
+     "deck": "An in-line flow sensor on every channel measures what was actually delivered, so the plate is normalised by measurement rather than by nominal volume. 1 uL minimum, 2 uL at 2% CV.",
+     "at": [
+      "lynx"
+     ]
     },
     {
-     "do": "Read polarisation. A rise against the monomer control is the aggregation flag.",
-     "at": "pherastar"
-    },
-    {
-     "do": "Normalise every well to one concentration before anything reaches an assay.",
-     "at": "lynx",
-     "note": "1 uL minimum and 2 uL at 2% CV. An in-line flow sensor measures what each channel actually delivered, so the normalised plate is measured rather than nominal and the per-well correction can be logged against the design."
-    },
-    {
-     "do": "Run a gel on a subset, offline, if band identity is the question. Purity in that sense is the one thing this workflow cannot answer.",
-     "at": "offline"
+     "step": "Band identity",
+     "hand": "A gel.",
+     "deck": "Still a gel, on a subset, off the deck. Purity in that sense is the one question this protocol cannot answer.",
+     "at": [
+      "offline"
+     ]
     }
    ],
    "inputs": [
@@ -1809,32 +1895,47 @@ window.PROTOCOLS = {
    ],
    "steps": [
     {
-     "do": "Pick the format. NanoBiT reads straight out of crude cell-free and is the one to reach for first; the other three need protein in hand.",
-     "at": "offline"
+     "step": "Pick the format",
+     "hand": "Four homogeneous formats, and the choice is the same at either scale.",
+     "deck": "NanoBiT reads straight out of crude cell-free and needs no purification at all; HTRF, AlphaScreen and FP each need protein in hand.",
+     "at": [
+      "offline"
+     ]
     },
     {
-     "do": "Build the plate: protein, target and controls into 384 or 1536.",
-     "at": "echo",
-     "t": "3 min a plate",
-     "note": "The Echo builds it, so 384 and 1536 cost the same deck time as 96."
+     "step": "Build the plate",
+     "hand": "Multichannel into 384. 1536 is not realistic by hand.",
+     "deck": "Acoustic, so protein, target and controls land at 384 or 1536 for the same three minutes it would cost at 96.",
+     "at": [
+      "echo"
+     ],
+     "t": "3 min a plate"
     },
     {
-     "do": "Add the format's detection reagents.",
-     "at": "multiflo"
+     "step": "Develop and seal",
+     "hand": "Reagent from a reservoir, seal pressed on.",
+     "deck": "Bulk dispense, then a thermal seal.",
+     "at": [
+      "multiflo",
+      "plateloc"
+     ]
     },
     {
-     "do": "Seal the plate.",
-     "at": "plateloc"
+     "step": "Hold to equilibrium",
+     "hand": "On the bench, timed by whoever is there.",
+     "deck": "Ambient random-access storage, returned when the reader is free.",
+     "at": [
+      "ambistore"
+     ]
     },
     {
-     "do": "Hold to equilibrium for the format's incubation.",
-     "at": "ambistore"
-    },
-    {
-     "do": "One read: a TR-FRET ratio, a luminescence count or a polarisation.",
-     "at": "pherastar",
-     "t": "8 min a TR-FRET plate",
-     "note": "Tipless in, one read out. This is the cheapest thing the foundry does per design."
+     "step": "One read",
+     "hand": "A plate at a time on a shared reader.",
+     "deck": "Eight minutes a TR-FRET plate, three if the format is luminescent. 150 plates in a 20 h day is the ceiling that matters here, not the liquid handler's 75.",
+     "at": [
+      "pherastar"
+     ],
+     "t": "8 min a TR-FRET plate"
     }
    ],
    "inputs": [
@@ -1909,31 +2010,47 @@ window.PROTOCOLS = {
    ],
    "steps": [
     {
-     "do": "Lay three extra columns onto the binding plate: the counter-target homolog, a hotspot point-mutant of your own target, and a non-binder control carried from an unrelated campaign.",
-     "at": "echo",
-     "t": "3 min a plate",
-     "crit": "The hotspot mutant is the only one of the three that catches a binder that found the wrong face. A homolog alone cannot tell you that."
+     "step": "Lay three control columns onto the binding plate",
+     "hand": "Three more columns to pipette, and a second plate once the first is full.",
+     "deck": "Acoustic, onto the plate 4.7 already built: the counter-target homolog, a hotspot point-mutant of your own target, and a non-binder control from an unrelated campaign.",
+     "at": [
+      "echo"
+     ],
+     "t": "3 min a plate"
     },
     {
-     "do": "Where an IC50 is wanted, build the competitor titration into the same destination.",
-     "at": "echo"
+     "step": "Add a competitor titration where an IC50 is wanted",
+     "hand": "A serial dilution, with the carryover a serial dilution brings.",
+     "deck": "Built acoustically into the same destination plate, from one titrant source.",
+     "at": [
+      "echo"
+     ]
     },
     {
-     "do": "Add detection reagents, as 4.7.",
-     "at": "multiflo"
+     "step": "Develop, seal and equilibrate",
+     "hand": "As 4.7, on a plate of its own.",
+     "deck": "As 4.7, on the same plate - which is why the counter-screen costs almost nothing new.",
+     "at": [
+      "multiflo",
+      "plateloc"
+     ]
     },
     {
-     "do": "Seal and hold to equilibrium.",
-     "at": "plateloc"
-    },
-    {
-     "do": "Read the whole plate in one pass.",
-     "at": "pherastar",
+     "step": "Read in one pass",
+     "hand": "Two reads, because the controls are on their own plate.",
+     "deck": "One read of the whole plate.",
+     "at": [
+      "pherastar"
+     ],
      "t": "8 min a TR-FRET plate"
     },
     {
-     "do": "Report each design's on-target signal against each control as a selectivity margin.",
-     "at": "offline"
+     "step": "Report the selectivity margin",
+     "hand": "On-target signal against each control, per design.",
+     "deck": "The same, off the deck. The hotspot mutant is the only one of the three controls that catches a binder that found the wrong face; a homolog alone cannot tell you that.",
+     "at": [
+      "offline"
+     ]
     }
    ],
    "inputs": [
@@ -1989,27 +2106,46 @@ window.PROTOCOLS = {
    ],
    "steps": [
     {
-     "do": "Build the dilution series acoustically in the destination plate from a single titrant source plate.",
-     "at": "echo",
-     "t": "3 min a plate",
-     "crit": "No serial pipetting, so no tip-to-tip carryover down the series. Spacing can be non- linear where the interesting part of the curve is not evenly spread."
+     "step": "Build the dilution series",
+     "hand": "Serial pipetting down the plate: tip-to-tip carryover, and even spacing whether or not the curve wants it.",
+     "deck": "Built acoustically in the destination from a single titrant source plate. No serial step, so no carryover, and the spacing can be non-linear where the interesting part of the curve is.",
+     "at": [
+      "echo"
+     ],
+     "t": "3 min a plate"
     },
     {
-     "do": "Backfill to constant volume and add the assay's detection reagents.",
-     "at": "multiflo"
+     "step": "Backfill and develop",
+     "hand": "Top each well up to constant volume, then add reagents.",
+     "deck": "Bulk dispense does both in one pass.",
+     "at": [
+      "multiflo"
+     ]
     },
     {
-     "do": "Seal and hold to equilibrium.",
-     "at": "plateloc"
+     "step": "Seal and equilibrate",
+     "hand": "Seal, then wait.",
+     "deck": "Thermal seal, then held until the reader is free.",
+     "at": [
+      "plateloc"
+     ]
     },
     {
-     "do": "Read the whole series on one plate.",
-     "at": "pherastar",
+     "step": "Read the series",
+     "hand": "A plate at a time on a shared reader.",
+     "deck": "One plate - the whole series fits on it - scheduled against everything else in flight.",
+     "at": [
+      "pherastar"
+     ],
      "t": "8 min a TR-FRET plate"
     },
     {
-     "do": "Fit the curve and report a KD or IC50 per hit, with the fit behind it.",
-     "at": "offline"
+     "step": "Fit",
+     "hand": "Fit the curve and report a KD or IC50 per hit.",
+     "deck": "The same, off the deck, with the fit kept behind the number.",
+     "at": [
+      "offline"
+     ]
     }
    ],
    "inputs": [
@@ -2054,31 +2190,45 @@ window.PROTOCOLS = {
    "gates": [],
    "steps": [
     {
-     "do": "Prepare the binding assay exactly as 4.7 and split it across four plates, one per temperature.",
-     "at": "offline"
+     "step": "Prepare the binding assay and split it four ways",
+     "hand": "Four plates to set up, or one set up four times.",
+     "deck": "4.7 built once and split across four plates, one per temperature.",
+     "at": [
+      "offline"
+     ]
     },
     {
-     "do": "Seal each plate.",
-     "at": "plateloc"
+     "step": "Seal each plate",
+     "hand": "Four seals, pressed on.",
+     "deck": "Four thermal seals.",
+     "at": [
+      "plateloc"
+     ]
     },
     {
-     "do": "Hold each plate at its own temperature, four arms in parallel.",
-     "at": "atc",
-     "note": "Three blocks are 96-well at 10-100 uL and the fourth is 384-well at 5-20 uL."
+     "step": "Hold four temperatures at once",
+     "hand": "One block, so the ladder is four runs one after another.",
+     "deck": "Four blocks running independent programs, so the ladder costs one pass rather than four.",
+     "at": [
+      "atc"
+     ]
     },
     {
-     "do": "Peel the seals.",
-     "at": "xpeel"
+     "step": "Peel",
+     "hand": "By hand, four times.",
+     "deck": "Up to 200 seals an hour.",
+     "at": [
+      "xpeel"
+     ]
     },
     {
-     "do": "Read residual binding at each temperature.",
-     "at": "pherastar",
+     "step": "Read residual binding",
+     "hand": "Four reads, and still four points.",
+     "deck": "Four reads. Four points, not a melt: neither cycler has optical detection, so a Tm has nowhere to be read on this system.",
+     "at": [
+      "pherastar"
+     ],
      "t": "8 min a TR-FRET plate"
-    },
-    {
-     "do": "Report four points of residual binding.",
-     "at": "offline",
-     "crit": "This is not a Tm. Neither ATC version has optical detection, so a melt curve has nowhere to be read on this system."
     }
    ],
    "inputs": [
@@ -2132,47 +2282,58 @@ window.PROTOCOLS = {
    "gates": [],
    "steps": [
     {
-     "do": "Hold competent cells and assembled DNA at 4 C until the run starts.",
-     "at": "steristore_cold"
-    },
-    {
-     "do": "Dispense assembled DNA into the cold plate sitting on the 4 C deck nest.",
-     "at": "echo",
+     "step": "Dispense DNA onto a cold plate",
+     "hand": "Assembled DNA into chilled tubes on ice.",
+     "deck": "Acoustic dispense into a plate already sitting on the 4 C deck nest.",
+     "at": [
+      "echo"
+     ],
      "t": "3 min a plate"
     },
     {
-     "do": "Add chemically competent cells and hold on the 4 C nest.",
-     "at": "bravo",
+     "step": "Add competent cells, cold",
+     "hand": "Pipette cells into each tube, on ice.",
+     "deck": "A 96-channel addition with the plate never leaving 4 C.",
+     "at": [
+      "bravo"
+     ],
      "t": "8 min at 96"
     },
     {
-     "do": "Move the plate to the 42 C nest, hold, and move it back to 4 C.",
-     "at": "bravo",
-     "t": "45 s at 42 C",
-     "crit": "The pulse is a plate move between two fixed nests. A single block ramps at about 12 K/min and would take roughly three minutes to cross from 4 C to 42 C, and a cycler in another cart cannot time it at all."
+     "step": "The 45-second pulse",
+     "hand": "A water bath and a stopwatch.",
+     "deck": "A plate move from the 4 C nest to the 42 C nest and back. A single block ramps at about 12 K/min and would take three minutes to cross; a cycler in another cart cannot time it at all.",
+     "at": [
+      "bravo"
+     ],
+     "t": "45 s at 42 C"
     },
     {
-     "do": "Add recovery medium immediately after the pulse.",
-     "at": "multiflo",
-     "note": "The 1 uL cassette covers anything down to 1 uL a well."
-    },
-    {
-     "do": "Recover with shaking on the deck, then move the plate to outgrowth.",
-     "at": "bioshake",
+     "step": "Recover",
+     "hand": "Add recovery medium, shake at 37 C for an hour.",
+     "deck": "Bulk dispense immediately after the pulse, then shaking on the deck for about an hour.",
+     "at": [
+      "multiflo",
+      "bioshake"
+     ],
      "t": "about 1 h"
     },
     {
-     "do": "Outgrow in liquid, shaken and incubated.",
-     "at": "cytomat"
+     "step": "Outgrow",
+     "hand": "Flasks, or a shaking block.",
+     "deck": "A shaking incubator position, scheduled with the rest of the day.",
+     "at": [
+      "cytomat"
+     ]
     },
     {
-     "do": "Lid the agar plates for the titre dilution series.",
-     "at": "a4s"
-    },
-    {
-     "do": "Plate the dilution series for titre and QC, and sequence.",
-     "at": "offline",
-     "crit": "Nothing picks a colony. No step on this system returns a clone from agar to liquid, so plating is for counting and checking only."
+     "step": "Titre, QC and sequence",
+     "hand": "Plate a dilution series, count, pick colonies, miniprep.",
+     "deck": "Plates are lidded on deck and the dilution series is for counting and checking only. Nothing here picks a colony, so no step returns a clone from agar back to liquid.",
+     "at": [
+      "a4s",
+      "offline"
+     ]
     }
    ],
    "inputs": [
@@ -2231,33 +2392,38 @@ window.PROTOCOLS = {
    ],
    "steps": [
     {
-     "do": "Express and purify offline to milligram scale at 10 mg/mL or better.",
-     "at": "offline",
-     "crit": "This has to come from offline expression. Magnetic bead purification reaches micrograms, and the gap is not close. The deck screens crystallisation protein; it does not make it."
+     "step": "Make the protein",
+     "hand": "Flask expression and column purification to milligram scale at 10 mg/mL or better.",
+     "deck": "Off the deck. Bead purification reaches micrograms and the gap is not close: this protocol screens crystallisation protein, it does not make it.",
+     "at": [
+      "offline"
+     ]
     },
     {
-     "do": "Load commercial sparse-matrix screens as Echo source plates, plus compound stocks in DMSO where the run is a fragment screen.",
-     "at": "offline"
-    },
-    {
-     "do": "Set sitting drops into the tray: protein against condition, apo or co- crystallisation, at 1536.",
-     "at": "echo",
+     "step": "Set the drops",
+     "hand": "A dedicated drop-setter, or by hand at 96.",
+     "deck": "Acoustic sitting drops at 1536, protein against condition, apo or co- crystallised. Eighty trays is 11.5 h on-system.",
+     "at": [
+      "echo"
+     ],
      "t": "3 min a plate"
     },
     {
-     "do": "Close the tray with a lid.",
-     "at": "offline",
-     "crit": "A lid, never a seal. Both sealers on the system are thermal and a 200 nL drop has no thermal mass to survive either of them."
+     "step": "Close and store the trays",
+     "hand": "A shelf, and a list of which tray is where.",
+     "deck": "A lid, never a seal - both sealers are thermal and a 200 nL drop has no thermal mass to survive either. Trays sit on a carousel that returns one in as little as 12 seconds.",
+     "at": [
+      "ambistore"
+     ],
+     "t": "weeks to grow"
     },
     {
-     "do": "Store the trays and retrieve them for each scoring round.",
-     "at": "ambistore",
-     "t": "weeks to grow",
-     "note": "216 standard positions on a carousel that returns a tray in as little as 12 seconds, which is exactly the access pattern a growing tray library needs."
-    },
-    {
-     "do": "Image and score each drop clear, precipitate or crystal, then take hits to diffraction.",
-     "at": "offline"
+     "step": "Image and score",
+     "hand": "A microscope. Eighty trays is 48.9 h of hand scoring.",
+     "deck": "Still by hand. The imager cart is not quoted, and it is the single thing standing between this protocol and running unattended.",
+     "at": [
+      "offline"
+     ]
     }
    ],
    "inputs": [
@@ -2316,31 +2482,47 @@ window.PROTOCOLS = {
    "gates": [],
    "steps": [
     {
-     "do": "Transfer compound from the DMSO library plate into the destination at 1536.",
-     "at": "echo",
-     "t": "3 min a plate",
-     "crit": "DMSO transfer needs the 6XX-series Echo. The 525 cannot do it."
+     "step": "Transfer compound from the DMSO library",
+     "hand": "A pin tool or a multichannel, with the carryover a pin tool brings.",
+     "deck": "Acoustic and tipless at 1536. DMSO transfer needs the 6XX-series dispenser; the 525 cannot do it.",
+     "at": [
+      "echo"
+     ],
+     "t": "3 min a plate"
     },
     {
-     "do": "Add protein and target on top, the same spine as 4.7.",
-     "at": "echo"
+     "step": "Add protein and target on top",
+     "hand": "Multichannel, and 384 at best.",
+     "deck": "The same assay spine as 4.7, built acoustically on top of the compound.",
+     "at": [
+      "echo"
+     ]
     },
     {
-     "do": "Add the 4.7 detection reagents.",
-     "at": "multiflo"
+     "step": "Develop, seal and equilibrate",
+     "hand": "As 4.7.",
+     "deck": "As 4.7 - the same reagents off a different source plate.",
+     "at": [
+      "multiflo",
+      "plateloc"
+     ]
     },
     {
-     "do": "Seal and hold to equilibrium.",
-     "at": "plateloc"
-    },
-    {
-     "do": "Read the plate.",
-     "at": "pherastar",
+     "step": "Read",
+     "hand": "Four 384 plates.",
+     "deck": "One 1536 plate, at the same plate cost as 4.7 for four times the wells.",
+     "at": [
+      "pherastar"
+     ],
      "t": "8 min a TR-FRET plate"
     },
     {
-     "do": "Report percent effect per compound against the plate's own controls, and return the compound source plate to ambient storage.",
-     "at": "ambistore"
+     "step": "Report, and put the library back",
+     "hand": "Percent effect per compound; the source plate goes back to a freezer.",
+     "deck": "Percent effect against the plate's own controls, and the compound source plate returns to ambient storage between runs.",
+     "at": [
+      "ambistore"
+     ]
     }
    ],
    "inputs": [
@@ -2397,35 +2579,49 @@ window.PROTOCOLS = {
    ],
    "steps": [
     {
-     "do": "Dispense every DNA component first: the CI-fusion fragments normalised to 50 nM and the reporter plasmid to 5 nM final.",
-     "at": "echo",
-     "t": "3 min a plate",
-     "crit": "DNA before the cold master mix. That ordering is what makes an ambient-deck sequence survivable."
+     "step": "Dispense every DNA component first",
+     "hand": "Pipette the fragments and the reporter into each well.",
+     "deck": "Acoustic: CI-fusion fragments normalised to 50 nM and the reporter plasmid to 5 nM final. DNA before the cold master mix is what makes an ambient-deck sequence survivable.",
+     "at": [
+      "echo"
+     ],
+     "t": "3 min a plate"
     },
     {
-     "do": "Add the cold extract and CF2H buffer master mix.",
-     "at": "bravo",
-     "t": "32 min at 384",
-     "note": "This is the only binding workflow with the Bravo in the chain, and at 384 that one step costs 32 min of the system bottleneck against 3 min on the Echo. If the cold master mix can be made acoustic, move it."
+     "step": "Add the cold extract master mix",
+     "hand": "On ice, by multichannel.",
+     "deck": "The 96-channel head into 384, which is four offset quadrant transfers and 32 minutes of the system bottleneck. If this mix can be made acoustic it drops to three.",
+     "at": [
+      "bravo"
+     ],
+     "t": "32 min at 384"
     },
     {
-     "do": "Top up to final volume. In the streptavidin format, add the pre-mixed biotinylated target at 150 nM here.",
-     "at": "multiflo"
+     "step": "Top up to volume",
+     "hand": "Multichannel from a reservoir.",
+     "deck": "Bulk dispense. In the streptavidin format the pre-mixed biotinylated target goes in here at 150 nM.",
+     "at": [
+      "multiflo"
+     ]
     },
     {
-     "do": "Seal the plate.",
-     "at": "plateloc"
-    },
-    {
-     "do": "Hold the sealed plate while expression and binding run in the same well.",
-     "at": "ambistore",
+     "step": "Seal and hold while it expresses and binds",
+     "hand": "Seal, then incubate for 4-8 h.",
+     "deck": "Thermal seal, then ambient storage while expression and binding run in the same well.",
+     "at": [
+      "plateloc",
+      "ambistore"
+     ],
      "t": "4-8 h"
     },
     {
-     "do": "Read sfGFP and convert raw RFU to mean-equivalent units against the FITC standard.",
-     "at": "pherastar",
-     "t": "3 min a plate",
-     "note": "The output is a rank, not an affinity, and nothing weaker than about 100 nM is detected at all."
+     "step": "Read sfGFP",
+     "hand": "A plate on a shared reader.",
+     "deck": "Three minutes a plate, converted to mean-equivalent units against the FITC standard so the numbers survive a change of reader.",
+     "at": [
+      "pherastar"
+     ],
+     "t": "3 min a plate"
     }
    ],
    "inputs": [
@@ -3365,20 +3561,42 @@ window.PROTOCOLS = {
   // how many workflows need each instrument — on the deck, or holding a plate
   const uses = (w, id) => w.deck.includes(id) || (w.holds || []).includes(id);
   const count = id => WF.filter(w => uses(w, id)).length;
-  const isStore = i => i.kind === 'store' || i.kind === 'consumable';
 
-  document.getElementById('insts').innerHTML = P.instruments.map(i =>
-    `<button class="ichip${isStore(i) ? ' store' : ''}" type="button" aria-pressed="false"
-       data-i="${esc(i.id)}">${esc(i.label)}<span class="n">${count(i.id)}</span></button>`).join('');
+  // Instrument -> cart -> group. Both this page and the blueprint read the
+  // same cart_groups list, so the categories cannot drift between them.
+  const GRP = {};
+  P.racs.forEach(r => (r.instruments || []).forEach(id => { GRP[id] = r.group; }));
 
-  // the ceiling. Solid chips act on a plate; dashed ones hold it.
+  const chip = i =>
+    `<button class="ichip" type="button" aria-pressed="false"
+       data-i="${esc(i.id)}">${esc(i.label)}<span class="n">${count(i.id)}</span></button>`;
+
+  // `offline` is a place in a protocol, not a machine, so it is not on a cart
+  // and does not belong in a bar of hardware. Anything else the carts do not
+  // place gets a heading of its own rather than being dropped silently.
+  const HW = P.instruments.filter(i => i.id !== 'offline');
+  const placed = new Set(P.cart_groups.map(g => g.id));
+  const loose = HW.filter(i => !placed.has(GRP[i.id]));
+  document.getElementById('insts').innerHTML = P.cart_groups.map(g => {
+    const mine = HW.filter(i => GRP[i.id] === g.id);
+    if (!mine.length) return '';
+    return `<div class="ig${g.id === 'handle' ? ' minor' : ''}">
+      <h4>${esc(g.label)}<span class="gn">${esc(g.note)}</span></h4>
+      <div class="insts">${mine.map(chip).join('')}</div></div>`;
+  }).join('') + (loose.length
+    ? `<div class="ig"><h4>On no cart<span class="gn">These are not placed by the
+         blueprint.</span></h4><div class="insts">${loose.map(chip).join('')}</div></div>`
+    : '');
+
+  // the ceiling. What the day costs, which is the one number the blueprint
+  // cannot give you because it depends on which protocols you chain.
   const R = P.rates;
   document.getElementById('ceil').innerHTML =
     `The day is <b>${R.day_min / 60} h</b>. Ceilings: ` +
     R.ceilings.map(c => `<b>${esc(c.what)} ${c.limit}</b> ${esc(c.per)}`)
       .join('<span class="sep">&middot;</span>') +
     '<details class="pnote"><summary>384 and the Bravo</summary><div>' +
-    'Solid chips act on the plate, dashed ones hold it. One Bravo step costs ' +
+    'One Bravo step costs ' +
     `<b>${R.bravo_96} min</b> on a 96-well plate and <b>${R.bravo_384} min</b> on a 384 ` +
     '&mdash; four offset quadrant transfers with a 96-channel head. That 4&times; is why so ' +
     'much of this page runs through the Echo.</div></details>';
@@ -3441,18 +3659,24 @@ window.PROTOCOLS = {
     ? `<span class="gl" aria-hidden="true">${svg(GLYPH[w.draw](23, 17, c), '', 34, 46)}</span>`
     : '<span class="gl"></span>';
 
-  // the procedure, written out. Each step names the machine it runs on, and
-  // the build fails if that machine is not in the workflow's deck chain.
+  // the procedure, as a comparison. Each row is one operation said twice -
+  // what it is at the bench, what it becomes on the rack - and names the
+  // machines it uses. The build fails if a machine named here is not in the
+  // workflow's deck chain, or if a machine in the chain is named by no step.
   const proc = w => {
     const st = w.steps || [];
     if (!st.length) return '';
-    return '<h4>Procedure</h4><ol class="steps">' + st.map(x => {
-      const a = x.at, lab = INST[a] ? INST[a].label : a;
-      return `<li><div>${esc(x['do'])}</div>
-        <div class="smeta">${a ? `<span class="son" data-i="${esc(a)}">${esc(lab)}</span>` : ''}
+    return '<h4>Bench against the deck</h4><ol class="steps">' + st.map(x => {
+      const at = Array.isArray(x.at) ? x.at : (x.at ? [x.at] : []);
+      return `<li>
+        <div class="sname"><b>${esc(x.step)}</b>
+          ${at.map(a => `<span class="son" data-i="${esc(a)}">${
+            esc(INST[a] ? INST[a].label : a)}</span>`).join('')}
           ${x.t ? `<span class="st">${esc(x.t)}</span>` : ''}</div>
-        ${x.crit ? `<p class="crit"><b>Critical</b>${esc(x.crit)}</p>` : ''}
-        ${x.note ? `<p class="snote"><b>Note</b>${esc(x.note)}</p>` : ''}</li>`;
+        <div class="cmp">
+          <div><span class="lbl">By hand</span>${esc(x.hand)}</div>
+          <div class="ondeck"><span class="lbl">On the deck</span>${esc(x.deck)}</div>
+        </div></li>`;
     }).join('') + '</ol>';
   };
 
@@ -3783,8 +4007,8 @@ window.PROTOCOLS = {
     document.querySelectorAll('.ichip').forEach(c =>
       c.setAttribute('aria-pressed', String(c.dataset.i === sel)));
     role.innerHTML = sel
-      ? `<b>${esc(INST[sel].label)}</b> &mdash; ${esc(INST[sel].role)}` +
-        `<span class="sp">${esc(INST[sel].spec)}</span>`
+      ? `<b>${esc(INST[sel].label)}</b> &mdash; ${esc(INST[sel].role)}. ` +
+        `<a href="blueprint.html">Full spec on the blueprint &rarr;</a>`
       : '';
     document.querySelectorAll('.wf').forEach(c => {
       const w = WF.find(x => x.id === c.dataset.id);

@@ -68,6 +68,16 @@
   .bar{border:1px solid var(--rule);border-radius:12px;padding:12px 14px;margin-bottom:8px}
   .bar h3{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
           font-weight:500;margin:0 0 9px}
+  .barnote{color:var(--muted);font-size:12.5px;line-height:1.5;margin:-4px 0 12px}
+  .barnote a{color:var(--ink)}
+  .igroups{display:grid;gap:11px}
+  .ig{display:grid;grid-template-columns:118px minmax(0,1fr);gap:4px 12px;align-items:baseline}
+  .ig > h4{font-size:11.5px;font-weight:500;color:var(--ink);margin:3px 0 0}
+  .ig > h4 .gn{display:block;color:var(--muted);font-size:11px;font-weight:400;
+                line-height:1.35;margin-top:1px}
+  /* sealing, peeling and spinning serve the plate rather than the assay, so
+     the group is here but reads quieter than the four that do the science. */
+  .ig.minor{opacity:.72;border-top:1px solid var(--rule);padding-top:9px}
   .insts{display:flex;flex-wrap:wrap;gap:7px}
   .ichip{font:inherit;font-size:12.5px;color:var(--ink);background:var(--tab-bg);
          border:1px solid transparent;border-radius:999px;padding:4px 10px;cursor:pointer;
@@ -76,11 +86,10 @@
   .ichip .n{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
   .ichip[aria-pressed=true]{background:var(--bg);border-color:var(--ink)}
   .ichip[aria-pressed=true] .n{color:var(--ink)}
-  .ichip.store{background:transparent;border:1px dashed var(--rule)}
-  .ichip.store[aria-pressed=true]{border-style:solid;border-color:var(--ink)}
-  .role{color:var(--muted);font-size:12.5px;margin-top:10px;min-height:1.3em}
+  .role{color:var(--muted);font-size:12.5px;margin-top:12px;min-height:1.3em;line-height:1.5}
   .role b{color:var(--ink);font-weight:500}
-  .role .sp{display:block;margin-top:4px;line-height:1.5}
+  .role a{color:var(--muted)}
+  @media (max-width:620px){ .ig{grid-template-columns:1fr;gap:2px} }
   /* --- plan a day --- */
   .plan{border:1px solid var(--rule);border-radius:12px;padding:14px 16px 16px;margin:34px 0 4px}
   .plan h2{font-size:16px;font-weight:500;margin:0 0 3px}
@@ -208,22 +217,27 @@
   .wf .sb{color:var(--muted);font-size:12.5px;margin-top:1px}
   .wf .tags{margin-top:11px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 
-  /* the procedure. Numbered, one machine named per step, criticals called
-     out the way a methods section calls them out. */
-  .steps{margin:7px 0 0;padding:0 0 0 22px;font-size:13px;line-height:1.5}
-  .steps > li{margin-bottom:9px;padding-left:3px}
+  /* the procedure, as a comparison. Each row is one operation said twice:
+     by hand, then on the deck. The two columns are the content, so they are
+     given equal width and the deck side is never styled as the winner. */
+  .steps{margin:8px 0 0;padding:0 0 0 22px;font-size:13px;line-height:1.5}
+  .steps > li{margin-bottom:11px;padding-left:3px}
   .steps > li::marker{color:var(--muted);font-variant-numeric:tabular-nums}
-  .smeta{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-top:3px}
+  .sname{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}
+  .sname > b{font-weight:500}
   .son{font-size:11.5px;border:1px solid var(--rule);border-radius:6px;padding:1px 7px;
        color:var(--muted);white-space:nowrap;transition:background .12s,border-color .12s,color .12s}
   .son.on{border-color:var(--ink);background:var(--tab-bg);color:var(--ink);font-weight:500}
   .son.off{border-style:dashed;opacity:.55}
   .st{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
-  .crit,.snote{font-size:12.5px;line-height:1.45;margin:4px 0 0;padding:5px 9px;
-               border-radius:6px;background:var(--tab-bg);color:var(--muted)}
-  .crit{border-left:2px solid var(--warn)}
-  .crit b,.snote b{color:var(--ink);font-weight:500;text-transform:uppercase;
-                   letter-spacing:.05em;font-size:10.5px;margin-right:5px}
+  .cmp{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-top:5px;
+       background:var(--rule);border:1px solid var(--rule);border-radius:7px;overflow:hidden}
+  .cmp > div{background:var(--bg);padding:6px 9px 7px;font-size:12.5px;line-height:1.45;
+             color:var(--muted)}
+  .cmp .lbl{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;
+            color:var(--muted);margin-bottom:2px}
+  .cmp .ondeck{color:var(--ink)}
+  @media (max-width:620px){ .cmp{grid-template-columns:1fr} }
   .pill{font-size:11px;border-radius:999px;padding:1px 8px;border:1px solid}
   .gate{font-size:11px;border-radius:4px;padding:1px 5px;background:var(--tab-bg);color:var(--muted);
         font-variant-numeric:tabular-nums}
@@ -343,16 +357,21 @@
 
   <div class="bar">
     <h3>Instruments</h3>
-    <div class="insts" id="insts"></div>
+    <p class="barnote">Grouped by what they do, in the order a plate meets them. Click one to
+      see which protocols need it &mdash; the <a href="blueprint.html">system blueprint</a> has
+      what each machine is and what it can do.</p>
+    <div class="igroups" id="insts"></div>
     <div class="role" id="role"></div>
     <div class="ceil" id="ceil"></div>
   </div>
   <div class="legend" id="legend"></div>
 
   <h2 class="libhead">Protocols</h2>
-  <p class="libnote">Fifteen of them, each with a schematic of what happens on the deck and a
-    sample output drawn in the shape the readout comes back in, not from real results. Add any
-    protocol to the campaign at the foot of the page; its gates come with it.</p>
+  <p class="libnote">Fifteen examples of what this system can run &mdash; not a fixed menu, and
+    not everything it can do. Each one sets the bench method beside what it becomes as a
+    sequence of moves on the rack, so you can see where your own protocol would translate and
+    where it would not. Open one for the steps, the schematic and the shape of the readout; add
+    it to the campaign at the foot of the page and its decision gates come with it.</p>
   <div id="phases"></div>
 
   <section class="plan">
@@ -922,20 +941,42 @@
   // how many workflows need each instrument — on the deck, or holding a plate
   const uses = (w, id) => w.deck.includes(id) || (w.holds || []).includes(id);
   const count = id => WF.filter(w => uses(w, id)).length;
-  const isStore = i => i.kind === 'store' || i.kind === 'consumable';
 
-  document.getElementById('insts').innerHTML = P.instruments.map(i =>
-    `<button class="ichip${isStore(i) ? ' store' : ''}" type="button" aria-pressed="false"
-       data-i="${esc(i.id)}">${esc(i.label)}<span class="n">${count(i.id)}</span></button>`).join('');
+  // Instrument -> cart -> group. Both this page and the blueprint read the
+  // same cart_groups list, so the categories cannot drift between them.
+  const GRP = {};
+  P.racs.forEach(r => (r.instruments || []).forEach(id => { GRP[id] = r.group; }));
 
-  // the ceiling. Solid chips act on a plate; dashed ones hold it.
+  const chip = i =>
+    `<button class="ichip" type="button" aria-pressed="false"
+       data-i="${esc(i.id)}">${esc(i.label)}<span class="n">${count(i.id)}</span></button>`;
+
+  // `offline` is a place in a protocol, not a machine, so it is not on a cart
+  // and does not belong in a bar of hardware. Anything else the carts do not
+  // place gets a heading of its own rather than being dropped silently.
+  const HW = P.instruments.filter(i => i.id !== 'offline');
+  const placed = new Set(P.cart_groups.map(g => g.id));
+  const loose = HW.filter(i => !placed.has(GRP[i.id]));
+  document.getElementById('insts').innerHTML = P.cart_groups.map(g => {
+    const mine = HW.filter(i => GRP[i.id] === g.id);
+    if (!mine.length) return '';
+    return `<div class="ig${g.id === 'handle' ? ' minor' : ''}">
+      <h4>${esc(g.label)}<span class="gn">${esc(g.note)}</span></h4>
+      <div class="insts">${mine.map(chip).join('')}</div></div>`;
+  }).join('') + (loose.length
+    ? `<div class="ig"><h4>On no cart<span class="gn">These are not placed by the
+         blueprint.</span></h4><div class="insts">${loose.map(chip).join('')}</div></div>`
+    : '');
+
+  // the ceiling. What the day costs, which is the one number the blueprint
+  // cannot give you because it depends on which protocols you chain.
   const R = P.rates;
   document.getElementById('ceil').innerHTML =
     `The day is <b>${R.day_min / 60} h</b>. Ceilings: ` +
     R.ceilings.map(c => `<b>${esc(c.what)} ${c.limit}</b> ${esc(c.per)}`)
       .join('<span class="sep">&middot;</span>') +
     '<details class="pnote"><summary>384 and the Bravo</summary><div>' +
-    'Solid chips act on the plate, dashed ones hold it. One Bravo step costs ' +
+    'One Bravo step costs ' +
     `<b>${R.bravo_96} min</b> on a 96-well plate and <b>${R.bravo_384} min</b> on a 384 ` +
     '&mdash; four offset quadrant transfers with a 96-channel head. That 4&times; is why so ' +
     'much of this page runs through the Echo.</div></details>';
@@ -998,18 +1039,24 @@
     ? `<span class="gl" aria-hidden="true">${svg(GLYPH[w.draw](23, 17, c), '', 34, 46)}</span>`
     : '<span class="gl"></span>';
 
-  // the procedure, written out. Each step names the machine it runs on, and
-  // the build fails if that machine is not in the workflow's deck chain.
+  // the procedure, as a comparison. Each row is one operation said twice -
+  // what it is at the bench, what it becomes on the rack - and names the
+  // machines it uses. The build fails if a machine named here is not in the
+  // workflow's deck chain, or if a machine in the chain is named by no step.
   const proc = w => {
     const st = w.steps || [];
     if (!st.length) return '';
-    return '<h4>Procedure</h4><ol class="steps">' + st.map(x => {
-      const a = x.at, lab = INST[a] ? INST[a].label : a;
-      return `<li><div>${esc(x['do'])}</div>
-        <div class="smeta">${a ? `<span class="son" data-i="${esc(a)}">${esc(lab)}</span>` : ''}
+    return '<h4>Bench against the deck</h4><ol class="steps">' + st.map(x => {
+      const at = Array.isArray(x.at) ? x.at : (x.at ? [x.at] : []);
+      return `<li>
+        <div class="sname"><b>${esc(x.step)}</b>
+          ${at.map(a => `<span class="son" data-i="${esc(a)}">${
+            esc(INST[a] ? INST[a].label : a)}</span>`).join('')}
           ${x.t ? `<span class="st">${esc(x.t)}</span>` : ''}</div>
-        ${x.crit ? `<p class="crit"><b>Critical</b>${esc(x.crit)}</p>` : ''}
-        ${x.note ? `<p class="snote"><b>Note</b>${esc(x.note)}</p>` : ''}</li>`;
+        <div class="cmp">
+          <div><span class="lbl">By hand</span>${esc(x.hand)}</div>
+          <div class="ondeck"><span class="lbl">On the deck</span>${esc(x.deck)}</div>
+        </div></li>`;
     }).join('') + '</ol>';
   };
 
@@ -1340,8 +1387,8 @@
     document.querySelectorAll('.ichip').forEach(c =>
       c.setAttribute('aria-pressed', String(c.dataset.i === sel)));
     role.innerHTML = sel
-      ? `<b>${esc(INST[sel].label)}</b> &mdash; ${esc(INST[sel].role)}` +
-        `<span class="sp">${esc(INST[sel].spec)}</span>`
+      ? `<b>${esc(INST[sel].label)}</b> &mdash; ${esc(INST[sel].role)}. ` +
+        `<a href="blueprint.html">Full spec on the blueprint &rarr;</a>`
       : '';
     document.querySelectorAll('.wf').forEach(c => {
       const w = WF.find(x => x.id === c.dataset.id);

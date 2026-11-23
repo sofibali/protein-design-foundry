@@ -68,11 +68,12 @@ protocol, a cart or a loop step has no drawing, or names one that does not
 exist: the figures are drawing code, so they live in the pages and in
 `pages/figkit.js`, and the build reads the registries back out of them.
 
-**Every protocol carries its own procedure.** `steps:` under a workflow in
-`_data/protocols.yml` is the step-by-step method, written the way a journal's
-methods section is written: a numbered instruction per step, the machine it
-runs on in `at:`, a timing in `t:` where the rate model has a real figure, and
-`crit:` or `note:` for what goes wrong. The build checks that every machine in
+**Every protocol carries its own procedure, as a comparison.** `steps:` under a
+workflow in `_data/protocols.yml` is one row per unit operation, each said
+twice: `hand:` is what it is at the bench, `deck:` is what it becomes on the
+rack. `at:` is the list of machines the row uses and `t:` a timing, only where
+the rate model has a real figure. Keep the rows short — they are read side by
+side, and the contrast is the content. The build checks that every machine in
 the workflow's `deck:` chain is used by some step, and that no step claims a
 machine the workflow does not have — so the deck chain, the drawing and the
 written method cannot drift apart. `at:` is spelt `at` and not `on` on purpose:
