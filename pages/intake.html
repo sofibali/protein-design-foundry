@@ -34,6 +34,8 @@
     details{display:block !important}
     details > *{display:revert !important}
     details .ddb,details .why,details .gitems{display:block !important}
+    details > summary{list-style:none}
+    .guide summary::before{display:none}
     .sheet,.elev{background:#fff !important}
     a[href^="http"]::after{content:" (" attr(href) ")";font-size:10px;color:#555}
     section,article,.lev,.gi,.wf{break-inside:avoid}
@@ -134,7 +136,16 @@ button.send.alt{background:transparent;color:var(--ink);border:1px solid var(--r
    entry requirements. Here they are advice next to the form they are advice
    about, and each one says what to do when the answer is no. */
 .guide{margin-top:44px;border-top:1px solid var(--rule);padding-top:26px}
-.guide h2{font-weight:400;font-size:19px;margin:0;letter-spacing:-.01em}
+.guide summary{font-weight:400;font-size:19px;margin:0;letter-spacing:-.01em;
+  cursor:pointer;list-style:none;padding-left:21px;position:relative}
+.guide summary::-webkit-details-marker{display:none}
+.guide summary::before{content:"";position:absolute;left:3px;top:50%;
+  width:6px;height:6px;border-right:1.6px solid var(--muted);
+  border-bottom:1.6px solid var(--muted);
+  transform:translateY(-70%) rotate(-45deg);transition:transform .15s ease}
+.guide details[open] summary::before{transform:translateY(-30%) rotate(45deg)}
+.guide summary:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.guide summary::before{transition:none}}
 .guide .scope{font-size:11px;text-transform:uppercase;letter-spacing:.08em;
   color:var(--muted);margin-top:9px;line-height:1.5;max-width:70ch}
 .guide .g-note{font-size:13px;color:var(--muted);line-height:1.55;
@@ -283,10 +294,12 @@ td.s2{font-variant-numeric:tabular-nums;white-space:nowrap}
 </div>
 
 <section class="guide" id="guide" hidden>
-  <h2 id="g-t"></h2>
-  <div class="scope" id="g-scope"></div>
-  <p class="g-note" id="g-note"></p>
-  <div class="gitems" id="g-items"></div>
+  <details>
+    <summary id="g-t"></summary>
+    <div class="scope" id="g-scope"></div>
+    <p class="g-note" id="g-note"></p>
+    <div class="gitems" id="g-items"></div>
+  </details>
 </section>
 
 {{NEXT}}
