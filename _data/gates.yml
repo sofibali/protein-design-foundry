@@ -2,7 +2,7 @@
 # A run ends in a verdict, not data.
 # Every gate has three outcomes. Ambiguous is where campaigns die quietly.
 # Criteria are fixed BEFORE the run.
-# All nine were set with Sofia on 2026-11-17 and every one carries a note
+# All nine were set on 2026-11-17 and every one carries a note
 # saying where its number came from. None is a convention borrowed unexamined.
 # Two are capacity statements rather than quality ones (D7's n, and D5's
 # determined window, which follows from D2's mass floor). One rank is
@@ -212,7 +212,7 @@ gates:
       is what the maturation loop is for. Failing it would put a true binder
       into the Aim 2 training set as a negative - the same error D4 is built
       to avoid.
-      ON R2, HONESTLY: Sofia chose R2 >= 0.95 as the fit gate on 2026-11-17.
+      ON R2, HONESTLY: R2 >= 0.95 was set as the fit gate on 2026-11-17.
       It should be read as a gross-misfit catch and not as evidence that a
       K_D is determined. Simulated 12-point titrations at 5% noise return
       R2 = 0.997 for K_D = 1 nM and R2 = 0.997 for K_D = 2 uM, where only the

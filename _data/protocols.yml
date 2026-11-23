@@ -84,7 +84,7 @@ rates:
     between two workflows as the thing worth trusting.
 
 # ---------------------------------------------------------------------------
-# The device set. 19 instruments across 15 RACs, confirmed by Sofia
+# The device set. 19 instruments across 15 RACs, confirmed
 # 2026-11-04. Nine of these were missing from this file until 2026-11-17.
 #
 # kind: deck        acts on a plate, and appears in a deck: sequence
@@ -338,7 +338,7 @@ instruments:
 # once. build.py enforces it, so a device cannot be on the capability map and
 # off the floor plan, which is how the device set drifted in the first place.
 #
-# status: installed  one of the 15 carts confirmed by Sofia 2026-11-04
+# status: installed  one of the 15 carts confirmed 2026-11-04
 #         phase2     one of the 4 additional carts the layout leaves room for
 # io:     this cart is where material enters or leaves the system by hand
 

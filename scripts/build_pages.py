@@ -48,7 +48,7 @@ KINDS = {"deck": "deck", "store": "holds", "consumable": "holds", "virtual": "de
 COST_KEYS = ("bravo", "echo", "reader")
 RAC_STATUSES = ("installed", "phase2")
 
-# Sofia, 2026-11-20: hide all phase 2 crystallography from the pages. The data
+# Decided 2026-11-20: hide all phase 2 crystallography from the pages. The data
 # stays in _data/ and is still checked - phase 2 carts, the phase 2 entries in
 # future.yml and the phase 2 programme are simply not bundled into any page.
 #

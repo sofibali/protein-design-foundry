@@ -185,7 +185,7 @@ performance — ±0.25 °C accuracy from 35–99.9 °C, under 0.5 °C uniformity
 twenty seconds after reaching 95 °C, 2.8 °C/s block ramp — so the arms are
 comparable by specification, not by assumption.
 
-**The 4× is still available, and it is Sofia's call.** The recommendation on
+**The 4× is still available, and the decision is open.** The recommendation on
 record is to swap a second 96 block for a 384 — still four units, so close to
 price-neutral against the quoted ATC line — and push retrieval PCR to 384 via
 the Echo. For a 1,152-design set that is 3 plates instead of 12 and cycler
