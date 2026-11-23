@@ -16,6 +16,7 @@ unknown:
   - Which precipitant fluid classes are validated; 25–35% PEG, high salt and glycerol fall outside the published set
 ---
 
+
 The Echo is the answer to the [Bravo's]({{ '/inventory/bravo/' | relative_url }})
 4× penalty on 384-well plates. A 96-channel head fills a 384 plate in four
 offset quadrant transfers; acoustic transfer does not care about density at
@@ -25,7 +26,8 @@ That is why most workflows here are designed to put the Echo in the chain and
 keep the Bravo out of it. It is not a preference about instruments. It is a
 factor of ten on the system bottleneck.
 
-## What it is uniquely good at
+<details markdown="1">
+<summary>What it is uniquely good at</summary>
 
 **Dose–response.** The dilution series is built acoustically in the
 destination plate. No serial pipetting, no tip-to-tip carryover, and
@@ -36,7 +38,11 @@ crystallisation drops. This is the thing no person can match, and it is the
 reason the 6XX requirement is not negotiable — the 525 handles neither DMSO
 nor the volumes.
 
-## The fluid class problem
+</details>
+
+
+<details markdown="1">
+<summary>The fluid class problem</summary>
 
 Acoustic dispensing works by matching a calibrated fluid class to the liquid
 in the source well. Crystallisation precipitants are where that breaks down:
@@ -45,3 +51,5 @@ the realistic expectation is losing 10–30% of a commercial screen.
 
 Glycerol-based enzyme master mixes are refused outright, which is what the
 [Magniflex]({{ '/inventory/magniflex/' | relative_url }}) is for.
+
+</details>

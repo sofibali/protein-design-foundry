@@ -15,6 +15,7 @@ unknown:
   - Settable range is from vendor documentation; the 130–180 °C figure came from the proposal and the two have not been reconciled against a single sheet
 ---
 
+
 Sealing is not a detail on this system. A plate that moves between carts with
 an open top will evaporate, aerosolise or cross-contaminate, so almost every
 transfer between unit operations has a seal or a peel on one side of it.
@@ -24,7 +25,8 @@ plate rim for one to three seconds. That works for everything the expression
 routes need and is the reason a twenty-hour deep-well culture can run
 anaerobically: a foil seal off this instrument closes the block completely.
 
-## Why there are two sealers
+<details markdown="1">
+<summary>Why there are two sealers</summary>
 
 The [a4S]({{ '/inventory/a4s/' | relative_url }}) on cart 15 is also a sealer,
 not the lidder it was first recorded as. Having two means the PlateLoc can hold
@@ -32,9 +34,15 @@ foil while the a4S holds the gas-permeable roll, and neither needs a human to
 change film in the middle of a run. That is a genuine capability, and it was
 discovered rather than designed.
 
-## Where it stops
+</details>
+
+
+<details markdown="1">
+<summary>Where it stops</summary>
 
 Both sealers on the system are thermal. A 200 nL crystallisation drop has
 almost no thermal mass, so neither is obviously safe over a wet tray, and
 crystallography trays are closed with a lid instead — except that nothing on
 the system currently handles lids either. That gap is still open.
+
+</details>

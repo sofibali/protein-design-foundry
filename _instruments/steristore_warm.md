@@ -11,12 +11,14 @@ specs:
   - {label: Holds, value: "Assay-plate incubation, cell-free reactions, static non-shaking culture, transformation recovery"}
 ---
 
+
 The humidity specification is the one that earns its place. At 98% RH a plate
 can sit through a long incubation without the edge wells drying, which is what
 otherwise turns a 384-well cell-free plate into a 300-well plate with a
 gradient around the outside.
 
-## Why this and not the thermal cyclers
+<details markdown="1">
+<summary>Why this and not the thermal cyclers</summary>
 
 Both hold 37 °C, and for a four-arm temperature experiment the
 [cyclers]({{ '/inventory/atc/' | relative_url }}) are the right answer because
@@ -27,9 +29,15 @@ This store is 288 standard positions, all at one temperature, and when a
 campaign is running one condition across many plates that is the instrument
 that matters. The cyclers are for finding the condition; this is for using it.
 
-## What it is not
+</details>
+
+
+<details markdown="1">
+<summary>What it is not</summary>
 
 It does not shake. Deep-well *E. coli* growth needs aeration and therefore
 goes to the [Cytomat]({{ '/inventory/cytomat/' | relative_url }}), which is a
 14-position cap on the whole *in vivo* route. The 20 deep-well positions here
 are for static recovery steps, not for growth.
+
+</details>

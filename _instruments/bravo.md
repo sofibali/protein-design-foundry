@@ -15,6 +15,7 @@ unknown:
   - Whether the achieved heat-shock CV across a 96-well plate matches bench transformation
 ---
 
+
 Read the throughput line before planning anything. The Bravo and the
 [PHERAstar]({{ '/inventory/pherastar/' | relative_url }}) are tied as the
 system bottleneck, and the Bravo is the one that binds first for any workflow
@@ -27,7 +28,8 @@ most well-designed workflows here put the
 [Echo]({{ '/inventory/echo/' | relative_url }}) in the chain and keep the Bravo
 out of it entirely: on the Echo, 384 costs the same as 96.
 
-## Two deck features that matter more than the pipetting
+<details markdown="1">
+<summary>Two deck features that matter more than the pipetting</summary>
 
 **The magnet** makes this the purification instrument. It is also where the
 *E. coli* route loses its time: 60 minutes per 96-well plate means a full
@@ -39,7 +41,11 @@ at all. A single ramping block takes about three minutes to go from 4 °C to
 45-second step. Two fixed positions and one plate move does it. That is a
 capability the deck turned out to have, rather than a decision anyone made.
 
-## Raising the ceiling
+</details>
+
+
+<details markdown="1">
+<summary>Raising the ceiling</summary>
 
 Two things would, and both are open. A 384-channel head would remove the 4×
 penalty outright. Pushing more dispensing to the Echo is free and is already
@@ -50,3 +56,5 @@ The rates above are arithmetic off the vendor's own throughput figures, not
 measurements taken on our system. Treat the **ratio** between two workflows as
 more trustworthy than the absolute number on either.
 </div>
+
+</details>

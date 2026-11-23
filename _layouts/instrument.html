@@ -26,8 +26,10 @@ layout: default
 {{ content }}
 
 {% if page.unknown %}
-<h2>Not yet confirmed</h2>
-<ul class="open">{% for u in page.unknown %}<li>{{ u }}</li>{% endfor %}</ul>
+<details>
+  <summary>Not yet confirmed <span class="count">{{ page.unknown | size }}</span></summary>
+  <ul class="open">{% for u in page.unknown %}<li>{{ u }}</li>{% endfor %}</ul>
+</details>
 {% endif %}
 
 {%- assign k = page.key -%}

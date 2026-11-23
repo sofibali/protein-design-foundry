@@ -13,6 +13,7 @@ unknown:
   - Whether a partially peeled seal is detected or passes silently to the next step
 ---
 
+
 The XPeel is the step that is easy to forget when planning a workflow and then
 blocks it. Cell-free expression, for example, seals before the thermal cycler
 and has to open again before the detection reagent goes in; without an
@@ -21,9 +22,12 @@ automated peel that is a person opening the enclosure in the middle of a run.
 Pairing it with the [PlateLoc]({{ '/inventory/plateloc/' | relative_url }}) on
 the same cart means the arm makes one trip rather than two.
 
-## What we do not know yet
+<details markdown="1">
+<summary>What we do not know yet</summary>
 
 This is the thinnest specification on the system, and that is worth saying
 plainly rather than padding. The consumable question matters most: a peel tape
 roll that runs out mid-campaign stops an unattended run exactly as effectively
 as a hardware fault, and we do not yet know the interval.
+
+</details>

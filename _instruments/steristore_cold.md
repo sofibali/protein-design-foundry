@@ -11,6 +11,7 @@ unknown:
   - Achieved stability under repeated door cycling during a long unattended run
 ---
 
+
 This is the coldest thing on the rack. There is no −20 °C and no −80 °C
 position anywhere on the system, so this store defines the lower bound of what
 can be kept without leaving the enclosure.
@@ -20,7 +21,8 @@ the day of a transformation rather than living on the system; enzyme stocks do
 the same. Any workflow that assumed a freezer two steps away has to be
 rewritten as a workflow with a delivery in it.
 
-## What actually lives here
+<details markdown="1">
+<summary>What actually lives here</summary>
 
 Two different things, and they are easy to conflate. **Reagents** — DNA,
 detection chemistry — sit here between runs. **Grown deep-well blocks** come
@@ -31,3 +33,5 @@ purification, which is the step that cannot keep up with them.
 That second use is the one that sizes the deep-well allocation. Fourteen
 blocks can be grown in a night and purification clears roughly one plate an
 hour, so the backlog has to go somewhere cold.
+
+</details>

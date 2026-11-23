@@ -14,6 +14,7 @@ unknown:
   - Whether a −20 °C configuration is available after install or only at order time
 ---
 
+
 Random access is the specification that matters here, not capacity. A
 rotating crystallography tray library is read in no particular order: the tray
 that needs looking at today is whichever one was set down seven days ago, and
@@ -23,7 +24,8 @@ A sequential stacker would not.
 The 216 standard positions were sized for 100–150 rotating trays plus bulk,
 and the 50 deep-well positions hold precipitant stocks. That split is settled.
 
-## The frozen storage footnote
+<details markdown="1">
+<summary>The frozen storage footnote</summary>
 
 The system has no frozen storage, which is a real limit — competent cells and
 enzyme stocks arrive cold on the day and the coldest position on the rack is
@@ -33,3 +35,5 @@ Worth knowing, though: this chassis is specified down to −20 °C. Frozen
 storage is a configuration question rather than a new instrument, if it is
 ever wanted. Nobody should plan around that until it is confirmed in writing,
 but it is a cheaper conversation than it sounds.
+
+</details>

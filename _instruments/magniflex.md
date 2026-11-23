@@ -12,6 +12,7 @@ specs:
   - {label: Source format, value: "Tubes at variable spacing, as well as plates"}
 ---
 
+
 The name is misleading and it misled us for a while. **There is no magnet in
 this instrument.** Bead separation is the
 [Bravo's]({{ '/inventory/bravo/' | relative_url }}) deck magnet, and for most
@@ -21,7 +22,8 @@ What it genuinely is: an OEM pipetting framework with independent channels
 whose spacing opens from 9 mm to 445 mm, driven by piston pumps rather than an
 air cushion.
 
-## What only this can do
+<details markdown="1">
+<summary>What only this can do</summary>
 
 Two capabilities, and no other instrument on the system has either.
 
@@ -36,9 +38,15 @@ this cart.
 rack and deliver into a plate. Everything else here assumes SBS geometry at
 both ends.
 
-## Why it looked redundant
+</details>
+
+
+<details markdown="1">
+<summary>Why it looked redundant</summary>
 
 On a channel count it overlaps the [Lynx]({{ '/inventory/lynx/' | relative_url }}),
 which is why an earlier reading of the device set could not find a job for it.
 The overlap is real for ordinary aqueous transfers. It disappears the moment
 the liquid is viscous or the source is not a plate.
+
+</details>

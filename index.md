@@ -4,6 +4,7 @@ title: Protein Design Foundry
 standfirst: An automated protein design facility at UCSF Mission Bay, built on fifteen enclosed robotic carts.
 ---
 
+
 The system is meant to take a designed sequence to measured data without a
 person moving a plate. This site is the working record of that build: what it
 can do, what it cannot, and how it is put together.
@@ -35,7 +36,8 @@ is useless to someone trying to work out whether their experiment will run here.
     <p>{{ site.data.instruments.instruments | where: "status", "quoted" | size }} instruments across {{ site.data.instruments.racs | size }} carts.</p></div>
 </div>
 
-## The shape of it
+<details markdown="1">
+<summary>The shape of it</summary>
 
 Each cart is a sealed micro-environment with its own six-axis arm, sitting on a
 shared magnetic transport track. Plates move between instruments without anyone
@@ -47,14 +49,24 @@ cell-free route skips growth entirely and takes about **12 hours** for the same
 library, with a ceiling more than a hundred times higher. Neither is the right
 answer on its own, which is the point of having both.
 
-## Working with us
+</details>
+
+
+<details markdown="1">
+<summary>Working with us</summary>
 
 Not open for general submissions yet. If you think a workflow belongs here, the
 most useful thing you can send is the step list, the plate formats and the
 volumes, because that is what determines whether it fits.
 
-## How this stays accurate
+</details>
+
+
+<details markdown="1">
+<summary>How this stays accurate</summary>
 
 The inventory lives in `_data/` and every table is rendered from it
 at build time. A number changes in one place. Figures taken from somewhere else
 say where they came from.
+
+</details>

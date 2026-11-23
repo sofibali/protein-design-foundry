@@ -59,3 +59,27 @@ ul.open li::marker{color:var(--open)}
   /* a five-column table cannot fit a phone; let it scroll rather than push the page wide */
   table.wide{display:block;overflow-x:auto;min-width:100%}
 }
+
+/* Disclosures ------------------------------------------------------------
+   Pages carry more prose than anyone scans, so the detail sits behind its
+   own heading. <details> rather than hover: hover has no equivalent on a
+   phone or a keyboard, and this needs no JS to work. */
+details{border-top:1px solid var(--line);padding:2px 0}
+details+details{border-top:1px solid var(--line)}
+details>summary{
+  cursor:pointer;list-style:none;padding:11px 2px 11px 22px;position:relative;
+  font-weight:600;color:var(--ink)}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{
+  content:"";position:absolute;left:4px;top:50%;width:6px;height:6px;
+  border-right:1.6px solid var(--accent);border-bottom:1.6px solid var(--accent);
+  transform:translateY(-70%) rotate(-45deg);transition:transform .15s ease}
+details[open]>summary::before{transform:translateY(-30%) rotate(45deg)}
+details>summary:hover{color:var(--accent)}
+details>summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+details>summary .count{
+  font-weight:400;color:var(--ink2);font-variant-numeric:tabular-nums;
+  margin-left:6px}
+details>summary+*{margin-top:2px}
+details>:last-child{margin-bottom:14px}
+@media (prefers-reduced-motion:reduce){details>summary::before{transition:none}}

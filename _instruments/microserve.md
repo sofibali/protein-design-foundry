@@ -12,10 +12,12 @@ unknown:
   - Whether an empty tip box is detected before a protocol starts or at the moment it fails
 ---
 
+
 An eight-position tip-box stacker was considered and dropped: all tip boxes
 live in this unit instead. That is tidier, and it concentrates a risk.
 
-## Why it decides unattended run length
+<details markdown="1">
+<summary>Why it decides unattended run length</summary>
 
 The point of an enclosed system is that a twenty-hour run needs nobody.
 Running out of tips breaks that as effectively as any hardware fault, and the
@@ -27,9 +29,15 @@ whether the mix of tip types a given campaign needs can all be resident at the
 same time, and how many plates' worth that is. We do not have those numbers,
 which is why they are listed as unknown rather than estimated.
 
-## The detection question
+</details>
+
+
+<details markdown="1">
+<summary>The detection question</summary>
 
 The difference between a protocol that refuses to start and one that stops
 halfway through with a half-processed plate is entirely about whether tip
 inventory is checked up front. Worth confirming before the first long
 unattended campaign rather than after it.
+
+</details>

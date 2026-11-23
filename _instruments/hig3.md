@@ -10,6 +10,7 @@ unknown:
   - Achieved plate temperature after a long spin, which decides whether a labile target survives harvest
 ---
 
+
 Read both specifications together, because the limit they create is not
 obvious from either one alone.
 
@@ -22,7 +23,8 @@ modes that otherwise give the most signal per well on the
 **It is not refrigerated.** A long spin warms the plate, which matters for
 anything labile.
 
-## What that forces
+<details markdown="1">
+<summary>What that forces</summary>
 
 Heat lysis at 95 °C in a 96-well
 [thermal cycler block]({{ '/inventory/atc/' | relative_url }}) is the only
@@ -36,9 +38,15 @@ which is what the
 it does not, this centrifuge becomes a real constraint rather than an
 interesting one.
 
-## The decision that was already weighed
+</details>
+
+
+<details markdown="1">
+<summary>The decision that was already weighed</summary>
 
 A refrigerated centrifuge was considered and rejected: it would need its own
 enclosure, a different vendor and true refrigeration, which is not worth it
 against what it buys. It was priced before it was rejected, and the
 reasoning is kept on file so nobody re-opens it blind.
+
+</details>
