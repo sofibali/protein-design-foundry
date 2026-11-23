@@ -22,7 +22,7 @@ the same. Any workflow that assumed a freezer two steps away has to be
 rewritten as a workflow with a delivery in it.
 
 <details markdown="1">
-<summary>What actually lives here</summary>
+<summary markdown="span">What actually lives here</summary>
 
 Two different things, and they are easy to conflate. **Reagents** — DNA,
 detection chemistry — sit here between runs. **Grown deep-well blocks** come

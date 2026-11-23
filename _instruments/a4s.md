@@ -20,7 +20,7 @@ heat sealer running 100–195 °C. The correction cuts both ways, and both
 directions are worth stating.
 
 <details markdown="1">
-<summary>What we gained</summary>
+<summary markdown="span">What we gained</summary>
 
 **The system has two sealers**, which is better than having a sealer and a
 lidder. Because this one is roll-fed and the
@@ -37,7 +37,7 @@ and the arm chooses between them without a human in the room.
 
 
 <details markdown="1">
-<summary>What we lost</summary>
+<summary markdown="span">What we lost</summary>
 
 **Nothing on the system handles lids.** Plating is in scope, agar plates carry
 lids, and filter-plus-carrier plate combinations are too tall for either

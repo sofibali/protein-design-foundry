@@ -26,7 +26,7 @@ routes need and is the reason a twenty-hour deep-well culture can run
 anaerobically: a foil seal off this instrument closes the block completely.
 
 <details markdown="1">
-<summary>Why there are two sealers</summary>
+<summary markdown="span">Why there are two sealers</summary>
 
 The [a4S]({{ '/inventory/a4s/' | relative_url }}) on cart 15 is also a sealer,
 not the lidder it was first recorded as. Having two means the PlateLoc can hold
@@ -38,7 +38,7 @@ discovered rather than designed.
 
 
 <details markdown="1">
-<summary>Where it stops</summary>
+<summary markdown="span">Where it stops</summary>
 
 Both sealers on the system are thermal. A 200 nL crystallisation drop has
 almost no thermal mass, so neither is obviously safe over a wet tray, and

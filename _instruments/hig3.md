@@ -24,7 +24,7 @@ modes that otherwise give the most signal per well on the
 anything labile.
 
 <details markdown="1">
-<summary>What that forces</summary>
+<summary markdown="span">What that forces</summary>
 
 Heat lysis at 95 °C in a 96-well
 [thermal cycler block]({{ '/inventory/atc/' | relative_url }}) is the only
@@ -42,7 +42,7 @@ interesting one.
 
 
 <details markdown="1">
-<summary>The decision that was already weighed</summary>
+<summary markdown="span">The decision that was already weighed</summary>
 
 A refrigerated centrifuge was considered and rejected: it would need its own
 enclosure, a different vendor and true refrigeration, which is not worth it

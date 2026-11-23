@@ -23,7 +23,7 @@ Pairing it with the [PlateLoc]({{ '/inventory/plateloc/' | relative_url }}) on
 the same cart means the arm makes one trip rather than two.
 
 <details markdown="1">
-<summary>What we do not know yet</summary>
+<summary markdown="span">What we do not know yet</summary>
 
 This is the thinnest specification on the system, and that is worth saying
 plainly rather than padding. The consumable question matters most: a peel tape

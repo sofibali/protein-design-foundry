@@ -25,7 +25,7 @@ per-well correction can be logged against the design, which is what makes a
 concentration series comparable between campaigns rather than only within one.
 
 <details markdown="1">
-<summary>Where it sits in a run</summary>
+<summary markdown="span">Where it sits in a run</summary>
 
 After expression and quality control, before any assay. Protein comes off
 purification at whatever concentration each well happened to give; the Lynx
@@ -40,7 +40,7 @@ biology, which is considerably worse.
 
 
 <details markdown="1">
-<summary>The 1 µL question</summary>
+<summary markdown="span">The 1 µL question</summary>
 
 1 µL is the stated minimum and 2 µL is where it holds 2% CV. Those are
 different claims and the gap matters: a 2.5 µL cell-free reaction in 1536 is

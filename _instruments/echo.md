@@ -27,7 +27,7 @@ keep the Bravo out of it. It is not a preference about instruments. It is a
 factor of ten on the system bottleneck.
 
 <details markdown="1">
-<summary>What it is uniquely good at</summary>
+<summary markdown="span">What it is uniquely good at</summary>
 
 **Dose–response.** The dilution series is built acoustically in the
 destination plate. No serial pipetting, no tip-to-tip carryover, and
@@ -42,7 +42,7 @@ nor the volumes.
 
 
 <details markdown="1">
-<summary>The fluid class problem</summary>
+<summary markdown="span">The fluid class problem</summary>
 
 Acoustic dispensing works by matching a calibrated fluid class to the liquid
 in the source well. Crystallisation precipitants are where that breaks down:

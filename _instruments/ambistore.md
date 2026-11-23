@@ -25,7 +25,7 @@ The 216 standard positions were sized for 100–150 rotating trays plus bulk,
 and the 50 deep-well positions hold precipitant stocks. That split is settled.
 
 <details markdown="1">
-<summary>The frozen storage footnote</summary>
+<summary markdown="span">The frozen storage footnote</summary>
 
 The system has no frozen storage, which is a real limit — competent cells and
 enzyme stocks arrive cold on the day and the coldest position on the rack is

@@ -18,7 +18,7 @@ otherwise turns a 384-well cell-free plate into a 300-well plate with a
 gradient around the outside.
 
 <details markdown="1">
-<summary>Why this and not the thermal cyclers</summary>
+<summary markdown="span">Why this and not the thermal cyclers</summary>
 
 Both hold 37 °C, and for a four-arm temperature experiment the
 [cyclers]({{ '/inventory/atc/' | relative_url }}) are the right answer because
@@ -33,7 +33,7 @@ that matters. The cyclers are for finding the condition; this is for using it.
 
 
 <details markdown="1">
-<summary>What it is not</summary>
+<summary markdown="span">What it is not</summary>
 
 It does not shake. Deep-well *E. coli* growth needs aeration and therefore
 goes to the [Cytomat]({{ '/inventory/cytomat/' | relative_url }}), which is a

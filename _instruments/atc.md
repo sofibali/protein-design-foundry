@@ -26,7 +26,7 @@ That is how the expression optimisation treats temperature, and it is the only
 way to get a clean effect size out of it.
 
 <details markdown="1">
-<summary>The volume split matters</summary>
+<summary markdown="span">The volume split matters</summary>
 
 The 384 block takes 5–20 µL and the 96 blocks take 10–100 µL, so they are not
 interchangeable. Golden Gate, heat lysis and held-temperature incubations want
@@ -38,7 +38,7 @@ swap-for-a-second-384 question, not a preference.
 
 
 <details markdown="1">
-<summary>No melt curves</summary>
+<summary markdown="span">No melt curves</summary>
 
 There is no optical detection in any of the four blocks, so differential
 scanning fluorimetry has nowhere to be read and **this system cannot measure a
@@ -52,7 +52,7 @@ reported as one.
 
 
 <details markdown="1">
-<summary>The cheapest capability on the system</summary>
+<summary markdown="span">The cheapest capability on the system</summary>
 
 Heat lysis at 95 °C in a 96-well block costs nothing, needs no new hardware,
 and removes the single most expensive step in the *E. coli* route — the

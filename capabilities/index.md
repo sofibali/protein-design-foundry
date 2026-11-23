@@ -6,7 +6,7 @@ standfirst: What the system does, at what scale, and what each route costs in in
 
 
 <details markdown="1">
-<summary>Throughput, measured against a real library</summary>
+<summary markdown="span">Throughput, measured against a real library</summary>
 
 The numbers below are for **1,152 designed binders**, the scale of the first
 campaign. They come from a stage-by-stage model of the device set, not from
@@ -34,7 +34,7 @@ the reader support the format. Both do.
 
 
 <details markdown="1">
-<summary>What it can do</summary>
+<summary markdown="span">What it can do</summary>
 
 **Molecular biology at plate scale.** Four independently programmable thermal
 cyclers in one cart, so four protocols run at once. A 1,152-member library is
@@ -69,7 +69,7 @@ acoustic nanolitre transfer with no tips.
 
 
 <details markdown="1">
-<summary>What it cannot do</summary>
+<summary markdown="span">What it cannot do</summary>
 
 Read [the limits]({{ '/capabilities/limits/' | relative_url }}) before planning
 around any of the above. In short: no frozen storage, no size exclusion, no

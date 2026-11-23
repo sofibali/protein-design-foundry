@@ -37,7 +37,7 @@ is useless to someone trying to work out whether their experiment will run here.
 </div>
 
 <details markdown="1">
-<summary>The shape of it</summary>
+<summary markdown="span">The shape of it</summary>
 
 Each cart is a sealed micro-environment with its own six-axis arm, sitting on a
 shared magnetic transport track. Plates move between instruments without anyone
@@ -53,7 +53,7 @@ answer on its own, which is the point of having both.
 
 
 <details markdown="1">
-<summary>Working with us</summary>
+<summary markdown="span">Working with us</summary>
 
 Not open for general submissions yet. If you think a workflow belongs here, the
 most useful thing you can send is the step list, the plate formats and the
@@ -63,7 +63,7 @@ volumes, because that is what determines whether it fits.
 
 
 <details markdown="1">
-<summary>How this stays accurate</summary>
+<summary markdown="span">How this stays accurate</summary>
 
 The inventory lives in `_data/` and every table is rendered from it
 at build time. A number changes in one place. Figures taken from somewhere else

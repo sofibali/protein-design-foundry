@@ -20,7 +20,7 @@ same master mix into all of them. Neither step touches the
 [Bravo]({{ '/inventory/bravo/' | relative_url }}).
 
 <details markdown="1">
-<summary>The 1536 answer</summary>
+<summary markdown="span">The 1536 answer</summary>
 
 This was an open question and it is now closed: 1 µL per well across a full
 1536 plate in 21 seconds. A 2.5 µL cell-free reaction sits comfortably inside
@@ -35,7 +35,7 @@ reader could see the plate. Both answers are now yes.
 
 
 <details markdown="1">
-<summary>The priming constraint</summary>
+<summary markdown="span">The priming constraint</summary>
 
 The pump has to be primed, and priming means pushing reagent through the line
 and discarding it. For a master mix that is a rounding error. For something

@@ -17,7 +17,7 @@ An eight-position tip-box stacker was considered and dropped: all tip boxes
 live in this unit instead. That is tidier, and it concentrates a risk.
 
 <details markdown="1">
-<summary>Why it decides unattended run length</summary>
+<summary markdown="span">Why it decides unattended run length</summary>
 
 The point of an enclosed system is that a twenty-hour run needs nobody.
 Running out of tips breaks that as effectively as any hardware fault, and the
@@ -33,7 +33,7 @@ which is why they are listed as unknown rather than estimated.
 
 
 <details markdown="1">
-<summary>The detection question</summary>
+<summary markdown="span">The detection question</summary>
 
 The difference between a protocol that refuses to start and one that stops
 halfway through with a half-processed plate is entirely about whether tip

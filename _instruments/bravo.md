@@ -29,7 +29,7 @@ most well-designed workflows here put the
 out of it entirely: on the Echo, 384 costs the same as 96.
 
 <details markdown="1">
-<summary>Two deck features that matter more than the pipetting</summary>
+<summary markdown="span">Two deck features that matter more than the pipetting</summary>
 
 **The magnet** makes this the purification instrument. It is also where the
 *E. coli* route loses its time: 60 minutes per 96-well plate means a full
@@ -45,7 +45,7 @@ capability the deck turned out to have, rather than a decision anyone made.
 
 
 <details markdown="1">
-<summary>Raising the ceiling</summary>
+<summary markdown="span">Raising the ceiling</summary>
 
 Two things would, and both are open. A 384-channel head would remove the 4×
 penalty outright. Pushing more dispensing to the Echo is free and is already

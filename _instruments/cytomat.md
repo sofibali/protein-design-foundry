@@ -26,7 +26,7 @@ temperature-controlled nests, but neither shakes, and a deep-well culture that
 does not aerate does not grow. There is no second option on this system.
 
 <details markdown="1">
-<summary>Temperature is not the constraint</summary>
+<summary markdown="span">Temperature is not the constraint</summary>
 
 This was an open question and it is now closed. The C-LiN series runs to 50 °C,
 and the unit has to reach 37 °C for *E. coli* anyway, so **30 °C growth for
@@ -37,7 +37,7 @@ change rather than a purchase.
 
 
 <details markdown="1">
-<summary>The orbit is</summary>
+<summary markdown="span">The orbit is</summary>
 
 1–3 mm at 100–1200 rpm is a mammalian-suspension specification. Published
 deep-well microbial protocols run at 25 mm. The concern is not speed, it is

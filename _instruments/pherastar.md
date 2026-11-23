@@ -29,7 +29,7 @@ The gain is equally real: 1,536 wells read in minutes, straight out of crude
 reactions, with no consumable per sample beyond the reagent itself.
 
 <details markdown="1">
-<summary>The format line is the one to notice</summary>
+<summary markdown="span">The format line is the one to notice</summary>
 
 "Every detection method from 6 through 3456 wells" is what opens the
 1536 route. It means AlphaScreen and HTRF are both available at 1536, so the
@@ -41,7 +41,7 @@ at that density, the 230,400-reaction ceiling is real rather than theoretical.
 
 
 <details markdown="1">
-<summary>It ties with the Bravo as the bottleneck</summary>
+<summary markdown="span">It ties with the Bravo as the bottleneck</summary>
 
 150 plate reads a day against the
 [Bravo's]({{ '/inventory/bravo/' | relative_url }}) ~75 two-plate protocols.
@@ -56,7 +56,7 @@ That is worth deciding before any kinetic protocol goes on a shared schedule.
 
 
 <details markdown="1">
-<summary>Known precision limits</summary>
+<summary markdown="span">Known precision limits</summary>
 
 Two numbers worth carrying into experimental design. Fluorescence polarisation
 reads to ±3–5 mP, which is enough to detect aggregation but not to resolve

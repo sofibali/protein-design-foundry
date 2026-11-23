@@ -23,7 +23,7 @@ whose spacing opens from 9 mm to 445 mm, driven by piston pumps rather than an
 air cushion.
 
 <details markdown="1">
-<summary>What only this can do</summary>
+<summary markdown="span">What only this can do</summary>
 
 Two capabilities, and no other instrument on the system has either.
 
@@ -42,7 +42,7 @@ both ends.
 
 
 <details markdown="1">
-<summary>Why it looked redundant</summary>
+<summary markdown="span">Why it looked redundant</summary>
 
 On a channel count it overlaps the [Lynx]({{ '/inventory/lynx/' | relative_url }}),
 which is why an earlier reading of the device set could not find a job for it.
