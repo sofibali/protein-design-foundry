@@ -253,6 +253,25 @@ python3 scripts/build_pages.py       # then commit only your own output
 A rebuild that produces no diff means the generated files match their
 sources. That is the check worth running when the history looks confused.
 
+None of these looks at the rendered page, and that is where the faults have
+actually been. In one day on the live site: summary tags eaten by kramdown,
+two links dead on a slug rule, a grid overflowing sideways on a phone, text
+sitting 24px on top of a button, four figures unreachable without a mouse,
+and a dark-theme token defined in one block and not the other. Every one
+passed both checkers.
+
+So for anything you changed that renders: push, poll the live URL with curl
+for a string you just added, then look. `file://` and `127.0.0.1` do not
+work — the browser runs on Sofia's computer, not this host.
+
+To measure a phone without a device, constrain the page's own wrapper and
+read the layout engine back with `javascript_tool`. The trap: a constrained
+container fires no viewport media queries, so a block with a breakpoint
+reports as broken when it is fine. Close it by walking `document.styleSheets`,
+taking every `@media` whose max-width is at or above the width you are
+testing, and re-inserting its rules unconditionally — about eight lines, and
+it turns a constrained container into a simulated viewport.
+
 ## What must never reach this repository
 
 It is public. See the confidentiality section of `README.md` for the full
