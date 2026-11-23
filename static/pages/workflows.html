@@ -45,14 +45,17 @@
   :root {
     --bg:#fff; --ink:#1d1d1f; --muted:#6e6e73; --rule:#d2d2d7; --tab-bg:#f2f2f4;
     --fillop:0.14; --chipop:0.10; --warn:#E69F00;
+    /* same accent as the blueprint: #56B4E9 is 2.3:1 on white, so the light
+       theme needs its own value and it flips the way --muted does. */
+    --accent:#1168a8;
     --font:"Helvetica Neue",Helvetica,Arial,sans-serif;
   }
   @media (prefers-color-scheme:dark){ :root:not([data-theme=light]){
     --bg:#141416; --ink:#f2f2f4; --muted:#8e8e93; --rule:#3a3a3d; --tab-bg:#242427;
-    --fillop:0.24; --chipop:0.20;
+    --fillop:0.24; --chipop:0.20; --accent:#56B4E9;
   }}
   :root[data-theme=dark]{ --bg:#141416; --ink:#f2f2f4; --rule:#3a3a3d; --tab-bg:#242427;
-                          --fillop:0.24; --chipop:0.20; }
+                          --fillop:0.24; --chipop:0.20; --accent:#56B4E9; }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
        -webkit-font-smoothing:antialiased}
@@ -65,10 +68,30 @@
   .nav a{color:var(--muted)}
   .nav a:hover{color:var(--ink)}
 
+  /* A whole section behind its own title, drawn the way the instrument sheets
+     draw theirs: <details> rather than hover, because hover has no equivalent
+     on a phone or a keyboard, and the summary says what is behind it. */
+  .sect{border-top:1px solid var(--rule);padding:2px 0;margin:0}
+  .sect + .sect{margin-top:0}
+  .sect > summary{cursor:pointer;list-style:none;padding:12px 2px 12px 22px;position:relative;
+                  font-weight:600;font-size:14px;color:var(--ink)}
+  .sect > summary::-webkit-details-marker{display:none}
+  .sect > summary::before{content:"";position:absolute;left:4px;top:50%;width:6px;height:6px;
+    border-right:1.6px solid var(--accent);border-bottom:1.6px solid var(--accent);
+    transform:translateY(-70%) rotate(-45deg);transition:transform .15s ease}
+  .sect[open] > summary::before{transform:translateY(-30%) rotate(45deg)}
+  .sect > summary:hover{color:var(--accent)}
+  .sect > summary .count{font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums;
+                         margin-left:7px}
+  .sect > :last-child{margin-bottom:16px}
+  @media (prefers-reduced-motion:reduce){ .sect > summary::before{transition:none} }
+
+  /* inside a disclosure the section brings its own frame, so take the chrome
+     off: one border around another reads as two boxes, not one section. */
+  .sect .plan,.sect .loops{border:0;padding:0;margin:0}
+
   /* instrument bar */
-  .bar{border:1px solid var(--rule);border-radius:12px;padding:12px 14px;margin-bottom:8px}
-  .bar h3{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
-          font-weight:500;margin:0 0 9px}
+  .bar{padding:0;margin:0}
   .barnote{color:var(--muted);font-size:12.5px;line-height:1.5;margin:-4px 0 12px}
   .barnote a{color:var(--ink)}
   .igroups{display:grid;gap:11px}
@@ -399,54 +422,57 @@
     <h1 id="t"></h1>
     <div class="sub" id="s"></div>
     <div class="note" id="n"></div>
-    <div class="nav">Every panel below is drawn, not measured &mdash; they show the
-      <i>shape</i> of each readout, not results. Full input spec in
-      <code>reference/constructs.md</code>.</div>
+    <div class="nav">Every figure here is drawn, not measured: it shows the
+      <i>shape</i> a readout comes back in, never a result.</div>
   </header>
 
-  <div class="bar">
-    <h3>Instruments</h3>
-    <p class="barnote">Grouped by what they do, in the order a plate meets them. Click one to
-      see which protocols need it &mdash; the <a href="blueprint.html">system blueprint</a> has
-      what each machine is and what it can do.</p>
-    <div class="igroups" id="insts"></div>
-    <div class="role" id="role"></div>
-  </div>
+  <details class="sect" id="instdet">
+    <summary>Instruments<span class="count" id="instn"></span></summary>
+    <div class="bar">
+      <p class="barnote">Click one to dim the protocols that do not use it. The
+        <a href="blueprint.html">blueprint</a> has what each machine is.</p>
+      <div class="igroups" id="insts"></div>
+      <div class="role" id="role"></div>
+    </div>
+  </details>
 
-  <section class="loops">
-    <h2>Loops</h2>
-    <div class="intro" id="lintro"></div>
-    <div id="loops"></div>
-    <div class="legend" id="wlegend" style="margin-top:16px"></div>
-  </section>
+  <details class="sect" id="loopdet" open>
+    <summary>Loops<span class="count" id="loopn"></span></summary>
+    <section class="loops">
+      <div class="intro" id="lintro"></div>
+      <div id="loops"></div>
+      <div class="legend" id="wlegend" style="margin-top:16px"></div>
+    </section>
+  </details>
+
   <h2 class="libhead">Protocols</h2>
-  <p class="libnote">Fifteen examples of what this system can run &mdash; not a fixed menu, and
-    not everything it can do. Each one sets the bench method beside what it becomes as a
-    sequence of moves on the rack, so you can see where your own protocol would translate and
-    where it would not. Open one for the steps, the schematic and the shape of the readout; add
-    it to the campaign at the foot of the page and its decision gates come with it.</p>
+  <p class="libnote">Fifteen examples of what the deck can run, each setting the bench method
+    beside what it becomes on the rack. Open one for the detail.</p>
   <div class="legend" id="legend"></div>
   <div id="phases"></div>
 
-  <section class="plan">
-    <h2>Plan a campaign</h2>
-    <div class="lede" id="plan-lede"></div>
-    <div class="routes" id="routes"></div>
-    <div class="chain-edit" id="chain-edit"></div>
-    <div class="cascade" id="cascade"></div>
-    <details class="deckcost"><summary>Deck cost</summary>
-      <div class="bars" id="bars"></div>
-      <div class="verdict" id="verdict"></div>
-      <div class="ceil" id="ceil"></div>
-    </details>
-  </section>
+  <details class="sect" id="plandet">
+    <summary>Plan a campaign<span class="count">cost a chain of protocols against a 20 h day</span></summary>
+    <section class="plan">
+      <div class="lede" id="plan-lede"></div>
+      <div class="routes" id="routes"></div>
+      <div class="chain-edit" id="chain-edit"></div>
+      <div class="cascade" id="cascade"></div>
+      <details class="deckcost"><summary>Deck cost</summary>
+        <div class="bars" id="bars"></div>
+        <div class="verdict" id="verdict"></div>
+        <div class="ceil" id="ceil"></div>
+      </details>
+    </section>
+  </details>
 
-
-  <section class="loops" id="cannot">
-    <h2 id="lm-t"></h2>
-    <div class="intro" id="lm-note"></div>
-    <ul class="limits" id="lm"></ul>
-  </section>
+  <details class="sect" id="cannotdet">
+    <summary id="lm-t"></summary>
+    <section class="loops" id="cannot">
+      <div class="intro" id="lm-note"></div>
+      <ul class="limits" id="lm"></ul>
+    </section>
+  </details>
   <div class="next"><span class="k">Next</span><a href="blueprint.html">System blueprint &rarr;</a><span class="w">The machine the protocols run on.</span></div>
 </main>
 </div>
@@ -594,7 +620,7 @@ window.FIGKIT = {G: G, svg: svg, rnd: rnd, gv: gv, STEP: STEP};
 window.PROTOCOLS = {
  "title": "Sample protocols",
  "subtitle": "What each one does on the deck, and what it hands back",
- "note": "Click a protocol to open it. Click an instrument to see everything that needs it.",
+ "note": "Click a protocol to open it.",
  "rates": {
   "day_min": 1200,
   "bravo_96": 8,
@@ -796,7 +822,7 @@ window.PROTOCOLS = {
    "id": "handle",
    "label": "Plate handling",
    "minor": true,
-   "note": "Sealing, peeling and spinning. These serve the plate rather than the assay, but nothing runs overnight without them.\n"
+   "note": "Sealing, peeling and spinning \u2014 they serve the plate, not the assay."
   }
  ],
  "racs": [
@@ -3641,6 +3667,9 @@ window.PROTOCOLS = {
     '&mdash; four offset quadrant transfers with a 96-channel head. That 4&times; is why so ' +
     `much of this page runs through the Echo. ${esc(R.note)}</div></details>`;
 
+  document.getElementById('instn').textContent = HW.length + ' machines, grouped by what they do';
+  document.getElementById('loopn').textContent = (P.loops || []).length;
+
   document.getElementById('legend').innerHTML = Object.entries(STATUS).map(([k, v]) =>
     `<span><i class="dot" style="background:${v.c}"></i>${esc(k)} &mdash; ${esc(v.label)}</span>`).join('');
 
@@ -3957,6 +3986,9 @@ window.PROTOCOLS = {
     hit ? hit.n++ : plan.push({ id: a.dataset.add, n: 1 });
     document.querySelectorAll('.rt').forEach(x => x.classList.remove('on'));
     draw();
+    // The planner is shut by default, so Add has to open the thing it feeds -
+    // otherwise the button is a click with nothing on screen to show for it.
+    document.getElementById('plandet').open = true;
     document.querySelector('.plan').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
   // A project style on the landing page links here with its route in the hash,
@@ -4007,10 +4039,8 @@ window.PROTOCOLS = {
         stroke-linejoin="round"/></marker></defs>${parts.join('')}</svg>`;
   }
 
-  document.getElementById('lintro').innerHTML =
-    'Five nested loops, each returning something different. A protocol below is one step ' +
-    'inside one of these, so this is the shape your campaign takes. Colour is where the ' +
-    'step happens. The first is open; click any other to open it.';
+  document.getElementById('lintro').textContent =
+    'A protocol is one step inside one of these. Colour is where the step happens.';
 
   // The first loop is open so the section shows what a loop looks like; the
   // rest are shut, the same way the protocols below are.
@@ -4047,7 +4077,8 @@ window.PROTOCOLS = {
   // a reader on this page is already looking at capability, and a limit is
   // only useful next to the thing it limits.
   const LM = P.limits;
-  document.getElementById('lm-t').textContent = LM.title;
+  document.getElementById('lm-t').innerHTML =
+    esc(LM.title) + `<span class="count">${LM.items.length}</span>`;
   document.getElementById('lm-note').textContent = LM.note || '';
   document.getElementById('lm').innerHTML =
     LM.items.map(x => `<li>${esc(x)}</li>`).join('');
