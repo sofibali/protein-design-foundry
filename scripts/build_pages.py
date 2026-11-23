@@ -334,6 +334,22 @@ def check(gates, stages, protos, progs):
     # The capability map and the floor plan have to describe the same machine.
     # Every real instrument sits on exactly one cart; a device that is on one
     # and not the other is precisely how the device set drifted before.
+    # The groups the blueprint sorts the carts into. One per cart, and no
+    # group may go empty, because an empty heading on the page reads as a
+    # capability we have lost rather than one we never grouped.
+    groups = {g["id"] for g in protos.get("cart_groups", [])}
+    if not groups:
+        errs.append("data/protocols.yml has no cart_groups")
+    for g in protos.get("cart_groups", []):
+        for k in ("id", "label", "note"):
+            if not g.get(k):
+                errs.append(f"cart group {g.get('id', '?')!r} is missing {k!r}")
+    used = {r["group"] for r in protos.get("racs", [])
+            if r.get("group") and (SHOW_PHASE2 or r["status"] == "installed")}
+    for g in sorted(groups - used):
+        errs.append(f"cart group {g!r} holds no cart that the page shows - "
+                    f"drop it from cart_groups or give it a cart")
+
     on_cart, seen_rac = {}, set()
     for r in protos.get("racs", []):
         rid = r["id"]
@@ -342,9 +358,12 @@ def check(gates, stages, protos, progs):
         seen_rac.add(rid)
         if r["status"] not in RAC_STATUSES:
             errs.append(f"cart {rid!r}: bad status {r['status']!r}")
-        for k in ("unitop", "note", "n"):
+        for k in ("unitop", "note", "n", "group"):
             if not r.get(k):
                 errs.append(f"cart {rid!r} is missing {k!r}")
+        if r.get("group") and r["group"] not in groups:
+            errs.append(f"cart {rid!r}: unknown group {r['group']!r} - "
+                        f"it must be one of {sorted(groups)}")
         for i in r["instruments"]:
             if i not in insts:
                 errs.append(f"cart {rid!r}: unknown instrument {i!r}")
@@ -853,6 +872,7 @@ def main():
         "title": "UCSF Protein Design Foundry",
         "subtitle": "RAC system blueprint",
         "racs": protos["racs"],
+        "groups": protos["cart_groups"],
         "instruments": [dict(i, **sheets.get(i["id"], {}))
                         for i in protos["instruments"]],
         "workflows": [{"id": w["id"], "name": w["name"], "phase": w["phase"]}

@@ -337,12 +337,35 @@ instruments:
 #         phase2     one of the 4 additional carts the layout leaves room for
 # io:     this cart is where material enters or leaves the system by hand
 
+# The carts, grouped by what a user would look for. The blueprint and the
+# protocol library both read this list, in this order, so the two pages sort
+# the machine the same way. Every cart carries a `group:` naming one of these.
+cart_groups:
+  - id: liquid
+    label: Liquid handling
+    note: Everything that moves liquid between plates, tubes and reservoirs.
+  - id: assay
+    label: Assay and thermal cycling
+    note: The carts that produce a number, or a reaction that one is read from.
+  - id: incubate
+    label: Incubation
+    note: Where a plate sits at temperature, shaken or still.
+  - id: store
+    label: Storage
+    note: Random-access shelving for plates, reagents and consumables.
+  - id: handle
+    label: Plate handling
+    note: >
+      Sealing, peeling and spinning. These serve the plate rather than the
+      assay, but nothing runs overnight without them.
+
 racs:
 
   - n: 9
     id: echo
     unitop: Non-contact acoustic cherry picking
     class: [liquid handling]
+    group: liquid
     instruments: [echo]
     status: installed
     io: false
@@ -354,6 +377,7 @@ racs:
     id: multiflo
     unitop: Bulk dispensing
     class: [liquid handling]
+    group: liquid
     instruments: [multiflo]
     status: installed
     io: false
@@ -365,6 +389,7 @@ racs:
     id: bravo
     unitop: Contact stamping pipetting
     class: [liquid handling, incubating]
+    group: liquid
     instruments: [bravo, bioshake]
     status: installed
     io: false
@@ -377,6 +402,7 @@ racs:
     id: magniflex
     unitop: Positive-displacement channel pipetting
     class: [liquid handling]
+    group: liquid
     instruments: [magniflex]
     status: installed
     io: false
@@ -389,6 +415,7 @@ racs:
     id: lynx
     unitop: Volume-verified contact pipetting
     class: [liquid handling]
+    group: liquid
     instruments: [lynx]
     status: installed
     io: false
@@ -400,6 +427,7 @@ racs:
     id: thermal
     unitop: Thermal cycling
     class: [incubating]
+    group: assay
     instruments: [atc]
     status: installed
     io: false
@@ -412,6 +440,7 @@ racs:
     id: sealpeel
     unitop: Microplate sealing & seal peeling
     class: [sealing]
+    group: handle
     instruments: [plateloc, xpeel]
     status: installed
     io: false
@@ -423,6 +452,7 @@ racs:
     id: breathable
     unitop: Microplate breathable sealing
     class: [sealing]
+    group: handle
     instruments: [a4s]
     status: installed
     io: false
@@ -435,6 +465,7 @@ racs:
     id: spin
     unitop: Centrifugation
     class: [centrifugation]
+    group: handle
     instruments: [hig3]
     status: installed
     io: false
@@ -446,6 +477,7 @@ racs:
     id: shaking
     unitop: Temp-control shaking incubation
     class: [incubating, storage]
+    group: incubate
     instruments: [cytomat]
     status: installed
     io: false
@@ -457,6 +489,7 @@ racs:
     id: static37
     unitop: 37 C static incubation
     class: [incubating, storage]
+    group: incubate
     instruments: [steristore_warm]
     status: installed
     io: false
@@ -468,6 +501,7 @@ racs:
     id: cold
     unitop: Refrigerated random access storage
     class: [storage]
+    group: store
     instruments: [steristore_cold]
     status: installed
     io: true
@@ -479,6 +513,7 @@ racs:
     id: ambient
     unitop: Ambient random access storage
     class: [storage]
+    group: store
     instruments: [ambistore]
     status: installed
     io: true
@@ -490,6 +525,7 @@ racs:
     id: consumable
     unitop: Tip & consumable storage
     class: [storage]
+    group: store
     instruments: [microserve]
     status: installed
     io: true
@@ -501,6 +537,7 @@ racs:
     id: reader
     unitop: Plate reading
     class: [assaying]
+    group: assay
     instruments: [pherastar]
     status: installed
     io: false
@@ -512,6 +549,7 @@ racs:
     id: imaging
     unitop: Crystal imaging
     class: [assaying]
+    group: assay
     instruments: []
     status: phase2
     io: false
@@ -524,6 +562,7 @@ racs:
     id: ambient2
     unitop: Ambient random access storage
     class: [storage]
+    group: store
     instruments: []
     status: phase2
     io: true
@@ -536,6 +575,7 @@ racs:
     id: sealer2
     unitop: Microplate sealing
     class: [sealing]
+    group: handle
     instruments: []
     status: phase2
     io: false
@@ -548,6 +588,7 @@ racs:
     id: handler2
     unitop: Contact stamping pipetting
     class: [liquid handling]
+    group: liquid
     instruments: []
     status: phase2
     io: false

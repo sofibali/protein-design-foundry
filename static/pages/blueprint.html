@@ -397,6 +397,7 @@ window.BLUEPRINT = {
    "class": [
     "liquid handling"
    ],
+   "group": "liquid",
    "instruments": [
     "echo"
    ],
@@ -424,6 +425,7 @@ window.BLUEPRINT = {
    "class": [
     "liquid handling"
    ],
+   "group": "liquid",
    "instruments": [
     "multiflo"
    ],
@@ -452,6 +454,7 @@ window.BLUEPRINT = {
     "liquid handling",
     "incubating"
    ],
+   "group": "liquid",
    "instruments": [
     "bravo",
     "bioshake"
@@ -474,6 +477,7 @@ window.BLUEPRINT = {
    "class": [
     "liquid handling"
    ],
+   "group": "liquid",
    "instruments": [
     "magniflex"
    ],
@@ -492,6 +496,7 @@ window.BLUEPRINT = {
    "class": [
     "liquid handling"
    ],
+   "group": "liquid",
    "instruments": [
     "lynx"
    ],
@@ -509,6 +514,7 @@ window.BLUEPRINT = {
    "class": [
     "incubating"
    ],
+   "group": "assay",
    "instruments": [
     "atc"
    ],
@@ -529,6 +535,7 @@ window.BLUEPRINT = {
    "class": [
     "sealing"
    ],
+   "group": "handle",
    "instruments": [
     "plateloc",
     "xpeel"
@@ -553,6 +560,7 @@ window.BLUEPRINT = {
    "class": [
     "sealing"
    ],
+   "group": "handle",
    "instruments": [
     "a4s"
    ],
@@ -571,6 +579,7 @@ window.BLUEPRINT = {
    "class": [
     "centrifugation"
    ],
+   "group": "handle",
    "instruments": [
     "hig3"
    ],
@@ -589,6 +598,7 @@ window.BLUEPRINT = {
     "incubating",
     "storage"
    ],
+   "group": "incubate",
    "instruments": [
     "cytomat"
    ],
@@ -609,6 +619,7 @@ window.BLUEPRINT = {
     "incubating",
     "storage"
    ],
+   "group": "incubate",
    "instruments": [
     "steristore_warm"
    ],
@@ -627,6 +638,7 @@ window.BLUEPRINT = {
    "class": [
     "storage"
    ],
+   "group": "store",
    "instruments": [
     "steristore_cold"
    ],
@@ -652,6 +664,7 @@ window.BLUEPRINT = {
    "class": [
     "storage"
    ],
+   "group": "store",
    "instruments": [
     "ambistore"
    ],
@@ -683,6 +696,7 @@ window.BLUEPRINT = {
    "class": [
     "storage"
    ],
+   "group": "store",
    "instruments": [
     "microserve"
    ],
@@ -705,6 +719,7 @@ window.BLUEPRINT = {
    "class": [
     "assaying"
    ],
+   "group": "assay",
    "instruments": [
     "pherastar"
    ],
@@ -721,6 +736,33 @@ window.BLUEPRINT = {
     "4.12",
     "CF2H"
    ]
+  }
+ ],
+ "groups": [
+  {
+   "id": "liquid",
+   "label": "Liquid handling",
+   "note": "Everything that moves liquid between plates, tubes and reservoirs."
+  },
+  {
+   "id": "assay",
+   "label": "Assay and thermal cycling",
+   "note": "The carts that produce a number, or a reaction that one is read from."
+  },
+  {
+   "id": "incubate",
+   "label": "Incubation",
+   "note": "Where a plate sits at temperature, shaken or still."
+  },
+  {
+   "id": "store",
+   "label": "Storage",
+   "note": "Random-access shelving for plates, reagents and consumables."
+  },
+  {
+   "id": "handle",
+   "label": "Plate handling",
+   "note": "Sealing, peeling and spinning. These serve the plate rather than the assay, but nothing runs overnight without them.\n"
   }
  ],
  "instruments": [

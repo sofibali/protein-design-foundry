@@ -731,6 +731,33 @@ window.PROTOCOLS = {
    "spec": "Not an instrument. The chain leaves the system here \u2014 bench work, sequencing, diffraction, or an imager that is not yet on the floor.\n"
   }
  ],
+ "cart_groups": [
+  {
+   "id": "liquid",
+   "label": "Liquid handling",
+   "note": "Everything that moves liquid between plates, tubes and reservoirs."
+  },
+  {
+   "id": "assay",
+   "label": "Assay and thermal cycling",
+   "note": "The carts that produce a number, or a reaction that one is read from."
+  },
+  {
+   "id": "incubate",
+   "label": "Incubation",
+   "note": "Where a plate sits at temperature, shaken or still."
+  },
+  {
+   "id": "store",
+   "label": "Storage",
+   "note": "Random-access shelving for plates, reagents and consumables."
+  },
+  {
+   "id": "handle",
+   "label": "Plate handling",
+   "note": "Sealing, peeling and spinning. These serve the plate rather than the assay, but nothing runs overnight without them.\n"
+  }
+ ],
  "racs": [
   {
    "n": 9,
@@ -739,6 +766,7 @@ window.PROTOCOLS = {
    "class": [
     "liquid handling"
    ],
+   "group": "liquid",
    "instruments": [
     "echo"
    ],
@@ -766,6 +794,7 @@ window.PROTOCOLS = {
    "class": [
     "liquid handling"
    ],
+   "group": "liquid",
    "instruments": [
     "multiflo"
    ],
@@ -794,6 +823,7 @@ window.PROTOCOLS = {
     "liquid handling",
     "incubating"
    ],
+   "group": "liquid",
    "instruments": [
     "bravo",
     "bioshake"
@@ -816,6 +846,7 @@ window.PROTOCOLS = {
    "class": [
     "liquid handling"
    ],
+   "group": "liquid",
    "instruments": [
     "magniflex"
    ],
@@ -834,6 +865,7 @@ window.PROTOCOLS = {
    "class": [
     "liquid handling"
    ],
+   "group": "liquid",
    "instruments": [
     "lynx"
    ],
@@ -851,6 +883,7 @@ window.PROTOCOLS = {
    "class": [
     "incubating"
    ],
+   "group": "assay",
    "instruments": [
     "atc"
    ],
@@ -871,6 +904,7 @@ window.PROTOCOLS = {
    "class": [
     "sealing"
    ],
+   "group": "handle",
    "instruments": [
     "plateloc",
     "xpeel"
@@ -895,6 +929,7 @@ window.PROTOCOLS = {
    "class": [
     "sealing"
    ],
+   "group": "handle",
    "instruments": [
     "a4s"
    ],
@@ -913,6 +948,7 @@ window.PROTOCOLS = {
    "class": [
     "centrifugation"
    ],
+   "group": "handle",
    "instruments": [
     "hig3"
    ],
@@ -931,6 +967,7 @@ window.PROTOCOLS = {
     "incubating",
     "storage"
    ],
+   "group": "incubate",
    "instruments": [
     "cytomat"
    ],
@@ -951,6 +988,7 @@ window.PROTOCOLS = {
     "incubating",
     "storage"
    ],
+   "group": "incubate",
    "instruments": [
     "steristore_warm"
    ],
@@ -969,6 +1007,7 @@ window.PROTOCOLS = {
    "class": [
     "storage"
    ],
+   "group": "store",
    "instruments": [
     "steristore_cold"
    ],
@@ -994,6 +1033,7 @@ window.PROTOCOLS = {
    "class": [
     "storage"
    ],
+   "group": "store",
    "instruments": [
     "ambistore"
    ],
@@ -1025,6 +1065,7 @@ window.PROTOCOLS = {
    "class": [
     "storage"
    ],
+   "group": "store",
    "instruments": [
     "microserve"
    ],
@@ -1047,6 +1088,7 @@ window.PROTOCOLS = {
    "class": [
     "assaying"
    ],
+   "group": "assay",
    "instruments": [
     "pherastar"
    ],
