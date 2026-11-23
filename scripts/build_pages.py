@@ -749,8 +749,8 @@ def nextstep(page):
                 f'<span class="w">{why.capitalize()}.</span></div>')
     return ('<div class="next"><span class="k">That is the path</span>'
             '<a href="{{SITE}}/">Back to the foundry site &rarr;</a>'
-            '<span class="w">Capabilities, projects, decisions and the cost model '
-            'are on the main site.</span></div>')
+            '<span class="w">Capabilities, projects and the instrument '
+            'inventory are on the main site.</span></div>')
 
 
 def bundle(page, src_tag, var, payload):
