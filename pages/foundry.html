@@ -33,7 +33,7 @@
     .path,.next,.skip,.nav{display:none !important}
     details{display:block !important}
     details > *{display:revert !important}
-    details .ddb,details .why,details .gitems{display:block !important}
+    details .ddb,details .why,details .gitems,.egd .eg{display:block !important}
     .sheet,.elev{background:#fff !important}
     a[href^="http"]::after{content:" (" attr(href) ")";font-size:10px;color:#555}
     section,article,.lev,.gi,.wf{break-inside:avoid}
@@ -192,7 +192,17 @@
   .lev h4{margin:0;font-size:13.5px;font-weight:600;letter-spacing:-.01em;
        display:flex;align-items:baseline;gap:8px}
   .lev p{margin:7px 0 0;font-size:12.5px;color:var(--muted);line-height:1.5}
-  .lev .eg{margin-top:11px;padding-top:10px;border-top:1px solid var(--rule);
+  .egd{margin-top:10px;border-top:1px solid var(--rule);padding-top:8px}
+  .egd>summary{list-style:none;cursor:pointer;font-size:11.5px;color:var(--muted);
+               text-transform:uppercase;letter-spacing:.06em;display:flex;
+               align-items:center;gap:7px}
+  .egd>summary::-webkit-details-marker{display:none}
+  .egd>summary::before{content:"";flex:none;width:6px;height:6px;
+       border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);
+       transform:rotate(-45deg);transition:transform .15s}
+  .egd[open]>summary::before{transform:rotate(45deg)}
+  .egd>summary:hover{color:var(--ink)}
+  .lev .eg{margin-top:9px;
        display:grid;gap:6px}
   .lev .eg span{font-size:12px;color:var(--muted);line-height:1.45;display:block;
        padding-left:13px;position:relative}
@@ -387,8 +397,8 @@
   };
   const COUNT = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'];
   document.getElementById('pr-lede').textContent =
-    (COUNT[PR.length - 1] || PR.length) + ' shapes of project. Click one for the problem it '
-    + 'solves, the loop it runs and what you get back.';
+    (COUNT[PR.length - 1] || PR.length) + ' shapes of project. Click one for what it solves '
+    + 'and what you get back.';
 
   document.getElementById('progs').innerHTML = PR.map(p => {
     const st = STYLE[p.status] || {c:'var(--muted)'};
@@ -518,13 +528,13 @@
     `<div class="lev" style="border-top-color:${LEVC[l.id] || 'var(--rule)'}">
       <h4>${esc(l.name)}</h4>
       <p>${esc(l.say)}</p>
-      <div class="eg">${(l.eg || []).map(e => `<span>${esc(e)}</span>`).join('')}</div>
+      <details class="egd"><summary>${(l.eg || []).length} examples</summary>
+        <div class="eg">${(l.eg || []).map(e => `<span>${esc(e)}</span>`).join('')}</div>
+      </details>
     </div>`).join('');
 
   document.getElementById('foot').innerHTML =
-    `Generated from <code>_data/programmes.yml</code>, <code>_data/stages.yml</code> and
-     <code>_data/gates.yml</code>; the build fails if a programme claims a loop, a route or a
-     gate that does not exist.`;
+    `Every figure on this page is generated from one file, so a number changes in one place.`;
 })();
 </script>
 </body>

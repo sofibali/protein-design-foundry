@@ -30,9 +30,8 @@ stages:
     body: >
       Cell-free and E. coli in parallel, optimised by fractional-factorial
       screen then Bayesian optimisation. Magnetic-bead purification, then a
-      quality gate before anything reaches an assay. Transformation, plating
-      and E. coli expression all run on the deck; colony picking does not, so
-      nothing returns a clone from a plate to liquid. The ceiling is the
+      quality gate before anything reaches an assay. Transformation and
+      plating run on the deck; colony picking does not. The ceiling is the
       Bravo at about 75 two-plate protocols in a 20-hour day, tied with the
       PHERAstar at 150 384-well TR-FRET plates.
     gates: [D1, D2]
@@ -124,8 +123,8 @@ stages:
 fit:
   question: What the foundry needs to know about your project
   note: >-
-    Nothing here is scored. If one of the styles above is close to your
-    project, you can answer by pointing at it.
+    Nothing here is scored. If a style above is close to your project, point
+    at it.
   asks:
     - id: problem
       q: What is the problem?
@@ -154,12 +153,10 @@ fit:
       sub: How hard the target is, agreed with you rather than assigned to you.
       why: >-
         This rates the target, not the experiment. The same binder campaign
-        against a well-characterised single domain and against a disordered
-        multi-domain system is the same chain of protocols with very
-        different odds, and it is the target that moves the odds. You know
-        yours better than we do, so the level is settled with you rather than
-        set here. It sets how much gets committed before the first result
-        comes back.
+        runs the same protocols against a well-characterised single domain
+        and against a disordered assembly, at very different odds. You know
+        your target better than we do, so the level is settled with you, and
+        it sets how much gets committed before the first result.
     - id: rounds
       q: Will a failed round inform the next one?
       sub: Where the pipeline fails, and at which step.
@@ -271,13 +268,13 @@ returns:
     - k: "A verdict per design, per gate"
       v: "Pass, fail or unclear. Not a data dump."
     - k: "Measured negatives"
-      v: "Failures are kept and returned. They are the training data, and most designs fail."
+      v: "Kept and returned. Most designs fail, and that is the training data."
     - k: "An affinity, where it is determined"
-      v: "K_D over 0.5 to 100 nM. Weaker binders come back as a bound and go to maturation."
+      v: "K_D from 0.5 to 100 nM. Weaker binders come back as a bound, for maturation."
     - k: "An epitope verdict"
-      v: "Whether the binder engaged the face it was designed for, or a different one."
+      v: "Whether it engaged the designed face, or a different one."
     - k: "A per-design quality record"
-      v: "Yield, aggregation state, and a specificity index that means the same thing in every campaign."
+      v: "Yield, aggregation state, and a specificity index comparable across campaigns."
 
 limits:
   title: Limits

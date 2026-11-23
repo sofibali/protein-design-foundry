@@ -16,8 +16,7 @@
 
 lede: >-
   The foundry runs campaigns, not samples. You bring a target and a question;
-  what comes back is a verdict per design at every gate it passed through,
-  with the failures kept. These are the shapes of project it takes.
+  back comes a verdict per design at every gate it passed, failures kept.
 
 aside:
   title: How a project is taken on

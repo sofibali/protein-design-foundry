@@ -33,7 +33,7 @@
     .path,.next,.skip,.nav{display:none !important}
     details{display:block !important}
     details > *{display:revert !important}
-    details .ddb,details .why,details .gitems{display:block !important}
+    details .ddb,details .why,details .gitems,.egd .eg{display:block !important}
     .sheet,.elev{background:#fff !important}
     a[href^="http"]::after{content:" (" attr(href) ")";font-size:10px;color:#555}
     section,article,.lev,.gi,.wf{break-inside:avoid}
@@ -192,7 +192,17 @@
   .lev h4{margin:0;font-size:13.5px;font-weight:600;letter-spacing:-.01em;
        display:flex;align-items:baseline;gap:8px}
   .lev p{margin:7px 0 0;font-size:12.5px;color:var(--muted);line-height:1.5}
-  .lev .eg{margin-top:11px;padding-top:10px;border-top:1px solid var(--rule);
+  .egd{margin-top:10px;border-top:1px solid var(--rule);padding-top:8px}
+  .egd>summary{list-style:none;cursor:pointer;font-size:11.5px;color:var(--muted);
+               text-transform:uppercase;letter-spacing:.06em;display:flex;
+               align-items:center;gap:7px}
+  .egd>summary::-webkit-details-marker{display:none}
+  .egd>summary::before{content:"";flex:none;width:6px;height:6px;
+       border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);
+       transform:rotate(-45deg);transition:transform .15s}
+  .egd[open]>summary::before{transform:rotate(45deg)}
+  .egd>summary:hover{color:var(--ink)}
+  .lev .eg{margin-top:9px;
        display:grid;gap:6px}
   .lev .eg span{font-size:12px;color:var(--muted);line-height:1.45;display:block;
        padding-left:13px;position:relative}
@@ -340,7 +350,7 @@ window.FOUNDRY = {
    "label": "Express",
    "sub": "make protein",
    "where": "rac",
-   "body": "Cell-free and E. coli in parallel, optimised by fractional-factorial screen then Bayesian optimisation. Magnetic-bead purification, then a quality gate before anything reaches an assay. Transformation, plating and E. coli expression all run on the deck; colony picking does not, so nothing returns a clone from a plate to liquid. The ceiling is the Bravo at about 75 two-plate protocols in a 20-hour day, tied with the PHERAstar at 150 384-well TR-FRET plates.\n",
+   "body": "Cell-free and E. coli in parallel, optimised by fractional-factorial screen then Bayesian optimisation. Magnetic-bead purification, then a quality gate before anything reaches an assay. Transformation and plating run on the deck; colony picking does not. The ceiling is the Bravo at about 75 two-plate protocols in a 20-hour day, tied with the PHERAstar at 150 384-well TR-FRET plates.\n",
    "gates": [
     "D1",
     "D2"
@@ -472,7 +482,7 @@ window.FOUNDRY = {
  ],
  "fit": {
   "question": "What the foundry needs to know about your project",
-  "note": "Nothing here is scored. If one of the styles above is close to your project, you can answer by pointing at it.",
+  "note": "Nothing here is scored. If a style above is close to your project, point at it.",
   "asks": [
    {
     "id": "problem",
@@ -496,7 +506,7 @@ window.FOUNDRY = {
     "id": "risk",
     "q": "What risk level would we agree on?",
     "sub": "How hard the target is, agreed with you rather than assigned to you.",
-    "why": "This rates the target, not the experiment. The same binder campaign against a well-characterised single domain and against a disordered multi-domain system is the same chain of protocols with very different odds, and it is the target that moves the odds. You know yours better than we do, so the level is settled with you rather than set here. It sets how much gets committed before the first result comes back."
+    "why": "This rates the target, not the experiment. The same binder campaign runs the same protocols against a well-characterised single domain and against a disordered assembly, at very different odds. You know your target better than we do, so the level is settled with you, and it sets how much gets committed before the first result."
    },
    {
     "id": "rounds",
@@ -572,19 +582,19 @@ window.FOUNDRY = {
    },
    {
     "k": "Measured negatives",
-    "v": "Failures are kept and returned. They are the training data, and most designs fail."
+    "v": "Kept and returned. Most designs fail, and that is the training data."
    },
    {
     "k": "An affinity, where it is determined",
-    "v": "K_D over 0.5 to 100 nM. Weaker binders come back as a bound and go to maturation."
+    "v": "K_D from 0.5 to 100 nM. Weaker binders come back as a bound, for maturation."
    },
    {
     "k": "An epitope verdict",
-    "v": "Whether the binder engaged the face it was designed for, or a different one."
+    "v": "Whether it engaged the designed face, or a different one."
    },
    {
     "k": "A per-design quality record",
-    "v": "Yield, aggregation state, and a specificity index that means the same thing in every campaign."
+    "v": "Yield, aggregation state, and a specificity index comparable across campaigns."
    }
   ]
  },
@@ -717,7 +727,7 @@ window.FOUNDRY = {
   }
  },
  "programmes": {
-  "lede": "The foundry runs campaigns, not samples. You bring a target and a question; what comes back is a verdict per design at every gate it passed through, with the failures kept. These are the shapes of project it takes.",
+  "lede": "The foundry runs campaigns, not samples. You bring a target and a question; back comes a verdict per design at every gate it passed, failures kept.",
   "aside": {
    "title": "How a project is taken on",
    "body": "A conversation, then one of three answers: onboarded and assigned an expression route, run as a feasibility arm first, or declined with the reason named."
@@ -1297,8 +1307,8 @@ window.FOUNDRY = {
   };
   const COUNT = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'];
   document.getElementById('pr-lede').textContent =
-    (COUNT[PR.length - 1] || PR.length) + ' shapes of project. Click one for the problem it '
-    + 'solves, the loop it runs and what you get back.';
+    (COUNT[PR.length - 1] || PR.length) + ' shapes of project. Click one for what it solves '
+    + 'and what you get back.';
 
   document.getElementById('progs').innerHTML = PR.map(p => {
     const st = STYLE[p.status] || {c:'var(--muted)'};
@@ -1428,13 +1438,13 @@ window.FOUNDRY = {
     `<div class="lev" style="border-top-color:${LEVC[l.id] || 'var(--rule)'}">
       <h4>${esc(l.name)}</h4>
       <p>${esc(l.say)}</p>
-      <div class="eg">${(l.eg || []).map(e => `<span>${esc(e)}</span>`).join('')}</div>
+      <details class="egd"><summary>${(l.eg || []).length} examples</summary>
+        <div class="eg">${(l.eg || []).map(e => `<span>${esc(e)}</span>`).join('')}</div>
+      </details>
     </div>`).join('');
 
   document.getElementById('foot').innerHTML =
-    `Generated from <code>_data/programmes.yml</code>, <code>_data/stages.yml</code> and
-     <code>_data/gates.yml</code>; the build fails if a programme claims a loop, a route or a
-     gate that does not exist.`;
+    `Every figure on this page is generated from one file, so a number changes in one place.`;
 })();
 </script>
 </body>
