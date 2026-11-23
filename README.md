@@ -36,8 +36,8 @@ opposite case, and stayed. Two things this has already cost: the nine gate notes
 were shipping inside every page without being rendered, so `build_pages.py` now
 strips `note` from the gate data at bundle time, leaving `gates.yml` whole; and
 the intake page's mail target is a build-time constant, so whatever goes there
-is published with the page. It is set deliberately rather than by default, and
-a role address would be the better answer if one is ever created.
+is published with the page. It is deliberately unset: the page offers copy and
+download, and a role address rather than a person's is what should go in it.
 
 **What this rule does not reach is git itself.** Every commit here is authored
 under a name and an email address, both public in the history of a public

@@ -269,7 +269,10 @@ git grep -nIE "Sofia|sofia\.bali"
 ```
 
 What should come back: `lead:` lines in `_projects/`, which are ordinary
-authorship credit, and the intake page's mail target in both the source and
-the built copy. **Do not remove the mail target.** It is deliberate, set in
-385a0b4 with the reason in a comment beside it, and it is the form's only
-destination. Anything else the grep returns is a leak.
+authorship credit. Nothing else. The `Author:` line on every commit carries
+the same address, which is ordinary git metadata and settled as acceptable;
+the grep above searches tracked files, so it will not show you those.
+
+The intake page's mail target is deliberately empty. Do not fill it with a
+person's address: the form offers copy and download without one, and a role
+address is what belongs there if one is ever created.
