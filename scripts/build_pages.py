@@ -843,6 +843,15 @@ def write_inventory(protos):
 def main():
     gates, stages, protos, progs = load()
     n = check(gates, stages, protos, progs)
+
+    # Every gate carries a note saying where its threshold came from - who
+    # decided it, when, and what the alternative was. That record belongs in
+    # _data/gates.yml, which is the point of it. It does not belong inside a
+    # public page: no page renders it, and these pages are mailed, so it was
+    # shipping thousands of words of internal reasoning, names and dates for
+    # nothing. Checked against gates.yml, not stripped from it.
+    gates = {gid: {k: v for k, v in g.items() if k != "note"}
+             for gid, g in gates.items()}
     protos = derive(protos)
     if not SHOW_PHASE2:
         protos, progs = hide_phase2(protos, progs)

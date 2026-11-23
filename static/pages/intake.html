@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Propose a Campaign</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <style>
   /* --muted carries most of the explanatory text on this page. At #8e8e93 on
      white it is 3.26:1, under the 4.5:1 WCAG AA needs for body text. #6e6e73
@@ -122,6 +121,8 @@ ol.steps li.off .g{color:var(--muted);text-decoration:line-through}
 button.send{width:100%;margin-top:4px;border:0;border-radius:10px;background:var(--ink);
   color:var(--bg);font:inherit;font-weight:500;font-size:15px;padding:11px;cursor:pointer}
 button.send:disabled{opacity:.3;cursor:not-allowed}
+.acts{display:grid;gap:7px}
+button.send.alt{background:transparent;color:var(--ink);border:1px solid var(--rule)}
 .note{font-size:12px;color:var(--muted);margin-top:8px}
 
 .nav{font-size:12.5px;color:var(--muted);margin:-12px 0 22px}
@@ -148,8 +149,6 @@ button.send:disabled{opacity:.3;cursor:not-allowed}
 .sent{border:1px solid var(--ok);border-radius:11px;padding:13px 15px;margin-bottom:18px;font-size:14px}
 .sent b{font-family:ui-monospace,Menlo,monospace}
 .err{color:var(--stop);font-size:12.5px;margin-top:8px}
-.inbox{margin-top:34px;border-top:1px solid var(--rule);padding-top:16px}
-.inbox h2{font-size:16px;font-weight:500;margin:0 0 10px}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{text-align:left;padding:7px 9px;border-top:1px solid var(--rule);vertical-align:top}
 th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
@@ -300,9 +299,13 @@ td.s2{font-variant-numeric:tabular-nums;white-space:nowrap}
 
   <aside>
     <div id="bp"></div>
-    <button class="send" id="send" disabled>Send</button>
+    <div class="acts">
+      <button class="send" id="copy" disabled>Copy proposal</button>
+      <button class="send alt" id="dl" disabled>Download .json</button>
+      <button class="send alt" id="mail" disabled hidden>Email it</button>
+    </div>
     <div class="note" id="note" role="status" aria-live="polite"></div>
-    <div class="note">Anyone with this link can read what is submitted.</div>
+    <div class="note">Nothing leaves this page. It builds the proposal; you send it.</div>
     <div class="err" id="err" role="alert"></div>
   </aside>
 </div>
@@ -314,11 +317,6 @@ td.s2{font-variant-numeric:tabular-nums;white-space:nowrap}
   <div class="gitems" id="g-items"></div>
 </section>
 
-<section class="inbox" id="inbox" hidden>
-  <h2 id="inbox-h">Proposals</h2>
-  <table><thead><tr><th>When</th><th>From</th><th>D0</th><th>Route</th><th>Goal</th></tr></thead>
-    <tbody id="inbox-rows"></tbody></table>
-</section>
 <div class="next"><span class="k">That is the path</span><a href="https://sofibali.github.io/protein-design-foundry/">Back to the foundry site &rarr;</a><span class="w">Capabilities, projects, decisions and the cost model are on the main site.</span></div>
 </main>
 </div>
@@ -693,7 +691,10 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','
 })();
 const val = id => ($(id)?.value || '').trim();
 const A = {limits:[]};
-let db=null, user=null, canWrite=false;
+/* Where a finished proposal should be sent. Deliberately empty: this
+   repository is public, so no address is published in it. Set it and the
+   Email button appears; leave it and the page offers copy and download. */
+const CONTACT = '';
 
 /* ---- blueprints ---------------------------------------------------------- */
 const met = k => A[k] === 'met' || A[k] === 'met2';
@@ -813,10 +814,9 @@ function paint() {
     : '<div class="empty">Answer a few and a pipeline appears here.</div>';
 
   const missing = ['who','pi','email','goal'].filter(k=>!val(k));
-  $('send').disabled = missing.length > 0 || !ps.length || !db || !canWrite;
-  $('note').textContent = !db ? 'Open the published page to send.'
-    : !canWrite ? 'You can read this but not submit.'
-    : missing.length ? 'Needs: ' + missing.join(', ') + '.'
+  const ready = !missing.length && ps.length > 0;
+  ['copy','dl','mail'].forEach(k => { $(k).disabled = !ready; });
+  $('note').textContent = missing.length ? 'Needs: ' + missing.join(', ') + '.'
     : !ps.length ? 'Keep going.' : 'Ready.';
   try { localStorage.setItem('foundry-proposal', JSON.stringify({A, who:val('who'),
     pi:val('pi'), email:val('email'), goal:val('goal'), notes:val('notes')})); } catch(e){}
@@ -860,57 +860,105 @@ try {
 } catch(e){}
 paint();
 
-$('send').addEventListener('click', async () => {
-  $('send').disabled = true; $('err').textContent = '';
-  const t = d0(), ps = plans();
-  const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
-  const doc = {...A, limits: A.limits.join(' '), who:val('who'), pi:val('pi'),
-    email:val('email'), goal:val('goal'), notes:val('notes'),
-    d0_met:t.m, d0_part:t.p, d0_no:t.x, d0_verdict:t.verdict,
-    route: ps[0] ? ps[0].name : '', steps: ps[0] ? ps[0].ids.join(' ') : '',
-    submitted: new Date().toISOString()};
-  try {
-    if (user) { try { doc.by = await user.id(); } catch(e){} }
-    await db.collection('proposals').doc(id).set(doc);
-    $('sent-box').innerHTML = `<div class="sent">Sent as <b>${esc(id)}</b>. Proposed route:
-      ${esc(doc.route)} — ${esc(doc.steps)}.</div>`;
-    try { localStorage.removeItem('foundry-proposal'); } catch(e){}
-    $('f').reset(); Object.keys(A).forEach(k=>delete A[k]); A.limits=[];
-    document.querySelectorAll('.c').forEach(c=>c.setAttribute('aria-pressed','false'));
-    paint(); window.scrollTo({top:0,behavior:'smooth'});
-  } catch(e) {
-    $('err').textContent = 'Did not send: ' + (e && e.message ? e.message : 'unknown') + '.';
-    $('send').disabled = false;
-  }
-});
+/* ---- what comes out ------------------------------------------------------
+   No server, no database. The page's job is to produce a complete, readable
+   proposal and hand it over; sending it is yours.                         */
 
-async function loadInbox() {
-  if (!user || !db) return;
-  let owner = false;
-  try { owner = user.isOwner() || user.canEdit(); } catch(e){}
-  if (!owner) return;
-  $('inbox').hidden = false;
-  db.collection('proposals').onSnapshot(snap => {
-    const rows = snap.docs.map(d=>({id:d.id,...d.data()}))
-      .sort((a,b)=>String(b.submitted).localeCompare(String(a.submitted)));
-    $('inbox-h').textContent = 'Proposals — ' + rows.length;
-    $('inbox-rows').innerHTML = rows.map(r=>`<tr>
-      <td class="s2">${esc(String(r.submitted||'').slice(0,10))}</td>
-      <td>${esc(r.who||'—')}<br><span style="color:var(--muted);font-size:12px">${esc(r.pi||'')}</span></td>
-      <td class="s2">${r.d0_met ?? 0}/4${r.d0_no ? ' ×'+r.d0_no : ''}</td>
-      <td>${esc(r.route||'—')}<br><span style="color:var(--muted);font-size:12px;
-        font-family:ui-monospace,Menlo,monospace">${esc(r.steps||'')}</span></td>
-      <td>${esc(String(r.goal||'—').slice(0,120))}</td></tr>`).join('');
-  });
+function record() {
+  const t = d0(), ps = plans();
+  return {...A, limits: A.limits.join(' '), who: val('who'), pi: val('pi'),
+    email: val('email'), goal: val('goal'), notes: val('notes'),
+    d0_met: t.m, d0_part: t.p, d0_no: t.x, d0_verdict: t.verdict,
+    route: ps[0] ? ps[0].name : '', steps: ps[0] ? ps[0].ids.join(' ') : '',
+    prepared: new Date().toISOString()};
 }
 
-(async () => {
-  if (typeof claude === 'undefined' || !claude.use) { paint(); return; }
-  user = await claude.use('user').catch(()=>null);
-  db = await claude.use('db').catch(()=>null);
-  if (user) { try { canWrite = (await user.can('data.write')) !== false; } catch(e){ canWrite = true; } }
-  paint(); loadInbox();
-})();
+// The chip labels are the question's own words. Read them back off the DOM
+// rather than keeping a second copy here that can drift out of step.
+function answers() {
+  return [...document.querySelectorAll('.chips[data-g]')].map(box => {
+    const q = box.closest('.s')?.querySelector('.k')?.textContent.trim()
+              || box.dataset.g;
+    const picked = [...box.querySelectorAll('.c[aria-pressed="true"]')]
+      .map(c => c.textContent.trim());
+    return picked.length ? [q, picked.join(', ')] : null;
+  }).filter(Boolean);
+}
+
+function asText() {
+  const r = record(), pad = s => (s + ' '.repeat(28)).slice(0, 28);
+  const L = ['FOUNDRY PROPOSAL', 'Prepared ' + r.prepared.slice(0, 10), '',
+    pad('From') + r.who + (r.pi ? ', ' + r.pi : ''),
+    pad('Email') + r.email, '', 'GOAL', '  ' + r.goal, '', 'ANSWERS'];
+  answers().forEach(([q, a]) => L.push('  ' + pad(q.slice(0, 26)) + a));
+  L.push('', 'D0 PRECONDITIONS',
+    '  ' + pad('Met') + r.d0_met + ' of 4'
+      + (r.d0_part ? ', ' + r.d0_part + ' partial' : '')
+      + (r.d0_no ? ', ' + r.d0_no + ' missing' : ''),
+    '  ' + pad('Verdict') + (r.d0_verdict === null ? 'incomplete'
+      : r.d0_verdict === 0 ? 'declines, a precondition is missing'
+      : r.d0_verdict === 4 ? 'all four met' : 'feasibility'),
+    '', 'PROPOSED ROUTE', '  ' + (r.route || '-'));
+  if (r.steps) L.push('  ' + r.steps);
+  if (r.notes) L.push('', 'NOTES', '  ' + r.notes);
+  return L.join('\n') + '\n';
+}
+
+async function toClipboard(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch (e) {
+    // Older browsers, and any page not served over https, refuse the async
+    // clipboard. The offscreen textarea still works in both.
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e2) {}
+    ta.remove();
+    return ok;
+  }
+}
+
+const say = m => { $('sent-box').innerHTML = '<div class="sent">' + esc(m) + '</div>'; };
+
+$('copy').addEventListener('click', async () => {
+  say(await toClipboard(asText())
+    ? 'Copied. Paste it into an email to the foundry.'
+    : 'Could not reach the clipboard. Use Download instead.');
+});
+
+$('dl').addEventListener('click', () => {
+  const r = record();
+  const stem = (r.who || 'anon').toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '') || 'anon';
+  const name = 'foundry-proposal-' + stem + '-' + r.prepared.slice(0, 10) + '.json';
+  const url = URL.createObjectURL(new Blob([JSON.stringify(r, null, 2)],
+    {type: 'application/json'}));
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  say('Downloaded ' + name + '.');
+});
+
+$('mail').addEventListener('click', async () => {
+  const r = record(), copied = await toClipboard(asText());
+  const subject = 'Foundry proposal - ' + (r.who || '')
+    + (r.pi ? ' (' + r.pi + ')' : '');
+  // A mailto body long enough to hold the whole proposal gets truncated by
+  // some mail clients, so it carries the summary and the clipboard carries
+  // the rest.
+  const body = 'Proposal prepared ' + r.prepared.slice(0, 10) + '.\n'
+    + 'D0: ' + r.d0_met + ' of 4 met. Route: ' + (r.route || '-') + '.\n\n'
+    + (copied ? 'Full proposal on my clipboard, pasted below.\n\n'
+              : 'Full proposal attached.\n\n');
+  location.href = 'mailto:' + CONTACT + '?subject=' + encodeURIComponent(subject)
+    + '&body=' + encodeURIComponent(body);
+  say(copied ? 'Mail window opening. Paste the proposal into it.'
+             : 'Mail window opening. Attach the downloaded file.');
+});
+
+if (CONTACT) $('mail').hidden = false;
+paint();
 </script>
 </body>
 </html>
