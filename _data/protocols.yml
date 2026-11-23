@@ -20,8 +20,8 @@
 #             at: ["echo"]        the machines, as a LIST
 #             t:  "3 min a plate" only where the rate model has a real figure
 #
-#         Keep it short. Sofia has cut text on every page this week and these
-#         rows are read side by side, so a long one reads as noise.
+#         Keep it short. The two sides are read against each other, so a long
+#         row buries the contrast that is the only reason the pair exists.
 #
 #         THE KEY IS `at`, NOT `on`. YAML 1.1 reads a bare `on:` key as the
 #         boolean true, so `- on: echo` parses as {True: "echo"} and the page
