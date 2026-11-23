@@ -68,7 +68,8 @@
   .cfig{margin:13px 0 0;border:1px solid var(--rule);border-radius:9px;padding:8px 10px}
   .cfig figcaption{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;
                    color:var(--muted);margin-bottom:4px}
-  .cfig svg{display:block;width:100%;height:auto;font-family:var(--font)}
+  .cfig svg{display:block;width:100%;max-width:430px;height:auto;margin:0 auto;
+            font-family:var(--font)}
   svg .ln{fill:none;stroke:var(--ink);stroke-width:1.1;stroke-linejoin:round;stroke-linecap:round}
   svg .mu{fill:none;stroke:var(--muted);stroke-width:1}
   svg .dash{stroke-dasharray:3 2.5}
@@ -89,8 +90,9 @@
   .grp.minor > h2{color:var(--on-paper);font-size:11px}
   .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:9px}
   .tile{appearance:none;-webkit-appearance:none;font:inherit;text-align:left;cursor:pointer;
-        display:grid;gap:6px;color:var(--line);background:#2c4463;
+        display:flex;flex-direction:column;gap:6px;color:var(--line);background:#2c4463;
         border:1.3px solid var(--line);border-radius:12px;padding:11px 11px 10px}
+  .tile .tc{margin-top:auto}
   .tile:hover{background:#36516f}
   .tile[aria-pressed=true]{background:#3d5c7e;border-color:var(--accent-p);border-width:2px;
                            padding:9.7px 9.7px 8.7px}
@@ -240,8 +242,6 @@
     <h1 id="t"></h1>
     <div class="sub" id="s"></div>
     <div class="note" id="n"></div>
-    <div class="nav">Click any cart for the machine inside it, its specification,
-      and the protocols that run through it.</div>
   </header>
 
   <div class="sheet"><div id="sheet"></div></div>
@@ -1711,8 +1711,7 @@ window.BLUEPRINT = {
   document.getElementById('s').textContent = B.subtitle;
   document.getElementById('n').textContent =
     `${RACS.length} carts on the track at install, grouped by what they are for. Click one ` +
-    `for the unit operation it performs, its specification, the protocols that run through ` +
-    `it, and how it is built.`;
+    `for the machine inside it, what it can do, and the protocols that run through it.`;
 
   // one line glyph per kind of unit operation
   const GPATH = {
