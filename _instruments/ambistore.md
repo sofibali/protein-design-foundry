@@ -29,7 +29,7 @@ and the 50 deep-well positions hold precipitant stocks. That split is settled.
 
 The system has no frozen storage, which is a real limit — competent cells and
 enzyme stocks arrive cold on the day and the coldest position on the rack is
-the [4 °C store]({{ '/inventory/steristore_cold/' | relative_url }}).
+the [4 °C store]({{ '/inventory/steristore-cold/' | relative_url }}).
 
 Worth knowing, though: this chassis is specified down to −20 °C. Frozen
 storage is a configuration question rather than a new instrument, if it is

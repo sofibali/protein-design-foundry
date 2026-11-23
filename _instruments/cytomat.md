@@ -20,7 +20,7 @@ positions, seven concurrent culture protocols, and no amount of clever
 scheduling moves either number. A 1,152-design library is 12 plates at 96-well
 format, so one round of *E. coli* expression essentially fills it.
 
-The [37 °C store]({{ '/inventory/steristore_warm/' | relative_url }}) holds 288
+The [37 °C store]({{ '/inventory/steristore-warm/' | relative_url }}) holds 288
 plates and the [Bravo]({{ '/inventory/bravo/' | relative_url }}) deck has
 temperature-controlled nests, but neither shakes, and a deep-well culture that
 does not aerate does not grow. There is no second option on this system.
