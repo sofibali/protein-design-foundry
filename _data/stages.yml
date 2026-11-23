@@ -30,18 +30,11 @@ stages:
     body: >
       Cell-free and E. coli in parallel, optimised by fractional-factorial
       screen then Bayesian optimisation. Magnetic-bead purification, then a
-      quality gate before anything reaches an assay.
-      Two things settled since this was written. The four ATCs are
-      3 x 96-well + 1 x 384-well, all in one RAC, running four independent
-      programs at once; the 96 blocks take 10-100 uL and the 384 block takes
-      5-20 uL. And heat shock works: the Bravo carries two
-      temperature-controlled deck positions at 4 C and 42 C, so the
-      45-second pulse is a plate move between them. Transformation, plating
-      and E. coli expression are all in scope on the RAC — colony picking is
-      not — and the backbones stand. The ceiling on all of it is the Bravo at
-      ~75 two-plate protocols per 20-hour day, tied with the PHERAstar at 150
-      384-well TR-FRET plates; a 384 plate costs the Bravo 4x a 96 plate, so
-      data/protocols.yml now carries what every workflow costs the day.
+      quality gate before anything reaches an assay. Transformation, plating
+      and E. coli expression all run on the deck; colony picking does not, so
+      nothing returns a clone from a plate to liquid. The ceiling is the
+      Bravo at about 75 two-plate protocols in a 20-hour day, tied with the
+      PHERAstar at 150 384-well TR-FRET plates.
     gates: [D1, D2]
     protocols:
       - {id: express.cfps.doe, status: draft}
@@ -54,13 +47,11 @@ stages:
                   SteriStore D 37 C, SteriStore D 4 C, MicroServe]
     open:
       - >-
-        A second 384-well ATC, in or out - Sofia's call, not an open question
-        for Ginkgo. The recommendation on record is to swap a second 96 block
-        for a 384, keeping four units, and push retrieval PCR to 384 via the
-        Echo: 3 plates instead of 12 for a 1,152-design set, cycler time 10 h
-        to 6 h. It is a swap, not a fifth unit, so it should be close to
-        price-neutral against the quoted ATC line. Keep two 96 blocks either
-        way: they take 10-100 uL and the 384 block takes 5-20 uL.
+        Whether a second thermal cycling block should be 384-well rather than
+        96. Swapping one keeps four blocks and takes retrieval PCR for a
+        1,152-design set from 12 plates to 3, and cycler time from about 10 h
+        to 6 h. Two 96-well blocks stay either way: they take 10-100 uL,
+        where the 384 block takes 5-20 uL.
       - >-
         Yeast at 30 C is inside the Cytomat's range - the C-LiN series runs to
         50 C and the unit has to reach 37 C for E. coli anyway - so a third
@@ -95,7 +86,8 @@ stages:
     instruments: [PHERAstar FSX, Echo 655, Bravo 96 + magnet, MultiFlo, PlateLoc,
                   AmbiStore D, SteriStore D 4 C, MicroServe]
     open:
-      - The PHERAstar UV TR-FRET laser is a priced option. It buys HTRF dynamic range.
+      - A UV laser for the PHERAstar is an option not taken yet. It would widen
+        the HTRF dynamic range.
       - CF2H would answer D1 and D4 in one well with no purified protein,
         but the reporter plasmid, CI cassette and dRecBCD extract are an
         offline build that does not exist yet.
@@ -113,8 +105,8 @@ stages:
       - {id: struct.crystal.screen, status: planned}
     instruments: [Fraser lab, imagers pending, Echo 655 required, a4s lidder, AmbiStore D]
     open:
-      - Aim 3 cannot run on an Echo 525. The 6XX is a scope decision.
-      - Imagers and automated crystal scoring are not yet quoted.
+      - Imagers and automated crystal scoring are not on the system yet, so
+        trays are set here and scored by hand.
 
 # ---------------------------------------------------------------------------
 # The user-facing half. A foundry user is a PI or postdoc from one of the
@@ -147,10 +139,9 @@ fit:
       q: Which proteins does it come down to?
       sub: A family, a set of paralogs, one domain.
       why: >-
-        The one page calls these the protein areas to target. It is the step
-        between a problem worth solving and something that fits in a plate,
-        and it is usually where a broad problem becomes a campaign of a
-        knowable size.
+        This is the step between a problem worth solving and something that
+        fits in a plate, and it is usually where a broad problem becomes a
+        campaign of a knowable size.
     - id: strategy
       q: What is the strategy for targeting them?
       sub: Which of the loops this becomes, or a new one.
@@ -166,9 +157,9 @@ fit:
         against a well-characterised single domain and against a disordered
         multi-domain system is the same chain of protocols with very
         different odds, and it is the target that moves the odds. You know
-        yours better than we do, which is why the session was explicit that
-        the level is agreed with the owning group rather than set centrally.
-        It sets how much gets committed before the first result comes back.
+        yours better than we do, so the level is settled with you rather than
+        set here. It sets how much gets committed before the first result
+        comes back.
     - id: rounds
       q: Will a failed round inform the next one?
       sub: Where the pipeline fails, and at which step.
@@ -180,8 +171,8 @@ fit:
   scale:
     title: The risk levels
     note: >-
-      These rate the target, not the campaign, and none has been agreed yet -
-      a level is settled with the group that owns the target.
+      These rate the target, not the campaign. A level is settled with you
+      when a project is taken on.
     levels:
       - id: low
         name: Low

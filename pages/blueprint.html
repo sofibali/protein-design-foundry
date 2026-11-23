@@ -11,14 +11,10 @@
      the dark background is only 3.63:1, so dark keeps #8e8e93, which is
      5.64:1 there. */
 
-  /* A visible focus ring on everything keyboard-reachable. The cart tiles are
-     SVG <g role=button>, which gets no focus ring at all in Safari, so the
-     fifteen of them were invisible to a keyboard user. */
+  /* A visible focus ring on everything keyboard-reachable. */
   a:focus-visible, button:focus-visible, summary:focus-visible,
   [tabindex]:focus-visible, input:focus-visible, textarea:focus-visible{
     outline:2px solid var(--ink); outline-offset:2px; border-radius:3px}
-  .tile:focus{outline:none}
-  .tile:focus-visible rect.box{stroke:#fff;stroke-width:3}
   .tile:focus-visible{outline:2px solid #fff;outline-offset:2px}
 
   @media (prefers-reduced-motion: reduce){
@@ -43,12 +39,19 @@
     --bg:#fff; --ink:#1d1d1f; --muted:#6e6e73; --rule:#d2d2d7; --tab-bg:#f2f2f4;
     --font:"Helvetica Neue",Helvetica,Arial,sans-serif;
     /* the drawing is a technical drawing: blueprint paper in either theme */
-    --paper:#0f1b2a; --grid:#24415e; --line:#e8eef5; --dim:#8fa6bd; --accent:#56B4E9;
+    --paper:#22364e; --grid:#3d5c80; --line:#e8eef5; --dim:#8fa6bd;
+    /* --on-paper is 5.1:1 on the tile fill, where --dim is only 4.0:1.
+       --accent-p only ever sits on the paper; --accent only ever sits on
+       the page, so it has to flip with the theme the way --muted does:
+       #56B4E9 is 2.3:1 on white, and #1168a8 is 3.1:1 on the dark page. */
+    --on-paper:#a8bdd2; --accent-p:#8ecbf3; --accent:#1168a8;
   }
   @media (prefers-color-scheme:dark){ :root:not([data-theme=light]){
     --bg:#141416; --ink:#f2f2f4; --muted:#8e8e93; --rule:#3a3a3d; --tab-bg:#242427;
+    --accent:#56B4E9;
   }}
-  :root[data-theme=dark]{ --bg:#141416; --ink:#f2f2f4; --rule:#3a3a3d; --tab-bg:#242427; }
+  :root[data-theme=dark]{ --bg:#141416; --ink:#f2f2f4; --rule:#3a3a3d; --tab-bg:#242427;
+    --muted:#8e8e93; --accent:#56B4E9; }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
        -webkit-font-smoothing:antialiased}
@@ -73,27 +76,36 @@
   svg text.lb{font-size:8.5px;fill:var(--ink)}
   svg text.sm{font-size:7.5px;fill:var(--muted)}
 
-  /* the sheet */
-  .sheet{background:var(--paper);border-radius:14px;padding:6px;overflow:hidden;
+  /* The sheet: the carts under the heading you would look for them under.
+     It used to draw them wired into a closed track loop, which cost most of
+     the page's height to assert a flow the machine does not have - a plate
+     goes where the schedule sends it, not once around a ring. */
+  .sheet{background:var(--paper);border-radius:14px;padding:17px 16px 19px;
          box-shadow:0 1px 3px rgba(0,0,0,.18)}
-  .sheet svg{display:block;width:100%;height:auto;font-family:var(--font)}
-  .cart-l{font-size:12.5px;fill:var(--line)}
-  .cart-n{font-size:10px;fill:var(--dim);font-variant-numeric:tabular-nums}
-  .io-l{font-size:8.5px;fill:var(--dim);letter-spacing:.04em}
-  .tile{cursor:pointer}
-  .tile rect.box{fill:#16263a;stroke:var(--line);stroke-width:1.3}
-  .tile:hover rect.box{fill:#21384f}
-  .tile[aria-pressed=true] rect.box{fill:#27405a;stroke:var(--accent);stroke-width:2}
-  .tile.dim{opacity:.3}
-  .glyph{fill:none;stroke:var(--line);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+  .grp + .grp{margin-top:19px;padding-top:16px;border-top:1px solid rgba(232,238,245,.14)}
+  .grp > h2{font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:500;
+            color:var(--line);margin:0}
+  .grp > p{font-size:12.5px;color:var(--dim);margin:3px 0 11px;line-height:1.45;max-width:74ch}
+  .grp.minor > h2{color:var(--on-paper);font-size:11px}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:9px}
+  .tile{appearance:none;-webkit-appearance:none;font:inherit;text-align:left;cursor:pointer;
+        display:grid;gap:6px;color:var(--line);background:#2c4463;
+        border:1.3px solid var(--line);border-radius:12px;padding:11px 11px 10px}
+  .tile:hover{background:#36516f}
+  .tile[aria-pressed=true]{background:#3d5c7e;border-color:var(--accent-p);border-width:2px;
+                           padding:9.7px 9.7px 8.7px}
+  .tile.dim{opacity:.34}
+  .tile .gl{display:block;width:40px;height:40px}
+  .tile .gl path{fill:none;stroke:var(--line);stroke-width:1.6;
+                 stroke-linecap:round;stroke-linejoin:round}
+  .tile .tn{font-size:13px;line-height:1.3}
+  .tile .tc{font-size:11px;color:var(--on-paper);font-variant-numeric:tabular-nums}
+  .tile .io{color:var(--accent-p)}
 
   /* legend */
   .bar{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:12.5px;color:var(--muted);
        margin:14px 2px 0;align-items:center}
   .bar span{display:inline-flex;align-items:center;gap:7px}
-  .key{width:17px;height:12px;border-radius:3px;flex:none;border:1.3px solid var(--ink)}
-  .key.inst{background:var(--tab-bg)}
-  .key.io{width:12px;height:12px;border-radius:999px}
 
   /* ---------- the cart detail sheet ---------- */
   .detail{border:1px solid var(--rule);border-radius:12px;margin-top:16px;overflow:hidden}
@@ -104,6 +116,7 @@
   .dhd{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
   .dhd h3{font-size:19px;font-weight:400;margin:0;letter-spacing:-.01em}
   .dhd .no{color:var(--muted);font-size:11.5px;font-variant-numeric:tabular-nums}
+  .detail .unitop{font-size:13.5px;color:var(--muted);margin-top:3px}
   .classes{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
   .cls{font-size:11.5px;border-radius:999px;padding:2px 10px;border:1px solid;
        text-transform:lowercase;letter-spacing:.01em}
@@ -199,8 +212,8 @@
     <h1 id="t"></h1>
     <div class="sub" id="s"></div>
     <div class="note" id="n"></div>
-    <div class="nav">Click any cart for what it does, the protocols through it,
-      and how it is built.</div>
+    <div class="nav">Click any cart for the machine inside it, its specification,
+      and the protocols that run through it.</div>
   </header>
 
   <div class="sheet"><div id="sheet"></div></div>
@@ -234,286 +247,203 @@
   // the drawing kit (pages/figkit.js, inlined by the build)
   const G = window.FIGKIT.G, svg = window.FIGKIT.svg, rnd = window.FIGKIT.rnd;
 
+  // The four cabinets on the system are the same object with different
+  // contents: shelves behind a door, and a port the track hands plates
+  // through. Drawing them from one function is what stops them drifting
+  // apart on a page where their only real difference is the temperature.
+  const cabinet = (c, o) => {
+    const X = 86, Y = 12, W = 116, H = 106, rows = o.rows || 7;
+    const pitch = (H - 24) / rows;
+    let b = G.r(X, Y, W, H, {r: 5, f: c, o: .07});
+    for (let i = 0; i < rows; i++) {
+      const y = Y + 14 + i * pitch;
+      b += G.l(X + 8, y + 8.5, X + W - 8, y + 8.5, {c: 'mu'})
+        + G.r(X + 16, y, W - 32, 7.5, {r: 1, f: c, o: .34});
+    }
+    b += G.r(X + W, Y + 44, 17, 13, {r: 2, c: 'mu'})
+      + G.a(X + W + 23, Y + 50.5, X + W + 44, Y + 50.5, {h: 4})
+      + G.t(X + W + 50, Y + 47, 'plate', {c: 'sm', a: 'start'})
+      + G.t(X + W + 50, Y + 59, 'port', {c: 'sm', a: 'start'})
+      + G.t(X - 9, Y + 50, o.badge, {c: 'lb', a: 'end'});
+    if (o.badge2) b += G.t(X - 9, Y + 64, o.badge2, {c: 'sm', a: 'end'});
+    return b + G.t(160, 130, o.name, {c: 'lb'});
+  };
+
   // CART FIGURES START
-  // One per installed cart. The four phase 2 carts are drawn too - in commit
-  // ed3d02f, where they were removed when phase 2 was hidden, because hiding
-  // has to mean not shipped on a page that gets mailed. Setting SHOW_PHASE2
-  // back to True fails the build naming exactly those four; lift them out of
-  // that commit and they are back.
+  // One per installed cart: a plain elevation of the machine inside it - the
+  // cabinet, the plate it takes, and the one part that makes it that machine.
+  // No readouts and no numbers; the numbers are the spec rows underneath, and
+  // a drawn readout on a page of drawn readouts reads as a result.
+  //
+  // The four phase 2 carts are drawn too - in commit ed3d02f, where they were
+  // removed when phase 2 was hidden, because hiding has to mean not shipped on
+  // a page that gets mailed. Setting SHOW_PHASE2 back to True fails the build
+  // naming exactly those four; lift them out of that commit and they are back.
   const CART = {
 
   'echo': {
-    s: c => {
-      let b = G.t(160, 12, 'destination plate, inverted', {c: 'sm'})
-        + G.plate(70, 16, 180, 18, 12, 1, {f: c});
-      [2, 6, 10].map(i => 73 + (174 / 12) * (i + .5)).forEach(x => {
-        b += G.dot(x, 44, 1.5) + G.dot(x, 54, 1.8) + G.dot(x, 64, 2.1);
-      });
-      b += G.plate(70, 74, 180, 18, 12, 1, {well: (i) => ([2, 6, 10].indexOf(i) >= 0 ? c : null)});
-      return b + G.p('M146 98H174L169 110H151Z', {f: c, o: .3})
-        + G.p('M148 96Q160 89 172 96', {c: 'mu'})
-        + G.t(258, 58, 'picked wells', {c: 'sm', a: 'start'})
-        + G.t(258, 68, 'only', {c: 'sm', a: 'start'})
-        + G.t(160, 126, 'the transducer fires 2.5 nL at a time - no tip, no contact', {c: 'sm'});
-    }
+    s: c => G.r(92, 12, 136, 106, {r: 5, f: c, o: .07})
+      + G.plate(106, 30, 108, 13, 12, 1, {f: c})
+      + G.plate(106, 64, 108, 13, 12, 1, {f: c})
+      + G.p('M152 106H168L164 94H156Z', {f: c, o: .5})
+      + G.a(160, 91, 160, 80, {h: 3.5})
+      + G.t(234, 38, 'destination,', {c: 'sm', a: 'start'})
+      + G.t(234, 49, 'inverted', {c: 'sm', a: 'start'})
+      + G.t(234, 73, 'source', {c: 'sm', a: 'start'})
+      + G.t(234, 101, 'transducer', {c: 'sm', a: 'start'})
+      + G.t(160, 130, 'Echo 655', {c: 'lb'})
   },
 
   'multiflo': {
-    s: c => {
-      let b = G.c(34, 44, 16, {c: 'mu'}) + G.c(34, 44, 8, {c: 'mu'})
-        + G.t(34, 22, 'cassette', {c: 'sm'})
-        + G.p('M50 44H64Q72 44 72 36V32', {c: 'mu'})
-        + G.r(72, 26, 216, 11, {r: 2, f: c});
-      for (let i = 0; i < 12; i++) {
-        const x = 82 + i * 18.6;
-        b += G.l(x, 37, x, 44) + G.l(x, 48, x, 62, {c: 'mu dash'});
-      }
-      return b + G.plate(72, 64, 216, 28, 12, 2, {f: c, well: () => c})
-        + G.t(180, 108, 'every well, same volume', {c: 'lb'})
-        + G.t(180, 124, 'three cassettes cover 1 uL to 3 mL; a 1536 plate at 1 uL a well takes 21 s', {c: 'sm'});
-    }
+    s: c => G.r(92, 12, 136, 106, {r: 5, f: c, o: .07})
+      + G.c(118, 38, 14, {c: 'mu'}) + G.c(118, 38, 4.5, {c: 'mu'})
+      + G.p('M132 38H164Q172 38 172 46V52', {c: 'mu'})
+      + G.r(130, 52, 72, 10, {r: 2, f: c})
+      + [0, 1, 2, 3, 4, 5, 6, 7].map(i => G.l(136 + i * 8.6, 62, 136 + i * 8.6, 74)).join('')
+      + G.plate(124, 78, 84, 20, 8, 2, {f: c})
+      + G.t(234, 38, 'cassette', {c: 'sm', a: 'start'})
+      + G.t(234, 60, 'manifold', {c: 'sm', a: 'start'})
+      + G.t(160, 130, 'MultiFlo FX', {c: 'lb'})
   },
 
   'bravo': {
-    s: c => {
-      let b = G.r(16, 18, 116, 14, {r: 2, f: c});
-      for (let i = 0; i < 12; i++) b += G.l(24 + i * 9.5, 32, 24 + i * 9.5, 48);
-      b += G.plate(16, 52, 116, 26, 12, 2, {f: c})
-        + G.t(74, 94, '96 channels, one stamp', {c: 'lb'})
-        + G.t(74, 106, 'the system throughput ceiling', {c: 'sm'});
-      const nest = (x, lbl, fill) => G.r(x, 40, 54, 26, {r: 3, f: fill, o: .22})
-        + G.t(x + 27, 56, lbl, {c: 'lb'});
-      b += nest(154, '4 C', '#0072B2') + nest(214, '42 C', '#D55E00')
-        + G.r(274, 40, 34, 26, {r: 3, f: c})
-        + G.p('M280 52Q286 46 292 52T304 52', {c: 'mu'})
-        + G.r(276, 58, 30, 4, {r: 1, f: 'var(--ink)', o: 1, c: 'fl'})
-        + G.t(291, 76, 'shake', {c: 'sm'}) + G.t(291, 86, '+ magnet', {c: 'sm'})
-        + G.a(208, 32, 214, 32, {h: 3.5}) + G.t(184, 30, '45 s', {c: 'sm'})
-        + G.t(231, 94, 'two fixed nests', {c: 'lb'})
-        + G.t(231, 106, 'make heat shock a plate move', {c: 'sm'});
-      return b + G.t(160, 126, 'on-deck: the plate never leaves the head to be heated, shaken or held', {c: 'sm'});
-    }
+    s: c => G.r(76, 12, 144, 106, {r: 5, f: c, o: .07})
+      + G.l(90, 24, 206, 24) + G.l(90, 24, 90, 70, {c: 'mu'})
+      + G.l(206, 24, 206, 70, {c: 'mu'})
+      + G.r(126, 28, 44, 24, {r: 2, f: c})
+      + [0, 1, 2, 3, 4, 5].map(i => G.l(132 + i * 6.4, 52, 132 + i * 6.4, 62)).join('')
+      + G.r(86, 82, 124, 24, {r: 2, c: 'mu'})
+      + [0, 1, 2].map(i => G.r(92 + i * 41, 86, 35, 13, {r: 1.5, f: c, o: .34})).join('')
+      + G.t(228, 40, '96-channel', {c: 'sm', a: 'start'})
+      + G.t(228, 51, 'head', {c: 'sm', a: 'start'})
+      + G.t(228, 95, 'fixed nests', {c: 'sm', a: 'start'})
+      + G.t(160, 130, 'Bravo 96 + magnet + BioShake', {c: 'lb'})
   },
 
   'magniflex': {
-    s: c => {
-      let b = G.r(40, 20, 250, 10, {r: 2, f: c});
-      // two channels close together over a tube, two spread over a plate
-      [60, 74].forEach(x => { b += G.l(x, 30, x, 46) + G.p(`M${x - 3} 46H${x + 3}L${x} 56Z`, {c: 'ln'}); });
-      [196, 266].forEach(x => { b += G.l(x, 30, x, 54) + G.p(`M${x - 3} 54H${x + 3}L${x} 64Z`, {c: 'ln'}); });
-      b += G.p('M50 58H84V86Q67 98 50 86Z', {f: c, o: .22}) + G.t(67, 110, 'from a tube', {c: 'sm'})
-        + G.plate(160, 66, 142, 22, 8, 1, {f: c}) + G.t(231, 110, 'into a plate', {c: 'sm'});
-      return b + G.a(96, 40, 186, 40, {h: 3.5}) + G.a(186, 40, 96, 40, {h: 3.5})
-        + G.t(141, 36, 'spacing 9-445 mm', {c: 'sm'})
-        + G.t(160, 128, '2, 4 or 8 independent channels, piston pumps over 5-1000 uL', {c: 'sm'});
-    }
+    s: c => G.r(76, 12, 144, 106, {r: 5, f: c, o: .07})
+      + G.l(88, 28, 208, 28)
+      + [104, 126, 166, 192].map(x => G.r(x - 5, 28, 10, 20, {r: 1.5, f: c})
+          + G.l(x, 48, x, 64, {c: 'mu'})
+          + G.p('M' + (x - 2.5) + ' 64H' + (x + 2.5) + 'L' + x + ' 72Z', {c: 'ln'})).join('')
+      + G.r(88, 80, 120, 24, {r: 2, c: 'mu'})
+      + G.plate(94, 84, 52, 15, 6, 1, {f: c})
+      + G.p('M170 84H192V96Q181 104 170 96Z', {f: c, o: .3})
+      + G.t(228, 36, 'channels that', {c: 'sm', a: 'start'})
+      + G.t(228, 47, 'move apart', {c: 'sm', a: 'start'})
+      + G.t(160, 130, 'Magniflex', {c: 'lb'})
   },
 
   'lynx': {
-    s: c => {
-      let b = G.r(30, 18, 180, 11, {r: 2, f: c});
-      for (let i = 0; i < 8; i++) {
-        const x = 42 + i * 22;
-        b += G.l(x, 29, x, 40) + G.r(x - 4.5, 40, 9, 9, {r: 1.5, f: c, o: .5})
-          + G.l(x, 49, x, 60) + G.dot(x, 64, 1.6);
-      }
-      b += G.t(120, 104, 'a flow sensor in every channel', {c: 'lb'})
-        + G.plate(30, 68, 180, 24, 8, 2, {f: c})
-        + G.r(226, 36, 84, 44, {r: 4, c: 'mu'})
-        + G.t(268, 52, 'channel 3', {c: 'sm'}) + G.t(268, 66, '1.02 uL', {c: 'lb'})
-        + G.p('M292 60L296 64L304 54', {c: 'ln'})
-        + G.t(268, 92, 'measured, per channel', {c: 'sm'});
-      return b + G.t(160, 126, 'so a normalised plate is measured rather than nominal', {c: 'sm'});
-    }
+    s: c => G.r(76, 12, 144, 106, {r: 5, f: c, o: .07})
+      + G.l(90, 24, 206, 24) + G.l(90, 24, 90, 56, {c: 'mu'})
+      + G.l(206, 24, 206, 56, {c: 'mu'})
+      + G.r(108, 28, 52, 22, {r: 2, f: c})
+      + [0, 1, 2, 3, 4, 5, 6, 7].map(i => G.l(112 + i * 6.4, 50, 112 + i * 6.4, 62)).join('')
+      + G.r(168, 30, 22, 16, {r: 2, c: 'mu'})
+      + G.p('M173 38L177 42L185 34', {c: 'ln'})
+      + G.r(86, 80, 124, 24, {r: 2, c: 'mu'})
+      + G.plate(92, 84, 58, 15, 8, 1, {f: c})
+      + G.r(160, 82, 42, 18, {r: 1.5, f: c, o: .3})
+      + G.t(228, 40, 'a flow sensor', {c: 'sm', a: 'start'})
+      + G.t(228, 51, 'per channel', {c: 'sm', a: 'start'})
+      + G.t(160, 130, 'Lynx LM900 VVP', {c: 'lb'})
   },
 
   'thermal': {
     s: c => {
-      let b = '';
-      [['96', '10-100 uL'], ['96', '10-100 uL'], ['96', '10-100 uL'], ['384', '5-20 uL']].forEach((blk, i) => {
-        const x = 14 + i * 77;
-        // each block runs its own program
-        const pts = [], base = 46;
-        for (let k = 0; k <= 12; k++) {
-          const u = k / 12;
-          const hi = i === 0 ? (k % 2 ? 16 : 0)                       // fast cycling
-            : i === 1 ? (k % 4 < 2 ? 15 : 2)                          // long holds
-            : i === 2 ? 16 * u                                        // a ramp
-            : (k < 2 ? 2 : 14);                                       // hold at one temperature
-          pts.push([x + 4 + k * 5, base - hi]);
-        }
-        b += G.poly(pts, {c: 'mu'})
-          + G.r(x, 54, 68, 30, {r: 3, f: c}) + G.l(x, 62, x + 68, 62, {c: 'mu'});
-        for (let k = 0; k < 4; k++) b += G.c(x + 12 + k * 15, 73, 4, {c: 'mu'});
-        b += G.t(x + 34, 98, blk[0] + '-well', {c: 'lb'}) + G.t(x + 34, 109, blk[1], {c: 'sm'});
+      let b = G.r(66, 16, 188, 92, {r: 5, f: c, o: .07});
+      [0, 1, 2, 3].forEach(i => {
+        const x = 78 + i * 44;
+        b += G.r(x, 32, 32, 16, {r: 2, f: c})
+          + G.r(x, 50, 32, 30, {r: 2, c: 'mu'})
+          + [0, 1, 2].map(k => G.c(x + 8 + k * 8, 65, 3, {c: 'mu'})).join('');
       });
-      return b + G.t(160, 128, 'four blocks, four independent programs at once', {c: 'sm'});
+      return b + G.t(160, 100, 'four blocks, four lids, four programs', {c: 'sm'})
+        + G.t(160, 130, 'ATC × 4', {c: 'lb'});
     }
   },
 
   'sealpeel': {
-    s: c => {
-      // apply: foil off a roll, pressed on by a heated head
-      let b = G.c(34, 32, 15, {c: 'mu'}) + G.c(34, 32, 5, {c: 'mu'})
-        + G.l(49, 32, 92, 32, {c: 'mu'})
-        + G.r(58, 36, 70, 12, {r: 2, f: '#D55E00', o: .25}) + G.t(93, 45, 'heat', {c: 'sm'})
-        + G.a(93, 52, 93, 60, {h: 3.5})
-        + G.plate(58, 62, 70, 22, 6, 2, {f: c})
-        + G.t(93, 100, 'PlateLoc', {c: 'lb'}) + G.t(93, 111, 'foil, 30-200 C', {c: 'sm'});
-      b += G.a(140, 62, 166, 62);
-      // peel: the seal lifted off at an angle
-      b += G.plate(192, 62, 70, 22, 6, 2, {f: c})
-        + G.p('M192 60H250L286 34', {c: 'ln'})
-        + G.p('M286 34Q298 30 300 22', {c: 'mu'})
-        + G.t(276, 48, 'seal off', {c: 'sm', a: 'start'})
-        + G.t(227, 100, 'XPeel', {c: 'lb'}) + G.t(227, 111, 'up to 200 seals an hour', {c: 'sm'});
-      return b + G.t(160, 128, 'Ginkgo gives sealing and peeling a cart each; ours shares one', {c: 'sm'});
-    }
+    s: c => G.r(22, 16, 128, 92, {r: 5, f: c, o: .07})
+      + G.c(54, 38, 13, {c: 'mu'}) + G.c(54, 38, 4, {c: 'mu'})
+      + G.l(67, 38, 116, 38, {c: 'mu'})
+      + G.r(78, 44, 48, 11, {r: 2, f: c})
+      + G.plate(78, 62, 48, 16, 6, 1, {f: c})
+      + G.t(86, 98, 'PlateLoc', {c: 'lb'})
+      + G.r(170, 16, 128, 92, {r: 5, f: c, o: .07})
+      + G.plate(192, 62, 48, 16, 6, 1, {f: c})
+      + G.p('M192 60H238L266 36', {c: 'ln'})
+      + G.c(274, 30, 10, {c: 'mu'}) + G.c(274, 30, 3, {c: 'mu'})
+      + G.t(234, 98, 'XPeel', {c: 'lb'})
+      + G.t(160, 130, 'the seal on, and the seal off', {c: 'sm'})
   },
 
   'breathable': {
-    s: c => {
-      let b = G.r(24, 44, 110, 40, {r: 2, f: c})
-        + [0, 1, 2, 3].map(i => G.well(32 + i * 26, 48, 20, 32)
-            + G.liq(32 + i * 26, 48, 20, 32, 58, c)).join('')
-        + G.l(22, 44, 136, 44, {c: 'ln dash'})
-        + G.t(79, 34, 'gas-permeable', {c: 'sm'})
-        + G.a(50, 40, 50, 22, {h: 3.5}) + G.a(108, 22, 108, 40, {h: 3.5})
-        + G.t(79, 100, 'air moves, 20 h unattended', {c: 'lb'});
-      b += G.r(186, 44, 110, 40, {r: 2, f: c})
-        + [0, 1, 2, 3].map(i => G.well(194 + i * 26, 48, 20, 32)
-            + G.liq(194 + i * 26, 48, 20, 32, 58, c)).join('')
-        + G.l(184, 44, 298, 44, {c: 'ln'})
-        + G.t(241, 34, 'foil', {c: 'sm'})
-        + G.l(234, 12, 248, 26, {c: 'mu'}) + G.l(248, 12, 234, 26, {c: 'mu'})
-        + G.t(241, 100, 'anaerobic by morning', {c: 'lb'});
-      return b + G.t(160, 124, 'the second sealer is what keeps both rolls resident, with no changeover', {c: 'sm'});
-    }
+    s: c => G.r(92, 12, 136, 106, {r: 5, f: c, o: .07})
+      + G.c(120, 38, 14, {c: 'mu'}) + G.c(120, 38, 4.5, {c: 'mu'})
+      + G.l(134, 38, 194, 38, {c: 'mu dash'})
+      + G.r(130, 54, 64, 10, {r: 2, f: c})
+      + G.plate(130, 72, 64, 18, 6, 2, {f: c})
+      + G.t(234, 36, 'gas-permeable', {c: 'sm', a: 'start'})
+      + G.t(234, 47, 'film, on a roll', {c: 'sm', a: 'start'})
+      + G.t(160, 130, 'a4s sealer', {c: 'lb'})
   },
 
   'spin': {
-    s: c => {
-      const cx = 96, cy = 62;
-      let b = G.c(cx, cy, 46, {c: 'mu'}) + G.c(cx, cy, 7, {f: c, o: .6})
-        + G.p(`M${cx - 44} ${cy}L${cx + 44} ${cy}`, {c: 'mu dash'});
-      [[-1, -14], [1, 14]].forEach(s => {
-        b += G.r(cx + s[0] * 44 - 13, cy - 11, 26, 22, {r: 2, f: c, o: .4});
-      });
-      b += G.arc(cx, cy, 56, 200, 330, 'var(--muted)', 1.4)
-        + G.a(cx + 50, cy - 26, cx + 56, cy - 14, {h: 4})
-        + G.t(cx, 124, '2 plates a run, 5000 g, about 20 s to speed', {c: 'sm'});
-      // what it leaves behind
-      b += G.well(212, 34, 44, 46) + G.liq(212, 34, 44, 46, 46, c)
-        + G.p('M218 74Q234 66 250 74Q250 80 244 80H224Q218 80 218 74Z', {f: 'var(--ink)', o: .55, c: 'ln'})
-        + G.t(234, 24, 'cell harvest', {c: 'lb'}) + G.t(234, 96, 'pellet, then lysis', {c: 'sm'});
-      return b;
-    }
+    s: c => G.r(88, 12, 144, 106, {r: 5, f: c, o: .07})
+      + G.c(160, 62, 40, {c: 'mu'}) + G.c(160, 62, 7, {f: c, o: .6})
+      + G.r(106, 51, 25, 22, {r: 2, f: c, o: .4})
+      + G.r(189, 51, 25, 22, {r: 2, f: c, o: .4})
+      + G.l(131, 62, 152, 62, {c: 'mu dash'}) + G.l(168, 62, 189, 62, {c: 'mu dash'})
+      + G.t(238, 56, 'two plate', {c: 'sm', a: 'start'})
+      + G.t(238, 67, 'buckets', {c: 'sm', a: 'start'})
+      + G.t(160, 130, 'HiG 3', {c: 'lb'})
   },
 
   'shaking': {
-    s: c => {
-      let b = G.r(14, 16, 170, 96, {r: 5, f: c, o: .08});
-      for (let i = 0; i < 2; i++) {
-        b += G.l(20, 44 + i * 26, 178, 44 + i * 26, {c: 'mu'});
-        for (let k = 0; k < 2; k++) b += G.r(28 + k * 76, 28 + i * 26, 68, 12, {r: 1, f: c, o: .3});
-      }
-      // the one shelf that shakes, with a deep-well block on it
-      b += G.r(34, 74, 130, 18, {r: 2, f: c})
-        + [0,1,2,3,4,5,6].map(k => G.l(44 + k * 17, 78, 44 + k * 17, 88, {c: 'mu'})).join('')
-        + G.r(24, 94, 150, 8, {r: 2, c: 'mu'})
-        + G.p('M18 92Q8 84 18 76', {c: 'mu'}) + G.p('M180 92Q190 84 180 76', {c: 'mu'})
-        + G.t(99, 124, '14 deep-well slots, 7 concurrent culture protocols', {c: 'sm'})
-        + G.t(214, 40, 'the only shaking', {c: 'lb', a: 'start'})
-        + G.t(214, 54, 'position on the system', {c: 'sm', a: 'start'})
-        + G.t(214, 76, 'so this is the cap on', {c: 'sm', a: 'start'})
-        + G.t(214, 88, 'everything that grows', {c: 'sm', a: 'start'});
-      return b;
-    }
+    s: c => cabinet(c, {name: 'Cytomat 2', badge: 'warm', badge2: 'and shaken', rows: 6})
+      + G.p('M78 56Q68 48 78 40', {c: 'mu'}) + G.p('M210 56Q220 48 210 40', {c: 'mu'})
   },
 
   'static37': {
-    s: c => {
-      let b = G.r(20, 14, 150, 100, {r: 4, f: c, o: .08});
-      for (let i = 0; i < 6; i++) {
-        b += G.l(24, 28 + i * 15, 166, 28 + i * 15, {c: 'mu'});
-        for (let k = 0; k < 3; k++) b += G.r(30 + k * 46, 18 + i * 15, 42, 9, {r: 1, f: c, o: .35});
-      }
-      return b + G.t(95, 128, '288 standard positions, static, up to 98% RH', {c: 'sm'})
-        + G.l(196, 30, 196, 86) + G.c(196, 92, 7, {f: '#D55E00', o: .55})
-        + G.r(193, 40, 6, 50, {r: 3, f: '#D55E00', o: .55, c: 'none'})
-        + G.t(210, 44, '37 C', {c: 'lb', a: 'start'})
-        + G.t(210, 68, 'this, not the four', {c: 'sm', a: 'start'})
-        + G.t(210, 80, 'cycler blocks, is where', {c: 'sm', a: 'start'})
-        + G.t(210, 92, 'cell-free scales', {c: 'sm', a: 'start'});
-    }
+    s: c => cabinet(c, {name: 'SteriStore D', badge: '37 °C', badge2: 'static', rows: 8})
   },
 
   'cold': {
-    s: c => {
-      const cx = 84, cy = 62;
-      let b = G.c(cx, cy, 46, {f: c, o: .1}) + G.c(cx, cy, 8, {c: 'mu'});
-      for (let a = 0; a < 12; a++) {
-        const r0 = 12, r1 = 45, th = a * 30 * Math.PI / 180;
-        b += G.l(cx + r0 * Math.cos(th), cy + r0 * Math.sin(th),
-                 cx + r1 * Math.cos(th), cy + r1 * Math.sin(th), {c: 'mu'});
-      }
-      b += G.r(126, 54, 36, 16, {r: 1, f: c, o: .5}) + G.a(136, 62, 172, 62)
-        + G.t(196, 50, 'to the track', {c: 'sm', a: 'start'})
-        + G.t(196, 66, '216 standard', {c: 'lb', a: 'start'})
-        + G.t(196, 78, '+ 50 deep-well', {c: 'sm', a: 'start'});
-      // the coldest position on the system
-      b += G.l(276, 16, 276, 36, {c: 'mu'}) + G.l(268, 21, 284, 31, {c: 'mu'})
-        + G.l(284, 21, 268, 31, {c: 'mu'}) + G.t(276, 48, '4 C', {c: 'lb'});
-      return b + G.t(160, 126, 'DNA, detection reagents, grown blocks, and competent cells on the day', {c: 'sm'});
-    }
+    s: c => cabinet(c, {name: 'SteriStore D', badge: '4 °C', badge2: 'refrigerated', rows: 8})
   },
 
   'ambient': {
-    s: c => {
-      const cx = 84, cy = 60;
-      let b = G.c(cx, cy, 46, {f: c, o: .1}) + G.c(cx, cy, 8, {c: 'mu'});
-      for (let a = 0; a < 12; a++) {
-        const r0 = 12, r1 = 45, th = a * 30 * Math.PI / 180;
-        b += G.l(cx + r0 * Math.cos(th), cy + r0 * Math.sin(th),
-                 cx + r1 * Math.cos(th), cy + r1 * Math.sin(th), {c: 'mu'});
-      }
-      b += G.r(126, 52, 36, 16, {r: 1, f: c, o: .5}) + G.a(136, 60, 172, 60)
-        + G.c(206, 60, 15, {c: 'ln'}) + G.l(206, 60, 206, 51) + G.l(206, 60, 212, 64)
-        + G.l(206, 45, 206, 41) + G.t(206, 88, '12 s', {c: 'lb'})
-        + G.t(238, 52, 'a tray back out in as', {c: 'sm', a: 'start'})
-        + G.t(238, 64, 'little as twelve seconds', {c: 'sm', a: 'start'});
-      return b + G.t(160, 126, 'crystallography trays, Echo source plates, assay plates in flight', {c: 'sm'});
-    }
+    s: c => cabinet(c, {name: 'AmbiStore D', badge: 'ambient', rows: 8})
   },
 
   'consumable': {
     s: c => {
-      let b = '';
-      [[30, 7, 'tip boxes'], [118, 9, 'plates'], [206, 6, 'reservoirs']].forEach(st => {
+      let b = G.r(80, 12, 158, 106, {r: 5, f: c, o: .07});
+      [[94, 6], [138, 5], [182, 4]].forEach(st => {
         for (let k = 0; k < st[1]; k++)
-          b += G.r(st[0], 86 - k * 9, 66, 8, {r: 1, f: c, o: .25 + k * .05});
-        b += G.t(st[0] + 33, 108, st[2], {c: 'sm'});
+          b += G.r(st[0], 100 - k * 9, 40, 8, {r: 1, f: c, o: .2 + k * .045});
       });
-      // the gripper taking the top box
-      b += G.l(63, 18, 63, 28) + G.l(50, 28, 76, 28) + G.l(50, 28, 50, 38) + G.l(76, 28, 76, 38)
-        + G.a(63, 42, 63, 52, {h: 3.5});
-      return b + G.t(160, 126, 'about 770 plates or 154 tip boxes - every tip box on the system lives here', {c: 'sm'});
+      b += G.l(158, 20, 158, 28, {c: 'mu'}) + G.l(146, 28, 170, 28)
+        + G.l(146, 28, 146, 37) + G.l(170, 28, 170, 37)
+        + G.a(158, 41, 158, 52, {h: 3.5});
+      return b + G.t(246, 58, 'stacked', {c: 'sm', a: 'start'})
+        + G.t(246, 69, 'towers', {c: 'sm', a: 'start'})
+        + G.t(160, 130, 'MicroServe', {c: 'lb'});
     }
   },
 
   'reader': {
-    s: c => {
-      let b = G.r(96, 14, 128, 30, {r: 3, f: c})
-        + G.c(130, 29, 10, {c: 'mu'}) + G.c(130, 29, 4, {c: 'mu'})
-        + G.l(130, 19, 130, 39, {c: 'mu'}) + G.l(120, 29, 140, 29, {c: 'mu'})
-        + G.t(188, 32, 'optic module', {c: 'sm'})
-        + G.a(126, 46, 140, 66, {h: 3.6}) + G.t(104, 58, 'ex', {c: 'sm'})
-        + G.a(170, 66, 184, 46, {h: 3.6}) + G.t(200, 58, 'em', {c: 'sm'})
-        + G.plate(60, 70, 200, 30, 24, 3, {f: c, wr: .3,
-            well: (i, j) => ((i * 3 + j) % 7 === 0 ? c : null)});
-      return b + G.t(160, 114, 'every readout in the spec, 6 to 3,456 wells', {c: 'lb'})
-        + G.t(160, 128, 'tied with the Bravo as the system bottleneck: 150 384-well plates a day', {c: 'sm'});
-    }
+    s: c => G.r(84, 28, 152, 76, {r: 5, f: c, o: .07})
+      + G.r(138, 12, 44, 16, {r: 2, f: c})
+      + G.l(160, 28, 160, 48, {c: 'mu'}) + G.c(160, 54, 6, {c: 'mu'})
+      + G.plate(102, 64, 116, 18, 12, 2, {f: c})
+      + G.r(94, 86, 132, 8, {r: 2, c: 'mu'})
+      + G.a(230, 90, 250, 90, {h: 4})
+      + G.t(190, 22, 'optic module', {c: 'sm', a: 'start'})
+      + G.t(256, 87, 'drawer', {c: 'sm', a: 'start'})
+      + G.t(160, 130, 'PHERAstar FSX', {c: 'lb'})
   }
 
   };
@@ -522,21 +452,27 @@
   // what the cart does to a plate, drawn. The elevation under "How it is
   // built" is the cart as hardware; this is the cart as a unit operation, in
   // the same hand as the protocol panels on the sample protocols page.
+  // What is in the cart, by name. This is what a cart is called on the sheet
+  // now: someone working out whether their assay runs here is looking for a
+  // PHERAstar, not for "plate reading".
+  const instName = r => (r.instruments || []).map(i => (INST[i] || {}).label || i)
+    .join(' + ') || r.unitop;
+
   const cartFig = r => {
     const f = CART[r.id];
     if (!f) return '';
     const cl = CLASS[(r.class || [])[0]];
     return `<figure class="cfig"><figcaption>Schematic</figcaption>
-      ${svg(f.s(cl ? cl.c : 'var(--muted)'), r.unitop + ': what the cart does')}</figure>`;
+      ${svg(f.s(cl ? cl.c : 'var(--muted)'), instName(r) + ', schematic')}</figure>`;
   };
 
 
   document.getElementById('t').textContent = B.title;
   document.getElementById('s').textContent = B.subtitle;
   document.getElementById('n').textContent =
-    `${RACS.length} carts on the track at install. Each is named for the unit operation it ` +
-    `performs rather than the instrument inside it — click one for what it does, what runs ` +
-    `through it, and how it is built.`;
+    `${RACS.length} carts on the track at install, grouped by what they are for. Click one ` +
+    `for the unit operation it performs, its specification, the protocols that run through ` +
+    `it, and how it is built.`;
 
   // one line glyph per kind of unit operation
   const GPATH = {
@@ -593,104 +529,34 @@
     return `<span class="cls" style="color:${k.c};border-color:${k.c}">${esc(k.t)}</span>`;
   }).join('');
 
-  // ---- lay the installed carts out around a closed track ----
-  const VW = 1200, TILE = 74, LBL = 170, GAPV = 26;
-  const n = RACS.length;
-  const topN = Math.min(4, Math.ceil(n / 5));
-  const botN = Math.min(4, Math.max(1, Math.floor((n - topN) / 5)));
-  const side = Math.floor((n - topN - botN) / 2);
-  const botTotal = botN + (n - topN - botN - 2 * side);
-
-  const trackL = LBL, trackR = VW - LBL - TILE;
-  const trackT = 120, trackH = Math.max(1, side) * (TILE + GAPV) - GAPV;
-  const trackB = trackT + trackH;
-  const yTop = trackT - 58, yBot = trackB + 58;
-
-  const pos = [];
-  {
-    const span = trackR - trackL;
-    for (let i = 0; i < topN; i++)
-      pos.push({x: trackL + span * (i + 1) / (topN + 1), y: yTop, at: 'top'});
-    for (let i = 0; i < side; i++)
-      pos.push({x: trackR, y: trackT + i * (TILE + GAPV), at: 'right'});
-    for (let i = 0; i < botTotal; i++)
-      pos.push({x: trackR - span * (i + 1) / (botTotal + 1), y: yBot, at: 'bottom'});
-    for (let i = side - 1; i >= 0; i--)
-      pos.push({x: trackL, y: trackT + i * (TILE + GAPV), at: 'left'});
-  }
-  const H = yBot + TILE + 62;
-
-  function wrap(text, max) {
-    const words = String(text).split(' '), lines = [];
-    let cur = '';
-    for (const w of words) {
-      if ((cur + ' ' + w).trim().length > max && cur) { lines.push(cur); cur = w; }
-      else cur = (cur + ' ' + w).trim();
-    }
-    if (cur) lines.push(cur);
-    return lines;
-  }
+  // ---- the carts, under the heading you would look for them under ----
+  const GROUPS = (B.groups || []).map(g => ({
+    g: g, carts: RACS.filter(r => r.group === g.id)
+  })).filter(x => x.carts.length);
 
   function sheet() {
-    const parts = [];
-    parts.push(`<defs><pattern id="gr" width="26" height="26" patternUnits="userSpaceOnUse">
-      <path d="M26 0H0V26" fill="none" stroke="var(--grid)" stroke-width="0.6"
-        opacity="0.55"/></pattern></defs>`);
-    parts.push(`<rect width="${VW}" height="${H}" fill="var(--paper)"/>`);
-    parts.push(`<rect width="${VW}" height="${H}" fill="url(#gr)"/>`);
-
-    const c = TILE / 2;
-    const x0 = trackL + c, x1 = trackR + c, y0 = yTop + c, y1 = yBot + c;
-    parts.push(`<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}"
-      rx="56" fill="none" stroke="var(--line)" stroke-width="3" opacity="0.9"/>`);
-
-    RACS.forEach((r, i) => {
-      const p = pos[i]; if (!p) return;
-      const cxp = p.x + TILE / 2, cyp = p.y + TILE / 2;
-
-      let lx, ly, anchor, lines;
-      if (p.at === 'left' || p.at === 'right') {
-        lines = wrap(r.unitop, 18);
-        lx = p.at === 'right' ? p.x + TILE + 16 : p.x - 16;
-        anchor = p.at === 'right' ? 'start' : 'end';
-        ly = cyp + 4.5 - (lines.length - 1) * 7.5;
-      } else {
-        lines = wrap(r.unitop, 17);
-        lx = cxp; anchor = 'middle';
-        ly = p.at === 'top' ? p.y - 12 - (lines.length - 1) * 15 : p.y + TILE + 24;
-      }
-      const label = lines.map((t, k) =>
-        `<text x="${lx}" y="${ly + k * 15}" text-anchor="${anchor}"
-           class="cart-l">${esc(t)}</text>`).join('');
-
-      let ix = cxp, iy = cyp;
-      if (p.at === 'top') iy = p.y + TILE + 22;
-      else if (p.at === 'bottom') iy = p.y - 22;
-      else if (p.at === 'left') ix = p.x + TILE + 22;
-      else ix = p.x - 22;
-      const io = r.io ? `<g><circle cx="${ix}" cy="${iy}" r="13" fill="var(--paper)"
-          stroke="var(--line)" stroke-width="1.2"/>
-        <text x="${ix}" y="${iy + 3.3}" text-anchor="middle" class="io-l">I/O</text></g>` : '';
-
-      parts.push(`<g class="tile" data-r="${esc(r.id)}"
-          aria-pressed="false" role="button" tabindex="0"
-          aria-label="${esc(r.unitop)}, cart ${r.n}">
-        <g transform="translate(${p.x} ${p.y})">
-          <rect class="box" width="${TILE}" height="${TILE}" rx="13"/>
-          <path class="glyph" d="${gpath(r.unitop)}"
-            transform="translate(${(TILE - 24) / 2} ${(TILE - 24) / 2 - 3})"/>
-          <text x="${TILE - 7}" y="${TILE - 6}" text-anchor="end" class="cart-n">${r.n}</text>
-        </g>${label}${io}</g>`);
-    });
-
-    return `<svg viewBox="0 0 ${VW} ${H}" role="img"
-      aria-label="${esc(B.title)} RAC system blueprint, ${n} carts">${parts.join('')}</svg>`;
+    return GROUPS.map(({g, carts}) => {
+      const tiles = carts.map(r => `<button class="tile" type="button" aria-pressed="false"
+          data-r="${esc(r.id)}"
+          aria-label="${esc(instName(r))} — ${esc(r.unitop)}, cart ${r.n}">
+          <svg class="gl" viewBox="0 0 24 24" aria-hidden="true"
+            ><path d="${gpath(r.unitop)}"/></svg>
+          <span class="tn">${esc(instName(r))}</span>
+          <span class="tc">cart ${r.n}${r.io
+            ? ' <span class="io">\u00b7 hand I/O</span>' : ''}</span>
+        </button>`).join('');
+      return `<section class="grp${g.minor ? ' minor' : ''}">
+        <h2>${esc(g.label)}</h2>
+        <p>${esc(g.note)}</p>
+        <div class="tiles">${tiles}</div>
+      </section>`;
+    }).join('');
   }
   document.getElementById('sheet').innerHTML = sheet();
 
   document.getElementById('legend').innerHTML =
-    `<span><i class="key inst"></i>on the track at install</span>` +
-    `<span><i class="key io"></i>material enters or leaves here by hand</span>` +
+    `<span>${RACS.length} carts, all on one track</span>` +
+    `<span>hand I/O marks where material enters or leaves the system by hand</span>` +
     `<span>cart numbers are Ginkgo's, confirmed 2026-11-04</span>`;
 
   // ---- the cart elevation, drawn in the style of the Ginkgo layout sheets ----
@@ -730,7 +596,7 @@
       <text x="${X + CW + 7}" y="${deckY + 3}" class="el-l">DECK</text>
       ${boxes}
       <!-- track pass-through -->
-      <line x1="${X - 20}" y1="${baseY}" x2="${X + CW + 20}" y2="${baseY}" stroke="var(--accent)"
+      <line x1="${X - 20}" y1="${baseY}" x2="${X + CW + 20}" y2="${baseY}" stroke="var(--accent-p)"
         stroke-width="2"/>
       <text x="${X + CW + 7}" y="${baseY - 5}" class="el-l">TRACK</text>
       <!-- base -->
@@ -755,11 +621,9 @@
   function show(id) {
     const r = RACS.find(x => x.id === id);
     if (!r) {
-      detail.innerHTML = `<div class="dbody"><p class="empty">Each cart is named for its unit
-        operation rather than its instrument — the way Ginkgo draws its own published
-        Application Blueprints, and the altitude that lets someone plan against the machine
-        without knowing the model numbers. <b>Click a cart</b> for what it can do, which
-        protocols run through it, and a schematic elevation of how it is built.</p></div>`;
+      detail.innerHTML = `<div class="dbody"><p class="empty"><b>Click a cart</b> for the
+        machine inside it: what it can do, its specification sheet, the protocols that run
+        through it, and a schematic elevation of how it is built.</p></div>`;
       return;
     }
     // One disclosure per instrument. The summary is the name, the vendor and
@@ -802,17 +666,17 @@
       <div class="ttl"><span>Fraser Lab &middot; UCSF</span>
         <span>Cart detail</span><span class="r">RAC ${r.n}</span></div>
       <div class="dbody">
-        <div class="dhd"><h3>${esc(r.unitop)}</h3><span class="no">cart ${r.n}</span></div>
+        <div class="dhd"><h3>${esc(instName(r))}</h3><span class="no">cart ${r.n}</span></div>
+        <div class="unitop">${esc(r.unitop)}</div>
         <div class="classes">${classChips(r)}${r.io
           ? '<span class="cls" style="color:var(--muted);border-color:var(--rule)">hand I/O</span>'
           : ''}</div>
         <p class="lead">${esc(r.note)}</p>
         ${cartFig(r)}
         <table class="kv" style="margin-top:13px">
-          <tr><td class="k">Unit operation</td><td class="v">${esc(r.unitop)}</td></tr>
+          <tr><td class="k">Made by</td><td class="v">${
+            esc([...new Set(insts.map(i => i.vendor).filter(Boolean))].join(', ')) || '—'}</td></tr>
           <tr><td class="k">Cart class</td><td class="v">${esc((r.class || []).join(', ') || '—')}</td></tr>
-          <tr><td class="k">On the cart</td><td class="v">${
-            insts.length ? insts.map(i => esc(i.label)).join(', ') : '—'}</td></tr>
           <tr><td class="k">Protocols through it</td><td class="v">${
             (r.runs || []).length}${(r.runs || []).length ? ' of ' + B.workflows.length : ''}</td></tr>
           <tr><td class="k">Material by hand</td><td class="v">${
@@ -845,10 +709,6 @@
   document.getElementById('sheet').addEventListener('click', e => {
     const t = e.target.closest('.tile'); if (t) pick(t.dataset.r);
   });
-  document.getElementById('sheet').addEventListener('keydown', e => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    const t = e.target.closest('.tile'); if (t) { e.preventDefault(); pick(t.dataset.r); }
-  });
 
   // ---- phase 2, in its own section. Nothing phase 2 is bundled into the
   // page while it is hidden, so this section renders only if there is
@@ -877,12 +737,12 @@
   document.getElementById('foot').innerHTML =
     `<b>${placed} instruments across ${RACS.length} carts</b>, generated from the same
      <code>_data/protocols.yml</code> that drives the campaign planner — the build fails if an
-     instrument is on the capability map and on no cart, or on two. The shape is borrowed from
-     Ginkgo's published Application Blueprints, which label a cart by its unit operation rather
-     than its instrument; where they have a term for something we have, the term here is theirs.
+     instrument is on the capability map and on no cart, or on two. Each cart also carries the
+     unit operation Ginkgo names it by in its published Application Blueprints; where they have
+     a term for something we have, the term here is theirs.
      <br><br>
-     <b>What this is not:</b> a floor plan. Cart order here reads as a workflow loop rather than
-     as the physical layout. The real block is 8,338&nbsp;mm long and 3,900&nbsp;mm wide at
+     <b>What this is not:</b> a floor plan. The carts are grouped here by what they are for, not
+     by where they sit. The real block is 8,338&nbsp;mm long and 3,900&nbsp;mm wide at
      ${RACS.length} carts, 1,800&nbsp;mm high, about 32.5&nbsp;m², and its orientation in room 515
      is forced. The elevation on each cart detail is schematic: the height is the system figure,
      the width is drawn to fit the page.`;
