@@ -48,7 +48,12 @@
     --bg:#141416; --ink:#f2f2f4; --muted:#8e8e93; --rule:#3a3a3d; --tab-bg:#242427;
     --fillop:0.24;
   }}
-  :root[data-theme=dark]{ --bg:#141416; --ink:#f2f2f4; --rule:#3a3a3d; --tab-bg:#242427; --fillop:0.24; }
+  /* --muted has to flip with the theme and cannot be one value for both:
+     #6e6e73 is 5.07:1 on white and 3.63:1 here, #8e8e93 is 5.64:1 here and
+     3.26:1 on white. This block exists so the attribute can override the OS
+     preference, so it has to carry every token the media query carries. */
+  :root[data-theme=dark]{ --bg:#141416; --ink:#f2f2f4; --muted:#8e8e93;
+    --rule:#3a3a3d; --tab-bg:#242427; --fillop:0.24; }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);
        -webkit-font-smoothing:antialiased}
