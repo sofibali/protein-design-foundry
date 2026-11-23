@@ -144,7 +144,7 @@ python3 scripts/check_data.py
 
 ### If anyone else is editing at the same time
 
-**Five** files here are generated, not four: the four in `static/pages/` and
+**Five** files here are generated: the four in `static/pages/` and
 `_data/instruments.yml`. One run of `scripts/build_pages.py` rewrites every one
 of them from whatever source happens to be in the tree at that moment, so a
 build picks up someone else's half-finished edit — to a page you are not
