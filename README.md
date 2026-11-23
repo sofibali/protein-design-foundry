@@ -32,7 +32,9 @@ and when, belongs in `_data` and in the internal repo; the page carries the
 decision, not the decider. Two things this has already cost: the nine gate notes
 were shipping inside every page without being rendered, so `build_pages.py` now
 strips `note` from the gate data at bundle time, leaving `gates.yml` whole; and
-the intake form leaves its contact field empty rather than prefilling it.
+the intake page's mail target is a build-time constant, so whatever goes there
+is published with the page. It is unset, and a role address rather than a
+person's is the one to put in it.
 
 ## Where everything lives
 
