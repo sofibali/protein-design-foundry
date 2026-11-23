@@ -157,6 +157,12 @@ carries the other edit. The rule that holds: rebuild, run `git status`, and
 commit a generated file **only in the same commit as the source that produced
 it**. Never commit one whose source someone else is editing.
 
+`git push` is the same trap one level up: it sends the branch, not your
+commits, so it publishes anything another session has committed here and not
+yet pushed. That is usually harmless — their commit was finished when they made
+it — but check `git log @{u}..` before pushing, so you at least know what you
+are publishing on someone else's behalf.
+
 ## Adding a project
 
 Add a Markdown file to `_projects/` with front matter (`title`, `summary`,
