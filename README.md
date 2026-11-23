@@ -18,6 +18,15 @@ question the figures are withheld from. Nothing in this repository should
 reintroduce either, and `scripts/check_data.py` fails the build if
 `_data/decisions.yml` reappears.
 
+**Nor does it name anyone.** The four pages in `static/pages/` are mailed and
+dropped in Slack, so a source comment, a form field or a bundled data blob
+travels with them even when nothing on screen shows it. Who decided a threshold,
+and when, belongs in `_data` and in the internal repo; the page carries the
+decision, not the decider. Two things this has already cost: the nine gate notes
+were shipping inside every page without being rendered, so `build_pages.py` now
+strips `note` from the gate data at bundle time, leaving `gates.yml` whole; and
+the intake form leaves its contact field empty rather than prefilling it.
+
 ## Where everything lives
 
 Two repositories, one job each.
