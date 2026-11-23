@@ -137,16 +137,18 @@ python3 scripts/check_data.py
 
 ### If anyone else is editing at the same time
 
-The four files in `static/pages/` are generated. `scripts/build_pages.py`
-rebuilds **all four** from whatever source happens to be in the tree at that
-moment, so a build picks up someone else's half-finished edit to a page you are
-not touching. `git add <paths>` followed by a bare `git commit` then commits the
-whole index, theirs included — use `git commit -- <paths>`, never `git add -A`.
+**Five** files here are generated, not four: the four in `static/pages/` and
+`_data/instruments.yml`. One run of `scripts/build_pages.py` rewrites every one
+of them from whatever source happens to be in the tree at that moment, so a
+build picks up someone else's half-finished edit — to a page you are not
+touching, or to `_data/protocols.yml`, which is where the inventory comes from.
+`git add <paths>` followed by a bare `git commit` then commits the whole index,
+theirs included — use `git commit -- <paths>`, never `git add -A`.
 
-That is not enough on its own, because the built page is the thing that carries
-the other edit. The rule that holds: rebuild, run `git status`, and commit a
-built page **only in the same commit as the source that produced it**. Never
-commit a built page whose source someone else is editing.
+That is not enough on its own, because the generated file is the thing that
+carries the other edit. The rule that holds: rebuild, run `git status`, and
+commit a generated file **only in the same commit as the source that produced
+it**. Never commit one whose source someone else is editing.
 
 ## Adding a project
 
