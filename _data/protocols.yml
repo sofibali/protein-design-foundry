@@ -361,9 +361,7 @@ cart_groups:
   - id: handle
     label: Plate handling
     minor: true   # drawn quieter: these serve the plate, not the question
-    note: >
-      Sealing, peeling and spinning. These serve the plate rather than the
-      assay, but nothing runs overnight without them.
+    note: Sealing, peeling and spinning — they serve the plate, not the assay.
 
 racs:
 

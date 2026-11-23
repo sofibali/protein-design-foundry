@@ -200,8 +200,11 @@
   .p2card .classes{margin-top:10px}
 
   .foot{font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:28px;
-        border-top:1px solid var(--rule);padding-top:12px}
+        border-top:1px solid var(--rule);padding-top:4px}
   .foot b{color:var(--ink);font-weight:500}
+  .foot .fline{margin:8px 0 2px}
+  .foot .dd:last-of-type{border-bottom:0}
+  .foot .kv{max-width:560px}
   @media (max-width:700px){ .split{grid-template-columns:1fr} }
 </style>
 </head>
@@ -470,8 +473,8 @@
   document.getElementById('t').textContent = B.title;
   document.getElementById('s').textContent = B.subtitle;
   document.getElementById('n').textContent =
-    `${RACS.length} carts on the track at install, grouped by what they are for. Click one ` +
-    `for the machine inside it, what it can do, and the protocols that run through it.`;
+    `${RACS.length} carts on the track at install, grouped by what they are for. ` +
+    `Click one for the machine inside it.`;
 
   // one line glyph per kind of unit operation
   const GPATH = {
@@ -553,10 +556,10 @@
   }
   document.getElementById('sheet').innerHTML = sheet();
 
+  // Of the three the bar used to carry, one repeated the standfirst and one
+  // was provenance. Only the marker needs explaining where it is used.
   document.getElementById('legend').innerHTML =
-    `<span>${RACS.length} carts, all on one track</span>` +
-    `<span>hand I/O marks where material enters or leaves the system by hand</span>` +
-    `<span>cart numbers are Ginkgo's, confirmed 2026-11-04</span>`;
+    `<span><b>hand I/O</b> &mdash; material enters or leaves the system here by hand</span>`;
 
   // ---- the cart elevation, drawn in the style of the Ginkgo layout sheets ----
   // The one dimension on it is real: 1800 mm overall height, from the
@@ -620,9 +623,7 @@
   function show(id) {
     const r = RACS.find(x => x.id === id);
     if (!r) {
-      detail.innerHTML = `<div class="dbody"><p class="empty"><b>Click a cart</b> for the
-        machine inside it: what it can do, its specification sheet, the protocols that run
-        through it, and a schematic elevation of how it is built.</p></div>`;
+      detail.innerHTML = `<div class="dbody"><p class="empty">Pick a cart above.</p></div>`;
       return;
     }
     // One disclosure per instrument. The summary is the name, the vendor and
@@ -630,11 +631,11 @@
     // and the paragraph underneath, so the detail is there without being in
     // the way. The first is open so a cart never opens onto nothing.
     const insts = r.instruments.map(i => INST[i]).filter(Boolean);
-    const specs = insts.map((i, n) => {
+    const specs = insts.map(i => {
       const rows = (i.rows || []).map(s =>
         `<tr><td class="k">${esc(s.label)}</td><td class="v">${esc(s.value)}</td></tr>`
       ).join('');
-      return `<details class="dd"${n === 0 ? ' open' : ''}>
+      return `<details class="dd">
         <summary><span>${esc(i.label)}</span>
           <span class="sv">${i.vendor ? esc(i.vendor) : ''}</span>
           <span class="cnt">${rows ? i.rows.length + ' specs' : 'no spec sheet'}</span></summary>
@@ -740,18 +741,30 @@
   }
 
   const placed = RACS.reduce((a, r) => a + r.instruments.length, 0);
+  // The figure stays on the page; everything that qualified it goes behind a
+  // title that says what is behind it. What was there before was a note to
+  // whoever maintains the build - which file generates the page, what makes
+  // the build fail - sitting under a drawing of a machine.
   document.getElementById('foot').innerHTML =
-    `<b>${placed} instruments across ${RACS.length} carts</b>, generated from the same
-     <code>_data/protocols.yml</code> that drives the campaign planner — the build fails if an
-     instrument is on the capability map and on no cart, or on two. Each cart also carries the
-     unit operation Ginkgo names it by in its published Application Blueprints; where they have
-     a term for something we have, the term here is theirs.
-     <br><br>
-     <b>What this is not:</b> a floor plan. The carts are grouped here by what they are for, not
-     by where they sit. The real block is 8,338&nbsp;mm long and 3,900&nbsp;mm wide at
-     ${RACS.length} carts, 1,800&nbsp;mm high, about 32.5&nbsp;m², and its orientation in room 515
-     is forced. The elevation on each cart detail is schematic: the height is the system figure,
-     the width is drawn to fit the page.`;
+    `<p class="fline"><b>${placed} instruments across ${RACS.length} carts.</b>
+       This is not a floor plan: the carts are grouped by what they are for, not by
+       where they stand.</p>
+     <details class="dd"><summary><span>How big it is, and where these figures come
+       from</span></summary>
+       <div class="ddb">
+         <table class="kv">
+           <tr><td class="k">Footprint</td><td class="v">8,338 &times; 3,900&nbsp;mm at
+             ${RACS.length} carts, about 32.5&nbsp;m²</td></tr>
+           <tr><td class="k">Height</td><td class="v">1,800&nbsp;mm</td></tr>
+           <tr><td class="k">Room</td><td class="v">515, Mission Bay. The orientation in it
+             is forced</td></tr>
+         </table>
+         <p class="prose">Every figure on this page is generated from one file, so a number
+           changes in one place. Each cart also carries the unit operation Ginkgo names it by
+           in its published Application Blueprints; where they have a term for something we
+           have, the term is theirs. The elevation under each cart is schematic — the height
+           is the system figure, the width is drawn to fit the page.</p>
+       </div></details>`;
 })();
 </script>
 </body>
