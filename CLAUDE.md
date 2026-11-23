@@ -92,6 +92,79 @@ Before archiving, check the lane actually landed — the commits are on `main`,
 the tree is clean, and `check_data.py` passes. A session's own report is its
 account of what it did, not proof that it worked.
 
+## Decide in your lane
+
+One front door is about questions only Sofia can answer. Everything else is
+yours. Inside your paths you do not need permission to choose a wording, a
+layout, a threshold's presentation, or which of two correct structures to
+use — make the call, say what you chose in the commit message, and move on.
+A lane that checks in on every decision is slower than no lane at all.
+
+What reaches her: a decision about scope, money, what is published, or
+something that contradicts a settled decision. Not a judgement call about
+how to present a table.
+
+## Read before you write
+
+**Do not rebuild what is already there.** Most of what looks missing has been
+done once already, somewhere in this repository or in the history. Before
+writing anything substantial:
+
+- `git log --oneline -20` and `git log -S'<the thing>'` — it may exist, or
+  have been removed on purpose.
+- Read the file you are about to replace, all of it, before replacing it.
+- `grep` for the number, the phrase or the function before writing a second
+  copy of it.
+
+Rewriting working prose into different working prose costs tokens, loses the
+reasons the first version encoded, and produces a diff nobody can review. If
+a page is wrong, change the wrong part.
+
+Keep edits small and anchored. Prefer a patch that names the exact text it
+replaces over regenerating a file. The same applies to your own earlier work
+in the same session.
+
+## What every lane is for
+
+Three things, in this order, and they are why a change is worth making:
+
+1. **Less text.** The default state of detail is shut. Prose that explains
+   the page to the person who commissioned it is dead weight to the person
+   who receives it — these pages get mailed and dropped in Slack. Before
+   adding a sentence, ask who reads it and what they do next.
+2. **Usability.** Can someone find the thing they came for without reading
+   the page? Titles that say what is behind them, disclosures over walls,
+   a comparison rather than a description.
+3. **Technical accuracy.** A number with nothing to compare it against reads
+   as noise. Every figure needs a referent — the protocol that reaches the
+   ceiling first, the bench method beside the deck method.
+
+## Numbers need a source, and it must be findable
+
+**Check the source. Do not write a specification from memory**, yours or a
+previous session's summary of it. Vendor figures come from vendor
+documentation; published figures from the paper; anything else is modelled
+and says so.
+
+Record it where the number lives, using what is already here rather than a
+new scheme:
+
+- `# Source: ...` comment above the block, as `_data/programmes.yml` does.
+- `note:` on the entry, as every gate in `gates.yml` does — "where its number
+  came from" is already the convention there.
+- `(modelled)` in the value itself when it is arithmetic rather than a
+  measurement, as the Bravo sheet's throughput ceiling does.
+- The long form goes in `reference/`, which is excluded from the build, so it
+  is one `grep` away and on no page.
+
+**Findable is not the same as visible.** A citation does not belong inline on
+a page; it belongs in the data file, the front matter or `reference/`, where
+someone checking can find it in a search and a reader never trips over it.
+
+Where two sources disagree, say so and name both rather than silently
+picking. The PlateLoc temperature range and the ATC fill volume are both on
+their sheets that way.
+
 ## Commit only your own paths
 
 ```
