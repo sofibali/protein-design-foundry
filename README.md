@@ -26,7 +26,7 @@ through one shared git index at the time, and `git add -A` takes whatever is
 staged, not only your own work. Use `git commit -- <paths>`.
 
 **Nor does it name anyone.** The four pages in `static/pages/` are mailed and
-dropped in Slack, so a source comment, a form field or a bundled data blob
+dropped in Slack, so a source comment, a built-in default or a bundled data blob
 travels with them even when nothing on screen shows it. Who decided a threshold,
 and when, belongs in `_data` and in the internal repo; the page carries the
 decision, not the decider. Two things this has already cost: the nine gate notes
@@ -35,6 +35,13 @@ strips `note` from the gate data at bundle time, leaving `gates.yml` whole; and
 the intake page's mail target is a build-time constant, so whatever goes there
 is published with the page. It is unset, and a role address rather than a
 person's is the one to put in it.
+
+**What this rule does not reach is git itself.** Every commit here is authored
+under a name and an email address, both public in the history of a public
+repository, and both set by the committing account rather than by anything in
+this repo. So the section above is a claim about what the pages carry, not about
+what the history records. GitHub's no-reply address is the switch if that is not
+wanted; changing it does not rewrite commits already pushed.
 
 ## Where everything lives
 
