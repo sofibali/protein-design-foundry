@@ -3,7 +3,107 @@
 
 title: UCSF Protein Design Foundry
 subtitle: Lab-in-the-loop automated protein targeting
-note: Install April 2027 · year 1 · 4 labs · PARP14 binder campaign
+
+# The chips under the title. Split on the middle dot at render time, so keep
+# it on one logical line. It used to lead with the install date; it does not
+# any more, because a date at the top makes the page read as a countdown
+# rather than as what the place is for. "Not open for general submissions
+# yet" is the part that has to stay true and visible.
+#
+# "year 1 · 4 labs" was also here and has been dropped: no file in this
+# repository carries that number, so it could not be given a source.
+note: >-
+  In build at UCSF Mission Bay · not open for general submissions yet ·
+  first campaign, designed binders against PARP14 MD1
+
+# ---------------------------------------------------------------------------
+# The landing band: four claims for a reader who will not click anything.
+# Every figure here is already published somewhere in this repository, and
+# the two that would go stale are not written down at all - `count:` names a
+# value the build computes and the page substitutes, so the number on the
+# page cannot drift from the data it came from.
+#
+# Source, per item:
+#   carts      computed from racs: in _data/protocols.yml, installed only.
+#   library    _projects/parp14-binders.md front matter (scale: 1,152 designs,
+#              one backbone) and "What it can do" in capabilities/index.md
+#              for the plate arithmetic.
+#   routes     the throughput table in capabilities/index.md, which gives
+#              51.5 h in-cell and 11.7 h cell-free for those same 1,152
+#              designs. Modelled from the device set, not measured.
+#   decisions  computed from _data/gates.yml.
+headline:
+  title: What it is
+  lede: >-
+    One enclosed system that takes a designed sequence to measured data
+    without a person moving a plate. It is being built, and nothing below is
+    running yet.
+  items:
+    - id: carts
+      count: carts
+      fig: carts, one track
+      say: >-
+        Each cart is a sealed micro-environment with its own six-axis arm,
+        sitting on a shared magnetic transport track. Plates move between
+        instruments without anyone opening a door, which is what makes a
+        20-hour unattended run possible.
+    - id: library
+      fig: 1,152 designs
+      say: >-
+        The first campaign's library, and the unit everything on this site is
+        costed against: 3 plates at 384-well, or 12 at 96-well.
+    - id: routes
+      fig: 51.5 h or 11.7 h
+      say: >-
+        The same 1,152 designs, by two expression routes on the same
+        hardware. In-cell growth, or cell-free with no growth step at all.
+        Both figures are modelled from the device set rather than measured.
+    - id: decisions
+      count: gates
+      fig: named decisions
+      say: >-
+        Every design comes back with a verdict at every gate it reached, and
+        the measured failures come back too. That record is what the next
+        round gets designed from.
+
+# ---------------------------------------------------------------------------
+# The four foundational test projects, in short form.
+#
+# Source: the front matter of the four files in _projects/, which are already
+# published at /projects/. name, status and say are the title, status and
+# summary from there, so nothing in this block is a new claim. If a project
+# changes, change it in _projects/ first; this is the landing page's index of
+# that list, not a second copy of it.
+proof:
+  title: Four projects that test it
+  lede: >-
+    The first projects are here to prove a capability rather than to be the
+    science. Each one is a claim the build has to survive.
+  items:
+    - id: parp14-binders
+      name: Designed binders against PARP14 MD1
+      status: running
+      say: >-
+        Library design through assay readout as one unbroken run, on both
+        expression routes.
+    - id: md1-thermal
+      name: Thermal survival of MD1 under heat lysis
+      status: running
+      say: >-
+        Whether the target survives the only lysis route the system can
+        actually deliver.
+    - id: g4fp
+      name: G4FP sensors
+      status: proposed
+      say: >-
+        A second, independent readout, to keep the system from being tuned to
+        one assay format.
+    - id: crystallography
+      name: Automated crystallography and fragment soaking
+      status: proposed
+      say: >-
+        The workflow that drives the most hardware decisions and is the least
+        automated of them.
 
 stages:
 

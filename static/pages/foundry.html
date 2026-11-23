@@ -73,6 +73,22 @@
             border-radius:999px;padding:5px 13px;transition:border-color .12s,background .12s}
   nav.top a:hover{border-color:var(--ink);background:var(--tab-bg)}
 
+  /* ---- the landing band: four claims, for a reader who clicks nothing ---- */
+  .heads{display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:12px}
+  .head1{border:1px solid var(--rule);border-radius:12px;padding:14px 16px 16px}
+  .head1 .fig{font-size:clamp(18px,2.5vw,24px);font-weight:500;letter-spacing:-.02em;
+              line-height:1.14;text-wrap:balance}
+  .head1 p{margin:9px 0 0;font-size:12.5px;line-height:1.5;color:var(--muted)}
+
+  /* ---- the four test projects ---- */
+  .proofs{display:grid;grid-template-columns:repeat(auto-fit,minmax(242px,1fr));gap:12px}
+  .pf{border:1px solid var(--rule);border-radius:12px;padding:13px 15px 14px;
+      display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;
+      transition:border-color .12s}
+  .pf:hover{border-color:var(--ink)}
+  .pf h3{font-size:14.5px;font-weight:500;margin:0;letter-spacing:-.008em;line-height:1.3}
+  .pf p{margin:0;font-size:12.5px;line-height:1.5;color:var(--muted);flex:1}
+
   /* ---- section furniture ---- */
   section.band{margin-top:46px;scroll-margin-top:12px}
   .bandhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
@@ -272,7 +288,7 @@
         border:1px solid var(--ink);border-radius:7px;padding:9px 13px;font-size:13px}
 </style>
 <nav aria-label="Where you are"><ol class="path">
-<li><span aria-current="step"><span class="n">1</span>What happens here</span></li>
+<li><span aria-current="step"><span class="n">1</span>What the foundry is for</span></li>
 <li><a href="workflows.html"><span class="n">2</span>Sample protocols</a></li>
 <li><a href="blueprint.html"><span class="n">3</span>System blueprint</a></li>
 <li><a href="intake.html"><span class="n">4</span>Propose a campaign</a></li>
@@ -285,14 +301,22 @@
     <p class="lede" id="lede"></p>
     <div class="note" id="n"></div>
     <nav class="top" aria-label="On this page">
-      <a href="#happens">What happens here</a>
+      <a href="#what">What it is</a>
+      <a href="#happens">How a campaign runs</a>
       <a href="#styles">Project styles</a>
+      <a href="#proof">Four projects that test it</a>
       <a href="#take">Can it take yours?</a>
     </nav>
   </div>
 
+  <section class="band" id="what" style="margin-top:34px">
+    <div class="bandhead"><h2 id="hd-t"></h2>
+      <span class="lede" id="hd-lede"></span></div>
+    <div class="heads" id="heads"></div>
+  </section>
+
   <section class="band" id="happens">
-    <div class="bandhead"><h2>What happens here</h2>
+    <div class="bandhead"><h2>How a campaign runs</h2>
       <span class="lede" id="stage-lede"></span></div>
     <div class="main">
       <div class="stage">
@@ -315,6 +339,12 @@
     <div class="progs" id="progs"></div>
     <div class="detail" id="pdetail" hidden></div>
     <div class="aside" id="pr-aside"></div>
+  </section>
+
+  <section class="band" id="proof">
+    <div class="bandhead"><h2 id="pf-t"></h2>
+      <span class="lede" id="pf-lede"></span></div>
+    <div class="proofs" id="proofs"></div>
   </section>
 
   <section class="band" id="take">
@@ -344,7 +374,65 @@
 window.FOUNDRY = {
  "title": "UCSF Protein Design Foundry",
  "subtitle": "Lab-in-the-loop automated protein targeting",
- "note": "Install April 2027 \u00b7 year 1 \u00b7 4 labs \u00b7 PARP14 binder campaign",
+ "note": "In build at UCSF Mission Bay \u00b7 not open for general submissions yet \u00b7 first campaign, designed binders against PARP14 MD1",
+ "headline": {
+  "title": "What it is",
+  "lede": "One enclosed system that takes a designed sequence to measured data without a person moving a plate. It is being built, and nothing below is running yet.",
+  "items": [
+   {
+    "id": "carts",
+    "count": "carts",
+    "fig": "carts, one track",
+    "say": "Each cart is a sealed micro-environment with its own six-axis arm, sitting on a shared magnetic transport track. Plates move between instruments without anyone opening a door, which is what makes a 20-hour unattended run possible."
+   },
+   {
+    "id": "library",
+    "fig": "1,152 designs",
+    "say": "The first campaign's library, and the unit everything on this site is costed against: 3 plates at 384-well, or 12 at 96-well."
+   },
+   {
+    "id": "routes",
+    "fig": "51.5 h or 11.7 h",
+    "say": "The same 1,152 designs, by two expression routes on the same hardware. In-cell growth, or cell-free with no growth step at all. Both figures are modelled from the device set rather than measured."
+   },
+   {
+    "id": "decisions",
+    "count": "gates",
+    "fig": "named decisions",
+    "say": "Every design comes back with a verdict at every gate it reached, and the measured failures come back too. That record is what the next round gets designed from."
+   }
+  ]
+ },
+ "proof": {
+  "title": "Four projects that test it",
+  "lede": "The first projects are here to prove a capability rather than to be the science. Each one is a claim the build has to survive.",
+  "items": [
+   {
+    "id": "parp14-binders",
+    "name": "Designed binders against PARP14 MD1",
+    "status": "running",
+    "say": "Library design through assay readout as one unbroken run, on both expression routes."
+   },
+   {
+    "id": "md1-thermal",
+    "name": "Thermal survival of MD1 under heat lysis",
+    "status": "running",
+    "say": "Whether the target survives the only lysis route the system can actually deliver."
+   },
+   {
+    "id": "g4fp",
+    "name": "G4FP sensors",
+    "status": "proposed",
+    "say": "A second, independent readout, to keep the system from being tuned to one assay format."
+   },
+   {
+    "id": "crystallography",
+    "name": "Automated crystallography and fragment soaking",
+    "status": "proposed",
+    "say": "The workflow that drives the most hardware decisions and is the least automated of them."
+   }
+  ]
+ },
  "stages": [
   {
    "id": "design",
@@ -859,6 +947,11 @@ window.FOUNDRY = {
    }
   ]
  },
+ "counts": {
+  "carts": 15,
+  "gates": 9
+ },
+ "site": "https://sofibali.github.io/protein-design-foundry",
  "loops": [
   {
    "id": "expression",
@@ -1235,6 +1328,7 @@ window.FOUNDRY = {
   const esc = t => String(t).replace(/[&<>"]/g, m =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
   const LEVC = {low: '#009E73', medium: '#E69F00', high: '#D55E00'};
+  const PFC = {running: '#009E73', proposed: '#0072B2'};
   const PH = {}; (F.phases || []).forEach(p => { PH[p.id] = p; });
   const LOOPS = {}; (F.loops || []).forEach(l => { LOOPS[l.id] = l; });
   const ROUTES = {}; (F.routes || []).forEach(r => { ROUTES[r.id] = r; });
@@ -1244,6 +1338,35 @@ window.FOUNDRY = {
   document.getElementById('lede').textContent = F.programmes.lede;
   document.getElementById('n').innerHTML = F.note.split('·').map(x => esc(x.trim()))
     .join('<i>·</i>');
+
+  // ======================= what it is, in four ========================
+  // The two figures that would go stale are not in the YAML at all: an item
+  // carrying `count` names a value the build computed from _data/, and the
+  // number is substituted here. Everything else is published elsewhere in
+  // the repository and sourced in the comment above the block in stages.yml.
+  const HD = F.headline;
+  document.getElementById('hd-t').textContent = HD.title;
+  document.getElementById('hd-lede').textContent = HD.lede;
+  document.getElementById('heads').innerHTML = HD.items.map(h => {
+    const n = h.count == null ? null : F.counts[h.count];
+    return `<div class="head1">
+      <div class="fig">${n == null ? '' : esc(n) + ' '}${esc(h.fig)}</div>
+      <p>${esc(h.say)}</p></div>`;
+  }).join('');
+
+  // ==================== the four test projects ========================
+  // Each card is the short form of a page that already exists on the site,
+  // so the card links to it rather than restating it.
+  const PF = F.proof;
+  document.getElementById('pf-t').textContent = PF.title;
+  document.getElementById('pf-lede').textContent = PF.lede;
+  document.getElementById('proofs').innerHTML = PF.items.map(x => {
+    const c = PFC[x.status] || 'var(--muted)';
+    return `<a class="pf" href="${esc(F.site)}/projects/${esc(x.id)}/">
+      <h3>${esc(x.name)}</h3><p>${esc(x.say)}</p>
+      <span class="st" style="color:${c};border-color:${c};align-self:flex-start"
+        >${esc(x.status)}</span></a>`;
+  }).join('');
 
   // =========================== the loop ===============================
   const svg = document.getElementById('loop');
@@ -1503,7 +1626,9 @@ window.FOUNDRY = {
     </div>`).join('');
 
   document.getElementById('foot').innerHTML =
-    `Every figure on this page is generated from one file, so a number changes in one place.`;
+    `The foundry is being built and is not open for general submissions yet. `
+    + `Every figure on this page is generated from the same data the rest of the `
+    + `site is, so a number changes in one place.`;
 })();
 </script>
 </body>

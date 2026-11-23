@@ -695,7 +695,12 @@ def sheet_specs():
 # order instead: what the place does, what it runs, what it runs on, how to
 # ask for it. Each page says where it sits, and offers exactly one next step.
 PATH = [
-    ("foundry.html",   "What happens here", "what the foundry is for"),
+    # Step 1 is the landing page: the one link a donor or a prospective user
+    # is sent. It was called "What happens here", which said nothing about
+    # what was behind it; the label is now what the step's own `why` already
+    # said it was for.
+    ("foundry.html",   "What the foundry is for",
+     "the goals, the machine, and the kinds of project it takes"),
     ("workflows.html", "Sample protocols",  "what it runs, and what each step decides"),
     ("blueprint.html", "System blueprint",  "the machine the protocols run on"),
     ("intake.html",    "Propose a campaign", "send us a target"),
@@ -869,6 +874,16 @@ def main():
     loop.pop("guidance", None)
     loop["gates"] = gates
     loop["programmes"] = progs
+    # Two figures the landing band shows are computed here rather than typed
+    # into stages.yml, so the page cannot drift from the data: the cart count
+    # is whatever racs: holds after phase 2 is dropped, and the decision count
+    # is whatever gates.yml holds. `headline.items[].count` names which one.
+    loop["counts"] = {"carts": len(protos["racs"]), "gates": len(gates)}
+    # The built pages are self-contained - mailed, opened off a disk - so a
+    # link back to the Jekyll site has to be absolute. {{SITE}} is substituted
+    # into the HTML before the payload is inlined, so it cannot be used inside
+    # the data; the address goes in as a value instead.
+    loop["site"] = site_url()
     loop["loops"] = protos["loops"]
     loop["routes"] = protos.get("routes", [])
     loop["wf"] = {w["id"]: {"name": w["name"], "short": w["short"],

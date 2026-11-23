@@ -1,21 +1,20 @@
 ---
 layout: page
 title: Protein Design Foundry
-standfirst: An automated protein design facility at UCSF Mission Bay, built on fifteen enclosed robotic carts.
+standfirst: An automated protein design facility at UCSF Mission Bay. It is being built, and is not open for general submissions yet.
 ---
 
 
-The system is meant to take a designed sequence to measured data without a
-person moving a plate. This site is the working record of that build: what it
-can do, what it cannot, and how it is put together.
+<div class="note" markdown="1">
+### [Start here: what the foundry is for &rarr;]({{ '/static/pages/foundry.html' | relative_url }})
 
-It is kept honest on purpose. A facility that publishes only its capabilities
-is useless to someone trying to work out whether their experiment will run here.
+What the system is, how a campaign runs, the kinds of project it takes, and
+whether yours is one of them. One page, mostly pictures.
+</div>
+
+Everything else on this site is the detail behind that page.
 
 <div class="cards" markdown="0">
-  <div class="card"><h3><a href="{{ '/static/pages/foundry.html' | relative_url }}">Project styles</a></h3>
-    <p>The five kinds of work the foundry takes on, each with its problem, its
-    strategy, the loop it runs and where it sits on the risk scale.</p></div>
   <div class="card"><h3><a href="{{ '/static/pages/workflows.html' | relative_url }}">Sample protocols</a></h3>
     <p>Every protocol drawn: what happens on the deck, what the readout looks like, what
     goes in and what comes back. Chain them into a campaign at the foot of the page.</p></div>
@@ -37,36 +36,11 @@ is useless to someone trying to work out whether their experiment will run here.
 </div>
 
 <details markdown="1">
-<summary markdown="span">The shape of it</summary>
-
-Each cart is a sealed micro-environment with its own six-axis arm, sitting on a
-shared magnetic transport track. Plates move between instruments without anyone
-opening a door, which is what makes a twenty-hour unattended run possible.
-
-Two expression routes run on the same hardware. The in-cell route is capped by
-shaking positions and takes about **51 hours** for a 1,152-member library. The
-cell-free route skips growth entirely and takes about **12 hours** for the same
-library, with a ceiling more than a hundred times higher. Neither is the right
-answer on its own, which is the point of having both.
-
-</details>
-
-
-<details markdown="1">
-<summary markdown="span">Working with us</summary>
-
-Not open for general submissions yet. If you think a workflow belongs here, the
-most useful thing you can send is the step list, the plate formats and the
-volumes, because that is what determines whether it fits.
-
-</details>
-
-
-<details markdown="1">
 <summary markdown="span">How this stays accurate</summary>
 
-The inventory lives in `_data/` and every table is rendered from it
-at build time. A number changes in one place. Figures taken from somewhere else
-say where they came from.
+The inventory lives in `_data/` and every table is rendered from it at build
+time. A number changes in one place. Figures taken from somewhere else say
+where they came from, and figures that are arithmetic rather than measurement
+say that too.
 
 </details>
