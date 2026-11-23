@@ -79,7 +79,26 @@
 
   /* ---- the loop diagram ---- */
   .main{display:flex;gap:20px;align-items:flex-start}
-  .stage{flex:1;min-width:0;overflow-x:auto}
+  .stage{flex:1;min-width:0}
+  /* The loop is 900 units wide and will not shrink below 620px without its
+     labels becoming unreadable, so on a narrow screen it scrolls sideways.
+     The fault that needs fixing is not the scrolling - it is that a reader
+     sees two and a bit stages with nothing saying there are four. The band
+     head above says "four stages"; this is the other half, an edge that says
+     the figure continues. It appears only when there is something to scroll
+     to, so at desktop width it is not there at all. */
+  .figwrap{position:relative}
+  .scroller{overflow-x:auto;overscroll-behavior-x:contain}
+  .scroller:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:4px}
+  .figwrap::after{content:"";position:absolute;top:0;right:0;bottom:0;width:64px;
+    background:linear-gradient(to right,rgba(255,255,255,0),var(--bg) 78%);
+    pointer-events:none;opacity:0;transition:opacity .18s}
+  .figwrap[data-more="yes"]::after{opacity:1}
+  @media (prefers-color-scheme:dark){ :root:not([data-theme=light]) .figwrap::after{
+    background:linear-gradient(to right,rgba(20,20,22,0),var(--bg) 78%)} }
+  :root[data-theme=dark] .figwrap::after{
+    background:linear-gradient(to right,rgba(20,20,22,0),var(--bg) 78%)}
+  @media print{ .figwrap::after{display:none} }
   svg#loop{display:block;width:100%;min-width:620px;height:auto;font-family:var(--font)}
   .node:focus{outline:none}
   .node:focus-visible .nodebox{stroke-width:3}
@@ -245,7 +264,11 @@
         Click a stage for what it decides and on what number.</span></div>
     <div class="main">
       <div class="stage">
-        <svg id="loop" viewBox="0 0 900 250" role="img" aria-label="The foundry design-test loop"></svg>
+        <div class="figwrap">
+          <div class="scroller" id="scroller">
+            <svg id="loop" viewBox="0 0 900 250" role="img" aria-label="The foundry design-test loop"></svg>
+          </div>
+        </div>
         <div class="legend" id="legend"></div>
         <div class="hint">Every result goes back into the models. Failures included &mdash; most designs fail,
           and a failure that was measured is worth more than a design that was never made.</div>
@@ -352,6 +375,34 @@
   const rtx = el('text', {x:450, y:by + 26, 'text-anchor':'middle', class:'rlbl'});
   rtx.textContent = 'every result goes back into the models, failures included';
   svg.appendChild(rtx);
+
+  // Does the figure continue past the right edge, and has the reader got
+  // there yet? Both answers come from the scroller, so neither can go stale.
+  // The fade is one half of the affordance; the other half is that a keyboard
+  // reaches the figure at all, which a plain overflow box does not give you.
+  // Both are attached only while there is something to scroll, so a desktop
+  // reader does not tab into a box that cannot move.
+  const scroller = document.getElementById('scroller');
+  const figwrap = document.querySelector('.figwrap');
+  function scrollState() {
+    if (!scroller || !figwrap) return;
+    const slack = scroller.scrollWidth - scroller.clientWidth;
+    const more = slack - scroller.scrollLeft > 2;
+    figwrap.dataset.more = more ? 'yes' : 'no';
+    if (slack > 2) {
+      scroller.setAttribute('tabindex', '0');
+      scroller.setAttribute('role', 'group');
+      scroller.setAttribute('aria-label',
+        `The design-test loop, ${S.length} stages. Scrolls sideways.`);
+    } else {
+      scroller.removeAttribute('tabindex');
+      scroller.removeAttribute('role');
+      scroller.removeAttribute('aria-label');
+    }
+  }
+  scroller.addEventListener('scroll', scrollState, {passive: true});
+  window.addEventListener('resize', scrollState);
+  scrollState();
 
   document.getElementById('legend').innerHTML = Object.values(WHERE).map(w =>
     `<span><i class="sw" style="background:${w.c};border-color:${w.c};opacity:.65"></i>${w.label}</span>`).join('');
