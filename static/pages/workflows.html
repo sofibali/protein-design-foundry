@@ -232,7 +232,10 @@
       display:block;transition:opacity .15s}
   .wf.dim{opacity:.26}
   .hdrow{display:flex;align-items:center;gap:8px;padding:8px 12px}
-  .hd{flex:1;min-width:0;display:grid;grid-template-columns:40px 46px 1fr auto;
+  /* minmax(0,...) and not 1fr: a bare 1fr takes an AUTO minimum, so the
+     nowrap time below cannot shrink and pushes the row wider than the card.
+     At 320px this column is about 71px and the longest time is about 170. */
+  .hd{flex:1;min-width:0;display:grid;grid-template-columns:40px 46px minmax(0,1fr) auto;
       align-items:center;gap:4px 12px;background:none;border:0;padding:2px 0;margin:0;
       font:inherit;color:inherit;text-align:left;cursor:pointer;border-radius:7px}
   .hd:hover .nm{text-decoration:underline;text-underline-offset:2px}
@@ -308,7 +311,11 @@
         font-size:12.5px;line-height:1.45}
   .mats dt{font-weight:500;white-space:nowrap}
   .mats dd{margin:0;color:var(--muted)}
+  /* one column here, so the term is on its own line and nowrap buys nothing
+     - and "Hotspot point-mutant of your own target" is about 238px against
+     288px of content at a 320px viewport. */
   @media (max-width:620px){ .mats{grid-template-columns:1fr;gap:1px}
+    .mats dt{white-space:normal}
     .mats dd{margin-bottom:6px} }
   .body{font-size:13px;line-height:1.46;margin:8px 0 0}
   .warn{font-size:12.5px;line-height:1.45;margin:8px 0 0;padding:7px 10px;border-radius:7px;
@@ -336,7 +343,20 @@
               border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);
               transform:rotate(45deg) translate(-2px,-2px);transition:transform .15s}
   .loop.open .chev{transform:rotate(225deg) translate(-2px,-2px)}
-  .loop .scroll{overflow-x:auto;margin-top:4px}
+  /* The loop figure has a 840px viewBox and a 560px floor, because scaling it
+     to a phone would put its labels at about 4px. So it scrolls sideways - and
+     a sideways scroller needs to say so and be reachable from a keyboard.
+     Two `local` layers ride the content and scroll away; two `scroll` layers
+     are pinned to the box and cover them, so an edge shows only on a side
+     that has something off-screen. No JS, and it is self-correcting. */
+  .loop .scroll{overflow-x:auto;margin-top:4px;
+    background:
+      linear-gradient(to right, var(--bg) 40%, transparent) left center/28px 100% no-repeat local,
+      linear-gradient(to left,  var(--bg) 40%, transparent) right center/28px 100% no-repeat local,
+      linear-gradient(to right, var(--rule), transparent) left center/9px 100% no-repeat scroll,
+      linear-gradient(to left,  var(--rule), transparent) right center/9px 100% no-repeat scroll}
+  .loop .scroll:focus-visible{outline:2px solid var(--accent);outline-offset:2px;
+                              border-radius:4px}
   .loop svg{display:block;width:100%;min-width:560px;height:auto;font-family:var(--font)}
   .loop .rt{font-size:13px;line-height:1.46;margin:4px 0 0}
   .lp-lbl{font-size:12.5px;fill:var(--ink)}
@@ -375,8 +395,10 @@
   .pnote > *:not(summary){margin-top:6px}
 
   @media (max-width:780px){
-    .hd{grid-template-columns:40px 46px 1fr;gap:2px 10px}
-    .hd .when{grid-column:3;justify-self:start;margin-top:2px}
+    .hd{grid-template-columns:40px 46px minmax(0,1fr);gap:2px 10px}
+    /* on its own row here, and free to wrap: nothing is gained by holding
+       "~2 h, plus an hour of recovery" on one line at this width. */
+    .hd .when{grid-column:3;justify-self:start;margin-top:2px;white-space:normal}
   }
   @media (max-width:760px){
     .figs{grid-template-columns:1fr}
@@ -4054,7 +4076,8 @@ window.PROTOCOLS = {
          <span class="chev" aria-hidden="true"></span>
        </button>
        <div class="lbd" id="${bid}"${i ? ' hidden' : ''}>
-         <div class="scroll">${loopSvg(lp)}</div>
+         <div class="scroll" tabindex="0" role="group"
+              aria-label="${esc(lp.name)} diagram, scrolls sideways">${loopSvg(lp)}</div>
          <p class="rt">${esc(lp.returns)}</p>
        </div>
      </article>`;
