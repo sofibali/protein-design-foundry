@@ -11,9 +11,12 @@ commercially confidential and must never be committed here, **including in a
 commit that is later reverted**, because git history keeps it.
 
 Priced line items, quotes and vendor correspondence live in the separate private
-repository `protein-design-foundry-internal`. The cost model page here gives the shape of
-the costs without the figures, which is the part that transfers to another
-institution anyway.
+repository `protein-design-foundry-internal`. So do the cost model and the
+register of open decisions: a public list of what is not yet settled reads as a
+list of what the facility cannot do, and the shape of the spend invites the
+question the figures are withheld from. Nothing in this repository should
+reintroduce either, and `scripts/check_data.py` fails the build if
+`_data/decisions.yml` reappears.
 
 ## Where everything lives
 
@@ -35,7 +38,6 @@ _data/
   protocols.yml    THE SOURCE for the device set: instruments, carts, workflows
   gates.yml        the nine decision gates a run is judged against
   stages.yml       the four loop stages
-  decisions.yml    build decisions and what each one blocks
   future.yml       carts the layout reserves, and capabilities we do not have
   instruments.yml  GENERATED from protocols.yml - do not edit by hand
 _projects/         one Markdown file per project: front matter + prose

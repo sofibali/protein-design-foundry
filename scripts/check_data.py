@@ -19,7 +19,6 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 PROBLEMS = []
 NOTES = []
 
-STATUSES = {"open", "pending", "settled", "dropped"}
 PROJECT_STATUSES = {"proposed", "running", "blocked", "complete"}
 INSTRUMENT_STATUSES = {"quoted", "phase2", "gap"}
 
@@ -44,7 +43,6 @@ def front_matter(path):
 
 def main():
     instruments = yaml.safe_load((ROOT / "_data/instruments.yml").read_text())
-    decisions = yaml.safe_load((ROOT / "_data/decisions.yml").read_text())
 
     rac_ids = {r["id"] for r in instruments["racs"]}
     keys = set()
@@ -81,19 +79,12 @@ def main():
         fail("instruments.yml", "missing its GENERATED header - it is written by "
                                 "scripts/build_pages.py from _data/protocols.yml")
 
-    seen = set()
-    for d in decisions["decisions"]:
-        if d["id"] in seen:
-            fail("decisions.yml", f"duplicate id {d['id']}")
-        seen.add(d["id"])
-        if d["status"] not in STATUSES:
-            fail(f"decision {d['id']}", f"unknown status {d['status']!r}")
-        if d["status"] in {"settled", "dropped"} and not d.get("date"):
-            fail(f"decision {d['id']}", f"{d['status']} but no date")
-        if not d.get("why") and not d.get("answer"):
-            fail(f"decision {d['id']}", "no why and no answer, so the table cell is blank")
-        if d["status"] == "open" and not d.get("owner"):
-            note(f"decision {d['id']}", "open with no owner, so it renders as unassigned")
+    # The decisions register lives in the internal repo: a public list of what
+    # is unsettled reads as a list of what the facility cannot do. Nothing here
+    # should reintroduce it.
+    if (ROOT / "_data/decisions.yml").exists():
+        fail("decisions.yml", "is back in the public repo - it belongs in "
+                              "protein-design-foundry-internal")
 
     projects = sorted((ROOT / "_projects").glob("*.md"))
     if not projects:
@@ -167,8 +158,7 @@ def main():
         fail("build_pages.check", f"could not run: {exc}")
 
     print(f"{len(keys)} instruments on {len(rac_ids)} carts, "
-          f"{len(decisions['decisions'])} decisions, {len(projects)} projects, "
-          f"{len(sheets)} spec sheets")
+          f"{len(projects)} projects, {len(sheets)} spec sheets")
     if NOTES:
         print(f"\n{len(NOTES)} note(s):")
         for n in NOTES:

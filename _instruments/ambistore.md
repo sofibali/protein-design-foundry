@@ -21,8 +21,7 @@ a carousel that returns any plate in about twelve seconds suits that exactly.
 A sequential stacker would not.
 
 The 216 standard positions were sized for 100–150 rotating trays plus bulk,
-and the 50 deep-well positions hold precipitant stocks. That split is
-[decision 1]({{ '/decisions/' | relative_url }}), settled.
+and the 50 deep-well positions hold precipitant stocks. That split is settled.
 
 ## The frozen storage footnote
 

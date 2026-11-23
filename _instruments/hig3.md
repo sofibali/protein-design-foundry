@@ -40,6 +40,5 @@ interesting one.
 
 A refrigerated centrifuge was considered and rejected: it would need its own
 enclosure, a different vendor and true refrigeration, which is not worth it
-against what it buys. That is
-[decision 10]({{ '/decisions/' | relative_url }}), and it stays on the list so
-nobody re-opens it without knowing it was priced.
+against what it buys. It was priced before it was rejected, and the
+reasoning is kept on file so nobody re-opens it blind.

@@ -40,8 +40,6 @@ nav:
   - {title: "Propose",         url: "/static/pages/intake.html"}
   - {title: "Capabilities", url: "/capabilities/"}
   - {title: "Projects",     url: "/projects/"}
-  - {title: "Decisions",    url: "/decisions/"}
-  - {title: "Cost model",   url: "/budget/"}
   - {title: "Inventory",    url: "/inventory/"}
 
 exclude:

@@ -37,5 +37,4 @@ discovered rather than designed.
 Both sealers on the system are thermal. A 200 nL crystallisation drop has
 almost no thermal mass, so neither is obviously safe over a wet tray, and
 crystallography trays are closed with a lid instead — except that nothing on
-the system currently handles lids either. That gap is
-[decision 16]({{ '/decisions/' | relative_url }}).
+the system currently handles lids either. That gap is still open.

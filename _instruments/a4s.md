@@ -35,9 +35,8 @@ and the arm chooses between them without a human in the room.
 
 **Nothing on the system handles lids.** Plating is in scope, agar plates carry
 lids, and filter-plus-carrier plate combinations are too tall for either
-sealer. That is now
-[decision 16]({{ '/decisions/' | relative_url }}), opened the day this was
-corrected.
+sealer. That gap opened the day this was corrected and is
+still open.
 
 It also closes off an idea that had been floated for crystallography. Both
 sealers here are thermal — the PlateLoc at 30–200 °C, this one at

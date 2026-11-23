@@ -6,7 +6,7 @@ standfirst: An automated protein design facility at UCSF Mission Bay, built on f
 
 The system is meant to take a designed sequence to measured data without a
 person moving a plate. This site is the working record of that build: what it
-can do, what it cannot, what is still undecided, and what it costs.
+can do, what it cannot, and how it is put together.
 
 It is kept honest on purpose. A facility that publishes only its capabilities
 is useless to someone trying to work out whether their experiment will run here.
@@ -31,8 +31,6 @@ is useless to someone trying to work out whether their experiment will run here.
     <p>What the system does, at what scale, and where it stops.</p></div>
   <div class="card"><h3><a href="{{ '/projects/' | relative_url }}">Projects</a></h3>
     <p>Foundational test projects. Each is a claim about a capability.</p></div>
-  <div class="card"><h3><a href="{{ '/decisions/' | relative_url }}">Decisions</a></h3>
-    <p>{{ site.data.decisions.decisions | where: "status", "open" | size }} still open, and what each one blocks.</p></div>
   <div class="card"><h3><a href="{{ '/inventory/' | relative_url }}">Inventory</a></h3>
     <p>{{ site.data.instruments.instruments | where: "status", "quoted" | size }} instruments across {{ site.data.instruments.racs | size }} carts.</p></div>
 </div>
@@ -57,6 +55,6 @@ volumes, because that is what determines whether it fits.
 
 ## How this stays accurate
 
-Inventory and decisions live in `_data/` and the tables are rendered from them
+The inventory lives in `_data/` and every table is rendered from it
 at build time. A number changes in one place. Figures taken from somewhere else
 say where they came from.
