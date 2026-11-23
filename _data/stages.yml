@@ -233,8 +233,8 @@ types:
 
 # ---------------------------------------------------------------------------
 # Section 4: the sign on the door. One line, and deliberately not a
-# countdown - Sofia has asked repeatedly that the date not be the framing, so
-# it is the last thing on the page and nothing is organised around it.
+# countdown. Settled 2026-11-23: the date is not the framing, so it is the
+# last thing on the page and nothing is organised around it.
 #
 # Source for the date: pages/tracker.html (the footer, and the 2027-04-01
 # milestone) and reference/capabilities.md, which calls April 2027 the line
