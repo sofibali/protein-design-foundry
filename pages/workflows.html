@@ -35,6 +35,7 @@
     details > *{display:revert !important}
     details .ddb,details .why,details .gitems{display:block !important}
     .bd[hidden]{display:block !important}
+    .lbd[hidden]{display:block !important}
     .chev{display:none !important}
     .sheet,.elev{background:#fff !important}
     a[href^="http"]::after{content:" (" attr(href) ")";font-size:10px;color:#555}
@@ -172,10 +173,22 @@
              line-height:1.45}
   .limits li::before{content:"\00d7";position:absolute;left:3px;top:-1px;color:#D55E00;font-size:15px}
   @media (max-width:560px){ .barrow{grid-template-columns:62px minmax(0,1fr) 80px;gap:8px} }
-  .ceil{border-top:1px solid var(--rule);margin-top:11px;padding-top:9px;
-        font-size:12px;color:var(--muted);line-height:1.5}
-  .ceil b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
-  .ceil .sep{opacity:.5;padding:0 6px}
+  /* the ceiling. Four numbers on their own say nothing, so each one names
+     the protocol that will reach it first, and they sit under the bars that
+     measure the same machines. */
+  .ceil{border-top:1px solid var(--rule);margin-top:14px;padding-top:11px;
+        font-size:12.5px;color:var(--muted);line-height:1.5}
+  .ceil > h3{font-size:12.5px;font-weight:500;color:var(--ink);margin:0 0 2px}
+  .ceil > p{margin:0 0 9px;max-width:74ch}
+  .ceil dl{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:4px 12px;margin:0}
+  .ceil dt{font-weight:500;color:var(--ink);white-space:nowrap}
+  .ceil .lim{font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+  .ceil dd{margin:0}
+  .ceil dd b{font-weight:400;color:var(--ink)}
+  @media (max-width:620px){
+    .ceil dl{grid-template-columns:1fr}
+    .ceil dd{margin-bottom:7px}
+  }
 
   /* status legend */
   .legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12.5px;color:var(--muted);
@@ -288,10 +301,18 @@
   .loops > h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:500;
               margin:0 0 4px;padding-bottom:6px;border-bottom:2px solid var(--rule)}
   .loops .intro{color:var(--muted);font-size:12.5px;margin:10px 0 18px}
-  .loop{border:1px solid var(--rule);border-radius:10px;padding:13px 14px 10px;margin-bottom:9px}
-  .loop .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-  .loop .hd h3{font-size:15px;font-weight:400;margin:0}
+  .loop{border:1px solid var(--rule);border-radius:10px;margin-bottom:9px}
+  .loop .lhd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;width:100%;
+             font:inherit;color:inherit;text-align:left;background:none;border:0;
+             padding:13px 14px;cursor:pointer;border-radius:10px}
+  .loop .lhd:hover{background:var(--tab-bg)}
+  .loop .lhd h3{font-size:15px;font-weight:400;margin:0;flex:1 1 auto}
   .loop .closes{font-size:11.5px;color:var(--muted)}
+  .loop .lbd{padding:0 14px 11px}
+  .loop .chev{width:9px;height:9px;flex:none;align-self:center;
+              border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);
+              transform:rotate(45deg) translate(-2px,-2px);transition:transform .15s}
+  .loop.open .chev{transform:rotate(225deg) translate(-2px,-2px)}
   .loop .scroll{overflow-x:auto;margin-top:4px}
   .loop svg{display:block;width:100%;min-width:560px;height:auto;font-family:var(--font)}
   .loop .rt{font-size:13px;line-height:1.46;margin:4px 0 0}
@@ -362,16 +383,21 @@
       what each machine is and what it can do.</p>
     <div class="igroups" id="insts"></div>
     <div class="role" id="role"></div>
-    <div class="ceil" id="ceil"></div>
   </div>
-  <div class="legend" id="legend"></div>
 
+  <section class="loops">
+    <h2>Loops</h2>
+    <div class="intro" id="lintro"></div>
+    <div id="loops"></div>
+    <div class="legend" id="wlegend" style="margin-top:16px"></div>
+  </section>
   <h2 class="libhead">Protocols</h2>
   <p class="libnote">Fifteen examples of what this system can run &mdash; not a fixed menu, and
     not everything it can do. Each one sets the bench method beside what it becomes as a
     sequence of moves on the rack, so you can see where your own protocol would translate and
     where it would not. Open one for the steps, the schematic and the shape of the readout; add
     it to the campaign at the foot of the page and its decision gates come with it.</p>
+  <div class="legend" id="legend"></div>
   <div id="phases"></div>
 
   <section class="plan">
@@ -383,15 +409,10 @@
     <details class="deckcost"><summary>Deck cost</summary>
       <div class="bars" id="bars"></div>
       <div class="verdict" id="verdict"></div>
+      <div class="ceil" id="ceil"></div>
     </details>
   </section>
 
-  <section class="loops">
-    <h2>Loops</h2>
-    <div class="intro" id="lintro"></div>
-    <div id="loops"></div>
-    <div class="legend" id="wlegend" style="margin-top:16px"></div>
-  </section>
 
   <section class="loops" id="cannot">
     <h2 id="lm-t"></h2>
@@ -968,18 +989,45 @@
          blueprint.</span></h4><div class="insts">${loose.map(chip).join('')}</div></div>`
     : '');
 
-  // the ceiling. What the day costs, which is the one number the blueprint
-  // cannot give you because it depends on which protocols you chain.
+  // The ceiling. Four numbers on their own told a reader nothing, so each one
+  // now names the protocol that reaches it first - read off the cost model,
+  // not written by hand - and the block sits under the bars that measure the
+  // same three machines, where it is the scale those bars are drawn against.
   const R = P.rates;
+  const CEIL_KEY = {Bravo: 'bravo', PHERAstar: 'reader', Echo: 'echo'};
+
+  // the protocol that spends the most of one machine, and what it spends
+  const heaviest = key => {
+    let best = null;
+    WF.forEach(w => {
+      const m = (w.cost || {})[key] || 0;
+      if (m > 0 && (!best || m > best.m)) best = {w: w, m: m};
+    });
+    return best;
+  };
+  // Cytomat has no minutes in the cost model - it is a position count, not
+  // deck time - so what matters is how many protocols here want one at once.
+  const cultures = WF.filter(w => w.deck.indexOf('cytomat') >= 0);
+
   document.getElementById('ceil').innerHTML =
-    `The day is <b>${R.day_min / 60} h</b>. Ceilings: ` +
-    R.ceilings.map(c => `<b>${esc(c.what)} ${c.limit}</b> ${esc(c.per)}`)
-      .join('<span class="sep">&middot;</span>') +
-    '<details class="pnote"><summary>384 and the Bravo</summary><div>' +
+    '<h3>What runs out first</h3>' +
+    `<p>The day is <b>${R.day_min / 60} h</b>. Each number below is where one machine, ` +
+    'rather than the protocol, becomes the limit &mdash; so a campaign that stays under ' +
+    'all four is bounded by the science and not by the deck.</p><dl>' +
+    R.ceilings.map(c => {
+      const h = CEIL_KEY[c.what] ? heaviest(CEIL_KEY[c.what]) : null;
+      const hits = h
+        ? `Reached first by <b>${esc(h.w.id)} ${esc(h.w.short)}</b>, at ${h.m} min a run.`
+        : `<b>${cultures.length}</b> of the protocols here culture ` +
+          `(${cultures.map(w => esc(w.id)).join(', ')}), so this is not tight yet.`;
+      return `<dt>${esc(c.what)}</dt><span class="lim">${c.limit}</span>` +
+             `<dd>${esc(c.per)}. ${hits}</dd>`;
+    }).join('') + '</dl>' +
+    '<details class="pnote"><summary>Why the Bravo is the tight one</summary><div>' +
     'One Bravo step costs ' +
     `<b>${R.bravo_96} min</b> on a 96-well plate and <b>${R.bravo_384} min</b> on a 384 ` +
     '&mdash; four offset quadrant transfers with a 96-channel head. That 4&times; is why so ' +
-    'much of this page runs through the Echo.</div></details>';
+    `much of this page runs through the Echo. ${esc(R.note)}</div></details>`;
 
   document.getElementById('legend').innerHTML = Object.entries(STATUS).map(([k, v]) =>
     `<span><i class="dot" style="background:${v.c}"></i>${esc(k)} &mdash; ${esc(v.label)}</span>`).join('');
@@ -1347,14 +1395,38 @@
         stroke-linejoin="round"/></marker></defs>${parts.join('')}</svg>`;
   }
 
-  document.getElementById('lintro').textContent =
-    'Nested, each returning something different. Colour is where the step happens.';
-  document.getElementById('loops').innerHTML = (P.loops || []).map(lp =>
-    `<article class="loop">
-       <div class="hd"><h3>${esc(lp.name)}</h3><span class="closes">${esc(lp.steps.length)} steps</span></div>
-       <div class="scroll">${loopSvg(lp)}</div>
-       <p class="rt">${esc(lp.returns)}</p>
-     </article>`).join('');
+  document.getElementById('lintro').innerHTML =
+    'Five nested loops, each returning something different. A protocol below is one step ' +
+    'inside one of these, so this is the shape your campaign takes. Colour is where the ' +
+    'step happens. The first is open; click any other to open it.';
+
+  // The first loop is open so the section shows what a loop looks like; the
+  // rest are shut, the same way the protocols below are.
+  document.getElementById('loops').innerHTML = (P.loops || []).map((lp, i) => {
+    const bid = 'lp-' + String(lp.id).replace(/[^\w]/g, '');
+    return `<article class="loop${i ? '' : ' open'}">
+       <button class="lhd" type="button" aria-expanded="${i ? 'false' : 'true'}"
+               aria-controls="${bid}">
+         <h3>${esc(lp.name)}</h3>
+         <span class="closes">${esc(lp.steps.length)} steps &middot; closes in ${esc(lp.closes)}</span>
+         <span class="chev" aria-hidden="true"></span>
+       </button>
+       <div class="lbd" id="${bid}"${i ? ' hidden' : ''}>
+         <div class="scroll">${loopSvg(lp)}</div>
+         <p class="rt">${esc(lp.returns)}</p>
+       </div>
+     </article>`;
+  }).join('');
+
+  document.getElementById('loops').addEventListener('click', e => {
+    const b = e.target.closest('.lhd'); if (!b) return;
+    const art = b.closest('.loop');
+    const body = document.getElementById(b.getAttribute('aria-controls'));
+    const open = b.getAttribute('aria-expanded') === 'true';
+    b.setAttribute('aria-expanded', String(!open));
+    art.classList.toggle('open', !open);
+    body.hidden = open;
+  });
 
   document.getElementById('wlegend').innerHTML = Object.values(WHERE).map(w =>
     `<span><i class="dot" style="background:${w.c}"></i>${esc(w.label)}</span>`).join('');

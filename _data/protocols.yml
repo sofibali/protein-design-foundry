@@ -79,8 +79,8 @@ rates:
     - {what: Cytomat, limit: 7, per: concurrent protocols that culture — 14 deep-well positions}
   note: >
     Modelled, not measured. The rates are arithmetic off Ginkgo's own
-    throughput figures; the step counts are read off each deck sequence
-    below. Treat a cost as the right order of magnitude and the ratio
+    throughput figures; the step counts are read off each protocol's own
+    deck sequence. Treat a cost as the right order of magnitude and the ratio
     between two workflows as the thing worth trusting.
 
 # ---------------------------------------------------------------------------
