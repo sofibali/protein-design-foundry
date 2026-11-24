@@ -40,17 +40,20 @@ what:
     filters, and an enclosed lab that makes and measures what survives.
   halves:
     - id: lab
-      count: carts
-      fig: carts, one enclosed system
-      name: The automated lab
+      fig: The automated lab
+      name: Makes it, and measures it
       say: >-
-        Each cart is a sealed micro-environment with its own six-axis arm, on
-        a shared transport track. A plate moves from one instrument to the
-        next without anyone opening a door, so a run can continue unattended
-        overnight.
+        Every cart is a sealed micro-environment with its own arm, on a shared
+        transport track. A plate moves from one instrument to the next without
+        anyone opening a door, so a run can carry on unattended overnight.
+    # The wording of this half is deliberately provisional. A survey of
+    # AI protein-design loops and capabilities is being written up as
+    # reference material, and this paragraph is the place it lands: it is one
+    # value in one file, with no figure in it and nothing else reading it, so
+    # replacing it is a one-line change to this block.
     - id: design
       fig: The design platform
-      name: Designs, before anything is made
+      name: Proposes it, and filters it
       say: >-
         Candidates are generated and scored computationally, and only what
         survives that filter is ever made. What comes back off the plates -
@@ -104,10 +107,14 @@ stages:
     label: Design
     sub: models propose
     where: compute
+    # "More than 1,000 candidates per target" came out on 2026-11-23: it is a
+    # planned output with no visual home on the page, and the rule settled
+    # that day is that a figure gets a table, a grid or a graphic or it does
+    # not go on the page at all.
     body: >
-      More than 1,000 candidates per target from RFdiffusion, ProteinMPNN and
-      BindCraft, rescored with Boltz and filtered by the expression model.
-      Runs on UCSF compute, not on the machine.
+      Candidates are generated with RFdiffusion, ProteinMPNN and BindCraft,
+      rescored with Boltz and filtered by the expression model. Runs on UCSF
+      compute, not on the machine.
     gates: [D0]
     protocols:
       - {id: intake.target.rank, status: draft}
@@ -197,6 +204,36 @@ stages:
     open:
       - Imagers and automated crystal scoring are not on the system yet, so
         trays are set here and scored by hand.
+
+# Section 1's figure table. Settled 2026-11-23: a number on this page gets a
+# table, a grid or a graphic, never a sentence - a digit inside a paragraph is
+# the hardest thing on a page to find and to compare against anything. So the
+# prose in halves: above carries no figures at all and they are all here.
+#
+# No value is typed in this file. Each row names a count the build works out
+# from _data/, so a row cannot disagree with the data behind it.
+#
+# Source, per row: carts and instruments are racs: and instruments: in
+# _data/protocols.yml, counted after phase 2 is dropped; gaps are the entries
+# marked `gap` in _data/future.yml, which is where the machine's absences are
+# recorded on purpose; decisions are _data/gates.yml.
+facts:
+  title: The system, as quoted
+  head: What
+  headn: Count
+  note: >-
+    All of it quoted and being built, none of it running. The capabilities the
+    device set will not cover are counted here rather than left out, and each
+    one is named on the inventory beside the instruments.
+  rows:
+    - count: carts
+      k: Enclosed carts on one shared track
+    - count: instruments
+      k: Instruments quoted for install
+    - count: gaps
+      k: Capabilities it will not have
+    - count: gates
+      k: Named decisions a design passes
 
 # ---------------------------------------------------------------------------
 # Section 3 of the landing page: the experimental types.

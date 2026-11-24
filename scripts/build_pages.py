@@ -879,13 +879,33 @@ def main():
     # would mail several thousand words of unread text with every link.
     for dead in ("fit", "provide", "returns"):
         loop.pop(dead, None)
+    # The per-stage "still being settled" lists come off the landing page on
+    # 2026-11-23 as well. They are the densest prose left on it, and the
+    # figures in them - the retrieval-PCR plate arithmetic for a 1,152-design
+    # set, among others - are exactly the planned numbers this page is meant
+    # not to carry. They stay in stages.yml, where the engineering questions
+    # belong and where pages/tracker.html already reads them.
+    loop["stages"] = [{k: v for k, v in st.items() if k != "open"}
+                      for st in loop["stages"]]
     loop["gates"] = gates
     loop["programmes"] = progs
     # Two figures the landing band shows are computed here rather than typed
     # into stages.yml, so the page cannot drift from the data: the cart count
     # is whatever racs: holds after phase 2 is dropped, and the decision count
     # is whatever gates.yml holds. `headline.items[].count` names which one.
-    loop["counts"] = {"carts": len(protos["racs"]), "gates": len(gates)}
+    # Section 1's figure table is counted here, so no row of it is typed into
+    # stages.yml and none can drift. The instrument count is what the site's
+    # inventory shows (non-virtual devices on carts that are being installed);
+    # the gap count is _data/future.yml's record of what the device set will
+    # not cover, which is a real figure and belongs beside the others.
+    on_cart = {i for r in protos["racs"] for i in r["instruments"]}
+    quoted = sum(1 for i in protos["instruments"]
+                 if i["kind"] != "virtual" and i["id"] in on_cart)
+    fut = ROOT / "_data" / "future.yml"
+    gaps = sum(1 for i in (yaml.safe_load(fut.read_text()) or {}).get("future", [])
+               if i.get("status") == "gap") if fut.exists() else 0
+    loop["counts"] = {"carts": len(protos["racs"]), "gates": len(gates),
+                      "instruments": quoted, "gaps": gaps}
     # How many protocols are drawn in each experimental type. Counted off
     # workflows: rather than written into stages.yml, so the figure beside a
     # category cannot disagree with the protocols the site actually holds.

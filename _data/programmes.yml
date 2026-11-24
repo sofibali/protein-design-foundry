@@ -18,12 +18,15 @@ lede: >-
   The foundry runs campaigns, not samples. You bring a target and a question;
   back comes a verdict per design at every gate it passed, failures kept.
 
+# The three outcomes are a list rather than a sentence, so the page can set
+# them side by side instead of asking a reader to count them out of a clause.
 aside:
   title: How a project is taken on
-  body: >-
-    A conversation, then one of three answers: onboarded and assigned an
-    expression route, run as a feasibility arm first, or declined with the
-    reason named.
+  lead: A conversation, then one of three answers.
+  answers:
+    - Onboarded, and assigned an expression route
+    - Run as a feasibility arm first
+    - Declined, with the reason named
 
 programmes:
 
