@@ -693,7 +693,19 @@ def sheet_specs():
 # other one, which gives a reader twelve edges, no sense of where they are and
 # no way to tell they have seen everything - the endless loop. This is the
 # order instead: what the place does, what it runs, what it runs on, how to
-# ask for it. Each page says where it sits, and offers exactly one next step.
+# ask for it.
+#
+# The strip below is the ONLY way between these pages. It used to be followed
+# by a "Next: X" panel at the foot, which linked to a page the strip was
+# already linking to from the same screen - so foundry.html carried three
+# links to workflows.html and every page carried a doubled one. {{NEXT}} now
+# renders a way back to the Jekyll site instead, which is a destination the
+# strip does not carry and which three of the four pages had no link to at
+# all.
+#
+# These labels are half of a pair: the `nav:` block in _config.yml names the
+# same four pages for the Jekyll side of the site. Rename a page in both, or
+# it has two names depending on where you came from.
 PATH = [
     # Step 1 is the landing page: the one link a donor or a prospective user
     # is sent. It was called "What happens here", which said nothing about
@@ -717,13 +729,9 @@ PATHCSS = """<style>
   .path a:focus-visible,.path span:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
   .path .n{font-variant-numeric:tabular-nums;margin-right:7px;opacity:.65}
   .path [aria-current=step]{color:var(--ink);font-weight:500;background:var(--tab-bg)}
-  .next{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:34px 0 0;
-        padding:15px 17px;border:1px solid var(--rule);border-radius:10px}
-  .next .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-  .next a{font-size:15px;color:var(--ink);text-decoration:none;font-weight:500;
-        border-bottom:1px solid var(--rule)}
-  .next a:hover{border-bottom-color:var(--ink)}
-  .next .w{flex:1 1 100%;font-size:12.5px;color:var(--muted);margin-top:1px}
+  .next{margin:34px 0 0;font-size:13px}
+  .next a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule)}
+  .next a:hover{color:var(--ink);border-bottom-color:var(--ink)}
   .skip{position:absolute;left:-9999px}
   .skip:focus{left:8px;top:8px;z-index:50;position:fixed;background:var(--bg);color:var(--ink);
         border:1px solid var(--ink);border-radius:7px;padding:9px 13px;font-size:13px}
@@ -744,18 +752,17 @@ def pathbar(page):
 
 
 def nextstep(page):
-    """Exactly one way onward, so the path has a direction and an end."""
-    ids = [h for h, _, _ in PATH]
-    i = ids.index(page)
-    if i + 1 < len(PATH):
-        href, label, why = PATH[i + 1]
-        return (f'<div class="next"><span class="k">Next</span>'
-                f'<a href="{href}">{label} &rarr;</a>'
-                f'<span class="w">{why.capitalize()}.</span></div>')
-    return ('<div class="next"><span class="k">That is the path</span>'
-            '<a href="{{SITE}}/">Back to the foundry site &rarr;</a>'
-            '<span class="w">Capabilities, projects and the instrument '
-            'inventory are on the main site.</span></div>')
+    """The one link off the path: back to the site the four pages belong to.
+
+    Not a "next page" panel. The strip at the top of every page already links
+    the other three, so a panel naming one of them again was a second button
+    to a place the reader could already see. What no page could reach from
+    here was the Jekyll site - capabilities, projects and the inventory - so
+    that is what this is.
+    """
+    return ('<div class="next">'
+            '<a href="{{SITE}}/">&larr; Capabilities, projects and inventory</a>'
+            '</div>')
 
 
 def bundle(page, src_tag, var, payload):

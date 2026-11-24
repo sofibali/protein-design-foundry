@@ -655,10 +655,11 @@
   document.getElementById('sn-when').textContent = SN.when;
   document.getElementById('sn-say').textContent = SN.say;
 
-  document.getElementById('foot').innerHTML =
-    `Generated from the same data as the rest of the site, so a number changes `
-    + `in one place. <a href="workflows.html" style="color:var(--ink)">Every `
-    + `protocol drawn &rarr;</a>`;
+  // No link here. The strip at the top of the page already goes to all three
+  // of the others, and this line used to add a third route to one of them.
+  document.getElementById('foot').textContent =
+    'Generated from the same data as the rest of the site, so a number '
+    + 'changes in one place.';
 })();
 </script>
 </body>

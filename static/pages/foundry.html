@@ -290,13 +290,9 @@
   .path a:focus-visible,.path span:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
   .path .n{font-variant-numeric:tabular-nums;margin-right:7px;opacity:.65}
   .path [aria-current=step]{color:var(--ink);font-weight:500;background:var(--tab-bg)}
-  .next{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:34px 0 0;
-        padding:15px 17px;border:1px solid var(--rule);border-radius:10px}
-  .next .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-  .next a{font-size:15px;color:var(--ink);text-decoration:none;font-weight:500;
-        border-bottom:1px solid var(--rule)}
-  .next a:hover{border-bottom-color:var(--ink)}
-  .next .w{flex:1 1 100%;font-size:12.5px;color:var(--muted);margin-top:1px}
+  .next{margin:34px 0 0;font-size:13px}
+  .next a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule)}
+  .next a:hover{color:var(--ink);border-bottom-color:var(--ink)}
   .skip{position:absolute;left:-9999px}
   .skip:focus{left:8px;top:8px;z-index:50;position:fixed;background:var(--bg);color:var(--ink);
         border:1px solid var(--ink);border-radius:7px;padding:9px 13px;font-size:13px}
@@ -379,7 +375,7 @@
     </div>
   </section>
 
-  <div class="next"><span class="k">Next</span><a href="workflows.html">Sample protocols &rarr;</a><span class="w">What it runs, and what each step decides.</span></div>
+  <div class="next"><a href="https://sofibali.github.io/protein-design-foundry/">&larr; Capabilities, projects and inventory</a></div>
 </main>
   <div class="foot" id="foot"></div>
 </div>
@@ -1537,10 +1533,11 @@ window.FOUNDRY = {
   document.getElementById('sn-when').textContent = SN.when;
   document.getElementById('sn-say').textContent = SN.say;
 
-  document.getElementById('foot').innerHTML =
-    `Generated from the same data as the rest of the site, so a number changes `
-    + `in one place. <a href="workflows.html" style="color:var(--ink)">Every `
-    + `protocol drawn &rarr;</a>`;
+  // No link here. The strip at the top of the page already goes to all three
+  // of the others, and this line used to add a third route to one of them.
+  document.getElementById('foot').textContent =
+    'Generated from the same data as the rest of the site, so a number '
+    + 'changes in one place.';
 })();
 </script>
 </body>

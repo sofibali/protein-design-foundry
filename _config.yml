@@ -33,11 +33,18 @@ defaults:
 # a pretty URL because they cross-link to each other by bare filename, and
 # because they are built to be self-contained - the same file opens from a
 # mail attachment as from the site.
+# This is the site's ONE navigation system. The homepage used to repeat all
+# seven of these as cards underneath it, which made 15 links to 7 places on
+# one page, and three of them carried a different name in the header than on
+# the card. The cards are gone; the names here are now the names the built
+# pages' own step strip uses, so a destination is called one thing wherever
+# it is linked from. If you rename a page, rename it in BOTH places:
+# scripts/build_pages.py's PATH holds the other half.
 nav:
-  - {title: "Project styles",  url: "/static/pages/foundry.html"}
-  - {title: "Sample protocols", url: "/static/pages/workflows.html"}
-  - {title: "Blueprint",       url: "/static/pages/blueprint.html"}
-  - {title: "Propose",         url: "/static/pages/intake.html"}
+  - {title: "What the foundry is for", url: "/static/pages/foundry.html"}
+  - {title: "Sample protocols",  url: "/static/pages/workflows.html"}
+  - {title: "System blueprint",  url: "/static/pages/blueprint.html"}
+  - {title: "Propose a campaign", url: "/static/pages/intake.html"}
   - {title: "Capabilities", url: "/capabilities/"}
   - {title: "Projects",     url: "/projects/"}
   - {title: "Inventory",    url: "/inventory/"}
