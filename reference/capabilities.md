@@ -635,7 +635,7 @@ the Baker or Adaptyv pipelines you would otherwise copy.
 
 ## 8. CF2H — read in full, and worth building
 
-Delauriere et al., *CF2H: a cell-free two-hybrid platform for rapid
+Capin et al., *CF2H: a cell-free two-hybrid platform for rapid
 protein binder screening*, Nat Commun 2026.
 <https://doi.org/10.1038/s41467-026-69741-1> (via PubMed Central,
 PMC13103306). Read in full on 2026-11-16 — everything below is from the

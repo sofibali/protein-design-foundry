@@ -13,7 +13,7 @@ gate: D4
 duration_h: 8
 ```
 
-Method from Delauriere et al., *CF2H: a cell-free two-hybrid platform
+Method from Capin et al., *CF2H: a cell-free two-hybrid platform
 for rapid protein binder screening*, Nat Commun 2026,
 <https://doi.org/10.1038/s41467-026-69741-1>. Every number below that
 is attributed to them is theirs; everything about the deck is ours and
