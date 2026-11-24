@@ -200,7 +200,6 @@
   ul.plain li{padding:3px 0;display:flex;gap:8px;align-items:baseline}
   .chip{font-size:11px;border:1px solid var(--rule);border-radius:999px;padding:1px 7px;
         color:var(--muted);flex:none}
-  .open li{padding:4px 0;color:var(--ink)}
   .legend{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;font-size:13px;
           margin-top:14px;color:var(--muted)}
   .legend span{display:inline-flex;align-items:center;gap:7px}
@@ -1402,15 +1401,13 @@ window.FOUNDRY = {
     }).join('');
     const protos = st.protocols.map(p =>
       `<li><span class="chip">${esc(p.status)}</span>${esc(p.id)}</li>`).join('');
-    const op = (st.open || []).map(o => `<li>${esc(o)}</li>`).join('');
     pc.innerHTML = `<h2>${esc(st.label)}</h2>
       <div class="where">${esc(WHERE[st.where].label)} &middot; ${esc(st.instruments.join(', '))}</div>
       <p>${esc(st.body)}</p>
       <h3>What decides here</h3>${gates}
-      <h3>Protocols</h3><ul class="plain">${protos}</ul>
-      ${op ? `<details><summary style="cursor:pointer;color:var(--muted);font-size:12.5px;
-         margin-top:12px">still being settled &middot; ${st.open.length}</summary>
-         <ul class="plain open">${op}</ul></details>` : ''}`;
+      <h3>Protocols</h3><ul class="plain">${protos}</ul>`;
+    // The "still being settled" list that used to render here came off this
+    // page with the data behind it; the questions live in stages.yml.
     panel.hidden = false;
   }
 
