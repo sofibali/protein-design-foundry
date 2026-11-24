@@ -45,7 +45,7 @@ build]**, all three of them CF2H's.
 | Item | Needed by | Notes |
 |---|---|---|
 | *E. coli* BL21(DE3), chemically competent | 4.4, 4.14 | Chemically competent is sufficient; no colony is picked either way |
-| *E. coli*, electrocompetent **[⚠]** | 4.2 | The `inputs:` block says electrocompetent; the transformation step describes an on-deck heat shock. One of the two is wrong |
+| *E. coli*, chemically competent | 4.2 | Was listed as electrocompetent; corrected 2026-11-23 — the transformation is an on-deck heat shock and the device set has no electroporator |
 | *E. coli* BL21 Rosetta 2 ΔRecBCD, homemade S30 extract **[to build]** | CF2H | The RecBCD deletion is what lets linear DNA survive, so no GamS is needed in any reaction |
 | Lysate-based cell-free expression kit, **two lots** | 4.3, 4.13, CF2H (fallback) | Lot is a factor in the 4.3 design matrix, not a constant — two lots are a requirement, not a convenience |
 | PURE reconstituted cell-free system | 4.3, 4.13 | The alternative to lysate. Linear template needs no GamS in PURE |
@@ -223,13 +223,11 @@ protocol cannot run until they exist.
 Every compound and crystallisation line in this inventory is contingent on
 that.
 
-## Flagged inconsistency
+## Flagged inconsistency — resolved
 
-**4.2 — electrocompetent cells against an on-deck heat shock.** The
-`inputs:` block specifies electrocompetent *E. coli*; the transformation
-step specifies the pulse as a plate move between the Bravo's two
-temperature-controlled nests, which is heat shock and does not work on
-electrocompetent cells. Both readings are carried in `4.2.md` rather than
-one being silently chosen. Whichever is right changes the cell line item in
-group 1 and may add an electroporation consumable that is not currently in
-this list.
+**4.2 — electrocompetent cells against an on-deck heat shock.** Resolved
+2026-11-23: the cells are **chemically competent**. The device set contains
+no electroporator, so electrocompetent cells could not be transformed on
+this system at all, and 4.14 names chemically competent cells for the same
+45-second pulse. `_data/protocols.yml` was corrected and group 1 above now
+reads chemically competent. No electroporation consumable is needed.

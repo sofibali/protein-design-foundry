@@ -676,7 +676,7 @@ workflows:
     gives: a library in liquid culture, never plated for colonies
     scale: one pool per run
     time: overnight
-    input: "One oligo pool, a linearised backbone and electrocompetent cells"
+    input: "One oligo pool, a linearised backbone and chemically competent cells"
     output: "The library in liquid culture, plus the sequencing read that says what is in it"
     cost: {bravo: 24, echo: 6, reader: 0, binds: Cytomat — the outgrowth occupies a shaking position for the night}
     gates: []
@@ -744,7 +744,12 @@ workflows:
       - item: SPRI beads
         spec: "0.8x drops anything under ~200 bp. The only size selection the deck has"
       - item: Competent cells + recovery medium
-        spec: "electrocompetent; outgrown as a pool, never plated. Delivered cold on the day; the coldest position on the system is the 4 C SteriStore"
+        # Corrected 2026-11-23: this said electrocompetent, which contradicted the
+        # transformation step below. That step is 4.14, a 45-second heat shock
+        # between the Bravo's 4 C and 42 C nests, and heat shock does not work on
+        # electrocompetent cells. There is no electroporator in the device set, so
+        # the step was right and the input was wrong. Matches 4.14's own input.
+        spec: "chemically competent, as 4.14; outgrown as a pool, never plated. Delivered cold on the day; the coldest position on the system is the 4 C SteriStore"
     ends: sequencing, to find out what is actually in the pool
     blocked: NGS path undecided — in-lab Nanopore or a campus core
     note: >
