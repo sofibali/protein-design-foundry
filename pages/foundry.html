@@ -87,7 +87,10 @@
      to find, to compare against anything, or to keep current. Prose carries
      the meaning and the table carries the digits, and neither repeats the
      other. */
-  .tscroll{overflow-x:auto;margin:4px 0 0;min-width:0}
+  /* Capped rather than full-bleed: a label on the left of a 1100px row and
+     its figure on the right is a table you have to track across with a
+     finger. The cap is what makes the pair readable as a pair. */
+  .tscroll{overflow-x:auto;margin:4px 0 0;min-width:0;max-width:620px}
   table.cmp{border-collapse:collapse;font-size:13.5px;min-width:100%}
   table.cmp th,table.cmp td{padding:8px 16px 8px 0;text-align:left;
        border-bottom:1px solid var(--rule)}
@@ -98,8 +101,8 @@
        font-variant-numeric:tabular-nums}
   table.cmp td.num{font-size:17px;font-weight:500;letter-spacing:-.02em}
 
-  dl.kv{display:grid;grid-template-columns:auto 1fr;gap:7px 18px;font-size:13.5px;
-        margin:4px 0 0}
+  dl.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:7px 18px;
+        font-size:13.5px;margin:4px 0 0;max-width:860px}
   dl.kv dt{color:var(--muted);font-size:11px;text-transform:uppercase;
        letter-spacing:.07em;padding-top:3px;white-space:nowrap}
   dl.kv dd{margin:0;line-height:1.5}
